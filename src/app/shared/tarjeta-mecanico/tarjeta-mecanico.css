@@ -1,0 +1,96 @@
+.tarjeta-mec {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 14px;
+  margin-bottom: 10px;
+  border: 1px solid var(--cafe-200);
+  border-radius: var(--radio);
+  background: var(--superficie);
+  box-shadow: var(--sombra);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--transicion), box-shadow var(--transicion),
+    transform var(--transicion);
+}
+
+.tarjeta-mec:hover {
+  border-color: var(--ambar-300);
+  box-shadow: var(--sombra-alta);
+}
+
+.tarjeta-mec:active {
+  transform: scale(0.99);
+}
+
+.tarjeta-mec__avatar {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: var(--ambar-100);
+  color: var(--ambar-600);
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.tarjeta-mec__info {
+  flex: 1;
+  min-width: 0;
+}
+
+.tarjeta-mec__fila {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 2px;
+}
+
+.tarjeta-mec__nombre {
+  font-weight: 600;
+  color: var(--cafe-900);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.tarjeta-mec__especialidades {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+  text-transform: capitalize;
+  margin-bottom: 4px;
+}
+
+.tarjeta-mec__datos {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 0.8rem;
+  color: var(--cafe-700);
+}
+
+.tarjeta-mec__dato {
+  white-space: nowrap;
+}
+
+.tarjeta-mec__tarifa {
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+
+.tarjeta-mec__monto {
+  font-weight: 700;
+  color: var(--cafe-900);
+}
+
+.tarjeta-mec__desde {
+  font-size: 0.7rem;
+  color: var(--texto-suave);
+}

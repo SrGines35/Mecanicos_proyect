@@ -1,0 +1,103 @@
+.filtros {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  padding-bottom: 10px;
+  margin: 0 -20px 4px;
+  padding-left: 20px;
+  padding-right: 20px;
+  scrollbar-width: none;
+}
+
+.filtros::-webkit-scrollbar {
+  display: none;
+}
+
+.chip {
+  flex-shrink: 0;
+  padding: 7px 14px;
+  border: 1px solid var(--cafe-200);
+  border-radius: 999px;
+  background: var(--superficie);
+  color: var(--cafe-700);
+  font-family: inherit;
+  font-size: 0.82rem;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: background var(--transicion), border-color var(--transicion);
+}
+
+.chip:hover {
+  border-color: var(--ambar-300);
+}
+
+.chip--activo {
+  background: var(--cafe-900);
+  border-color: var(--cafe-900);
+  color: var(--ambar-300);
+  font-weight: 600;
+}
+
+.barra {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+
+.alternar {
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--ambar-600);
+  font-family: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: pointer;
+}
+
+.resumen {
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  color: var(--texto-suave);
+}
+
+.estado {
+  padding: 48px 20px;
+  text-align: center;
+}
+
+.estado__icono {
+  display: block;
+  font-size: 2.2rem;
+  margin-bottom: 10px;
+}
+
+.estado .boton {
+  margin-top: 14px;
+}
+
+.cargador {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 14px;
+  border: 3px solid var(--cafe-200);
+  border-top-color: var(--ambar-500);
+  border-radius: 50%;
+  animation: girar 800ms linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.boton-flotante {
+  position: sticky;
+  bottom: 16px;
+  margin-top: 16px;
+  box-shadow: var(--sombra-alta);
+}

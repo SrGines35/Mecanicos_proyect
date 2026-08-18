@@ -1,0 +1,51 @@
+<app-encabezado titulo="Seguimiento del servicio" />
+
+@if (mecanico(); as m) {
+  <div class="tarjeta mecanico-asignado">
+    <div class="mecanico-asignado__info">
+      <span class="mecanico-asignado__nombre">{{ m.nombre }}</span>
+      <span class="texto-suave">{{ m.telefono }}</span>
+    </div>
+    <a class="boton boton--secundario boton--chico" [href]="'tel:' + m.telefono">Llamar</a>
+  </div>
+}
+
+<div class="progreso">
+  @for (paso of pasos; track paso.estado; let i = $index) {
+    <div class="paso" [class.paso--activo]="i <= indicePaso()">
+      <div class="paso__marca">
+        @if (i < indicePaso()) {
+          ✓
+        } @else {
+          {{ i + 1 }}
+        }
+      </div>
+      <div class="paso__texto">
+        <span class="paso__titulo">{{ paso.titulo }}</span>
+        <span class="paso__detalle">{{ paso.detalle }}</span>
+      </div>
+    </div>
+  }
+</div>
+
+@if (solicitud(); as s) {
+  <div class="tarjeta bloque">
+    <h2 class="bloque__titulo">Resumen</h2>
+    <p class="texto-suave"><strong>Folio:</strong> {{ s.id }}</p>
+    <p class="texto-suave"><strong>Vehiculo:</strong> {{ s.vehiculo }}</p>
+    <p class="texto-suave"><strong>Problema:</strong> {{ s.descripcionProblema }}</p>
+    <p class="texto-suave"><strong>Direccion:</strong> {{ s.ubicacion.direccion }}</p>
+    <p class="texto-suave"><strong>Costo estimado:</strong> ${{ s.costoEstimado }} MXN</p>
+  </div>
+}
+
+@if (terminado()) {
+  <button class="boton boton--primario" type="button" (click)="volverAlInicio()">
+    Volver al inicio
+  </button>
+}
+
+<p class="texto-suave aviso-demo">
+  Nota: el avance de los pasos esta simulado. Cuando el back este listo, aqui se
+  conectara el estado real del servicio.
+</p>
