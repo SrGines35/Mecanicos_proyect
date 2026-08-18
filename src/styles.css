@@ -1,18 +1,37 @@
 /* =========================================================
    Estilos base de Oaxicanicos
-   Paleta: negro / rojo intenso, texto blanco (estilo automotriz)
+   Paleta: negro / ambar (color de herramienta y señalizacion).
+   El rojo se reserva UNICAMENTE para errores, para que cuando
+   algo este mal el usuario lo distinga de la marca.
    ========================================================= */
 
 :root {
-  --negro: #050505;
-  --superficie: #161616;
-  --superficie-alta: #1f1f1f;
+  /* Fondos */
+  --negro: #0a0a0b;
+  --superficie: #151517;
+  --superficie-alta: #1e1e22;
+
+  /* Bordes */
   --borde: rgba(255, 255, 255, 0.08);
-  --rojo: #e2231a;
-  --rojo-claro: #ff4d3d;
-  --rojo-oscuro: #9c1811;
-  --blanco: #ffffff;
-  --gris: #a3a3a3;
+  --borde-fuerte: rgba(255, 255, 255, 0.16);
+
+  /* Marca */
+  --ambar: #f0951f;
+  --ambar-claro: #fbbf3c;
+  --ambar-oscuro: #b96a08;
+  --ambar-tenue: rgba(240, 149, 31, 0.12);
+
+  /* Texto */
+  --blanco: #f4f4f5;
+  --gris: #9b9ba3;
+  --gris-tenue: #6b6b73;
+
+  /* Estados */
+  --error: #ff6b5e;
+  --error-tenue: rgba(255, 107, 94, 0.1);
+  --exito: #4ade80;
+
+  --transicion: 180ms ease;
 }
 
 * {
@@ -50,11 +69,17 @@ p {
 }
 
 a {
-  color: var(--rojo-claro);
+  color: var(--ambar-claro);
   text-decoration: none;
 }
 
-/* ---------- Autenticación (login / registro) ---------- */
+a:hover {
+  text-decoration: underline;
+}
+
+/* =========================================================
+   Autenticacion (login / registro)
+   ========================================================= */
 
 .auth-pagina {
   min-height: 100vh;
@@ -62,110 +87,167 @@ a {
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 24px;
+  padding: 32px 20px;
   background:
-    radial-gradient(circle at 50% 0%, rgba(226, 35, 26, 0.22), transparent 55%),
-    linear-gradient(180deg, #000000 0%, #0d0d0d 100%);
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(240, 149, 31, 0.13), transparent 70%),
+    linear-gradient(180deg, #0a0a0b 0%, #101012 100%);
 }
 
 .auth-tarjeta {
   width: 100%;
-  max-width: 380px;
+  max-width: 400px;
   background: var(--superficie);
   border: 1px solid var(--borde);
-  border-radius: 24px;
-  padding: 40px 32px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+  border-radius: 20px;
+  padding: 36px 30px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
 }
+
+.auth-tarjeta--ancha {
+  max-width: 460px;
+}
+
+/* ---------- Marca ---------- */
 
 .auth-marca {
   text-align: center;
-  margin-bottom: 32px;
+  margin-bottom: 28px;
 }
 
-.auth-marca__icono {
-  display: inline-block;
-  font-size: 2rem;
-  margin-bottom: 8px;
+.auth-marca__insignia {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 14px;
+  border-radius: 15px;
+  background: var(--ambar-tenue);
+  border: 1px solid rgba(240, 149, 31, 0.28);
+  color: var(--ambar);
+}
+
+.auth-marca__insignia svg {
+  width: 26px;
+  height: 26px;
 }
 
 .auth-marca h1 {
-  margin: 0 0 4px;
-  font-size: 1.75rem;
+  margin: 0 0 5px;
+  font-size: 1.6rem;
   font-weight: 800;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+}
+
+.auth-marca h1 span {
+  color: var(--ambar);
 }
 
 .auth-subtitulo {
   margin: 0;
   color: var(--gris);
-  font-size: 0.9rem;
+  font-size: 0.88rem;
 }
 
-.auth-formulario .campo {
-  margin-bottom: 20px;
+/* ---------- Campos ---------- */
+
+.campo {
+  margin-bottom: 18px;
 }
 
-.auth-formulario label {
+.campo label,
+.campo-label {
   display: block;
-  margin-bottom: 6px;
-  font-size: 0.85rem;
+  margin-bottom: 7px;
+  font-size: 0.82rem;
   font-weight: 600;
   color: var(--gris);
+  letter-spacing: 0.01em;
 }
 
-.auth-formulario input {
+.campo input,
+.campo select,
+.campo textarea {
   width: 100%;
   padding: 12px 14px;
   border: 1px solid var(--borde);
-  border-radius: 10px;
+  border-radius: 11px;
   background: var(--superficie-alta);
   color: var(--blanco);
   font-family: inherit;
   font-size: 1rem;
-  transition: border-color 180ms ease;
+  transition: border-color var(--transicion), background var(--transicion);
 }
 
-.auth-formulario input::placeholder {
-  color: rgba(255, 255, 255, 0.3);
+.campo input::placeholder,
+.campo textarea::placeholder {
+  color: var(--gris-tenue);
 }
 
-.auth-formulario input:focus {
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
   outline: none;
-  border-color: var(--rojo);
+  border-color: var(--ambar);
+  background: #232329;
 }
 
-.campo {
-  margin-bottom: 20px;
+/* Solo se pinta de rojo cuando el campo YA se toco y esta mal */
+.campo input.ng-invalid.ng-touched,
+.campo select.ng-invalid.ng-touched {
+  border-color: var(--error);
+}
+
+.campo textarea {
+  min-height: 78px;
+  resize: vertical;
+}
+
+.campo__ayuda {
+  margin: 7px 0 0;
+  font-size: 0.76rem;
+  color: var(--gris-tenue);
 }
 
 .campo__error {
-  margin: 6px 0 0;
-  font-size: 0.8rem;
-  color: var(--rojo-claro);
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 7px 0 0;
+  font-size: 0.78rem;
+  color: var(--error);
 }
 
-.campo-label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--gris);
+.campo__error::before {
+  content: '!';
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--error-tenue);
+  font-size: 0.65rem;
+  font-weight: 700;
 }
+
+/* ---------- Contraseña con ojito ---------- */
 
 .campo-contrasena {
   position: relative;
 }
 
 .campo-contrasena input {
-  padding-right: 44px;
+  padding-right: 46px;
 }
 
 .boton-ojo {
   position: absolute;
   top: 50%;
-  right: 6px;
+  right: 7px;
   transform: translateY(-50%);
   display: flex;
   align-items: center;
@@ -173,66 +255,145 @@ a {
   width: 32px;
   height: 32px;
   border: none;
-  background: transparent;
-  color: var(--gris);
-  cursor: pointer;
   border-radius: 8px;
-  transition: color 180ms ease;
+  background: transparent;
+  color: var(--gris-tenue);
+  cursor: pointer;
+  transition: color var(--transicion), background var(--transicion);
 }
 
 .boton-ojo svg {
-  width: 20px;
-  height: 20px;
+  width: 19px;
+  height: 19px;
 }
 
 .boton-ojo:hover {
-  color: var(--blanco);
+  color: var(--ambar);
+  background: rgba(255, 255, 255, 0.05);
 }
+
+/* ---------- Selector de rol ---------- */
 
 .segmentado {
   display: flex;
+  gap: 4px;
+  padding: 4px;
   border: 1px solid var(--borde);
-  border-radius: 999px;
-  overflow: hidden;
+  border-radius: 13px;
   background: var(--superficie-alta);
 }
 
 .segmentado__opcion {
   flex: 1;
-  padding: 12px 14px;
+  padding: 11px 12px;
   border: none;
+  border-radius: 9px;
   background: transparent;
   color: var(--gris);
   font-family: inherit;
-  font-size: 1rem;
+  font-size: 0.95rem;
   font-weight: 600;
   cursor: pointer;
-  transition: background 180ms ease, color 180ms ease;
+  transition: background var(--transicion), color var(--transicion);
+}
+
+.segmentado__opcion:hover:not(.activo) {
+  color: var(--blanco);
+  background: rgba(255, 255, 255, 0.04);
 }
 
 .segmentado__opcion.activo {
-  background: var(--rojo);
+  background: var(--ambar);
+  color: #1a1200;
+}
+
+/* ---------- Bloque de campos del mecanico ---------- */
+
+.bloque-mecanico {
+  padding: 18px 16px 4px;
+  margin-bottom: 18px;
+  border: 1px solid rgba(240, 149, 31, 0.22);
+  border-radius: 14px;
+  background: rgba(240, 149, 31, 0.05);
+}
+
+.bloque-mecanico__titulo {
+  margin: 0 0 14px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ambar);
+}
+
+.fila-doble {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* ---------- Especialidades (checkboxes tipo chip) ---------- */
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 13px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie-alta);
+  color: var(--gris);
+  font-size: 0.85rem;
+  cursor: pointer;
+  user-select: none;
+  transition: border-color var(--transicion), color var(--transicion),
+    background var(--transicion);
+}
+
+.chip:hover {
+  border-color: var(--borde-fuerte);
   color: var(--blanco);
 }
+
+.chip input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.chip--activo {
+  border-color: var(--ambar);
+  background: var(--ambar-tenue);
+  color: var(--ambar-claro);
+}
+
+/* ---------- Botones ---------- */
 
 .boton-primario {
   width: 100%;
   padding: 14px 20px;
-  margin-top: 8px;
+  margin-top: 6px;
   border: none;
-  border-radius: 999px;
-  background: linear-gradient(180deg, var(--rojo-claro) 0%, var(--rojo) 100%);
-  color: var(--blanco);
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--ambar-claro) 0%, var(--ambar) 100%);
+  color: #1a1200;
   font-family: inherit;
   font-size: 1rem;
   font-weight: 700;
-  letter-spacing: 0.02em;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: filter 180ms ease, transform 180ms ease;
+  transition: filter var(--transicion), transform var(--transicion);
 }
 
 .boton-primario:hover:not(:disabled) {
-  filter: brightness(1.1);
+  filter: brightness(1.08);
 }
 
 .boton-primario:active:not(:disabled) {
@@ -240,26 +401,73 @@ a {
 }
 
 .boton-primario:disabled {
-  background: var(--superficie-alta);
-  color: var(--gris);
-  opacity: 1;
+  filter: grayscale(0.6) brightness(0.7);
   cursor: not-allowed;
 }
 
-.auth-mensaje {
-  margin: 16px 0 0;
-  text-align: center;
-  font-size: 0.85rem;
-  color: var(--rojo-claro);
+/* ---------- Mensajes ---------- */
+
+.auth-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 12px 14px;
+  margin: 0 0 18px;
+  border-radius: 11px;
+  font-size: 0.84rem;
+}
+
+.auth-aviso--error {
+  border: 1px solid rgba(255, 107, 94, 0.3);
+  background: var(--error-tenue);
+  color: var(--error);
+}
+
+.auth-aviso--exito {
+  border: 1px solid rgba(74, 222, 128, 0.28);
+  background: rgba(74, 222, 128, 0.08);
+  color: var(--exito);
 }
 
 .auth-alt {
-  margin: 16px 0 0;
+  margin: 18px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--borde);
   text-align: center;
-  font-size: 0.85rem;
+  font-size: 0.86rem;
   color: var(--gris);
 }
 
 .auth-alt a {
   font-weight: 600;
+}
+
+/* ---------- Utilidades ---------- */
+
+.cargador {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 8px;
+  border: 2px solid rgba(26, 18, 0, 0.3);
+  border-top-color: #1a1200;
+  border-radius: 50%;
+  vertical-align: -2px;
+  animation: girar 700ms linear infinite;
+}
+
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 420px) {
+  .auth-tarjeta {
+    padding: 28px 20px;
+  }
+
+  .fila-doble {
+    grid-template-columns: 1fr;
+  }
 }
