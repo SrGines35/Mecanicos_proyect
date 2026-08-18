@@ -11,6 +11,11 @@ export const routes: Routes = [
     loadComponent: () => import('./features/inicio/inicio').then((m) => m.Inicio),
     title: 'MecaGo - Inicio',
   },
+  {
+    path: 'solicitar',
+    loadComponent: () => import('./features/solicitar/solicitar').then((m) => m.Solicitar),
+    title: 'Solicitar mecanico',
+  },
   // Cualquier ruta que no exista regresa al inicio
   { path: '**', redirectTo: '' },
 ];
