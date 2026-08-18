@@ -1,0 +1,112 @@
+.mecanico-asignado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.mecanico-asignado__info {
+  display: flex;
+  flex-direction: column;
+}
+
+.mecanico-asignado__nombre {
+  font-weight: 600;
+  color: var(--cafe-900);
+}
+
+.boton--chico {
+  width: auto;
+  padding: 8px 16px;
+  font-size: 0.85rem;
+  text-decoration: none;
+}
+
+.progreso {
+  position: relative;
+  margin-bottom: 20px;
+  padding-left: 4px;
+}
+
+.paso {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding-bottom: 22px;
+  position: relative;
+}
+
+.paso:not(:last-child)::before {
+  content: '';
+  position: absolute;
+  left: 15px;
+  top: 32px;
+  bottom: 0;
+  width: 2px;
+  background: var(--cafe-200);
+}
+
+.paso--activo:not(:last-child)::before {
+  background: var(--ambar-300);
+}
+
+.paso__marca {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--superficie-suave);
+  color: var(--gris);
+  font-size: 0.85rem;
+  font-weight: 700;
+  z-index: 1;
+  transition: background 200ms ease, color 200ms ease;
+}
+
+.paso--activo .paso__marca {
+  background: var(--ambar-500);
+  color: #fff;
+}
+
+.paso__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 4px;
+}
+
+.paso__titulo {
+  font-weight: 600;
+  color: var(--gris);
+}
+
+.paso--activo .paso__titulo {
+  color: var(--cafe-900);
+}
+
+.paso__detalle {
+  font-size: 0.82rem;
+  color: var(--texto-suave);
+}
+
+.bloque {
+  margin-bottom: 16px;
+}
+
+.bloque__titulo {
+  margin-bottom: 8px;
+  font-size: 0.95rem;
+}
+
+.aviso-demo {
+  margin-top: 18px;
+  padding: 10px 12px;
+  border-radius: var(--radio-chico);
+  background: var(--ambar-100);
+  color: var(--ambar-600);
+  font-size: 0.78rem;
+}

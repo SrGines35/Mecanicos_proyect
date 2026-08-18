@@ -28,6 +28,11 @@ export const routes: Routes = [
       import('./features/detalle-mecanico/detalle-mecanico').then((m) => m.DetalleMecanico),
     title: 'Detalle del mecanico',
   },
+  {
+    path: 'seguimiento/:id',
+    loadComponent: () => import('./features/seguimiento/seguimiento').then((m) => m.Seguimiento),
+    title: 'Seguimiento del servicio',
+  },
   // Cualquier ruta que no exista regresa al inicio
   { path: '**', redirectTo: '' },
 ];
