@@ -16,6 +16,12 @@ export const routes: Routes = [
     loadComponent: () => import('./features/solicitar/solicitar').then((m) => m.Solicitar),
     title: 'Solicitar mecanico',
   },
+  {
+    path: 'mecanicos',
+    loadComponent: () =>
+      import('./features/mecanicos-cercanos/mecanicos-cercanos').then((m) => m.MecanicosCercanos),
+    title: 'Mecanicos cerca de ti',
+  },
   // Cualquier ruta que no exista regresa al inicio
   { path: '**', redirectTo: '' },
 ];
