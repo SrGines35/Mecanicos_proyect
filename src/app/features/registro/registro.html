@@ -1,144 +1,229 @@
 <div class="auth-pagina">
-  <div class="auth-tarjeta">
+  <div class="auth-tarjeta auth-tarjeta--ancha">
     <div class="auth-marca">
-      <span class="auth-marca__icono">🔧</span>
-      <h1>Oaxicanicos</h1>
+      <app-logo />
+      <h1>Oaxi<span>canicos</span></h1>
       <p class="auth-subtitulo">Crea tu cuenta</p>
     </div>
 
-    <form class="auth-formulario" (ngSubmit)="registrar()" #formulario="ngForm">
-      <div class="campo">
-        <label for="nombre">Nombre</label>
-        <input
-          id="nombre"
-          name="nombre"
-          type="text"
-          autocomplete="name"
-          placeholder="Tu nombre completo"
-          required
-          [pattern]="patronNombre"
-          [ngModel]="nombre"
-          (ngModelChange)="onNombreChange($event)"
-          #nombreInput="ngModel"
-        />
-        @if (nombreInput.invalid && nombreInput.touched) {
-          <p class="campo__error">Solo letras, entre 4 y 14 caracteres</p>
-        }
+    @if (sesion(); as usuario) {
+      <!-- Registro completado -->
+      <div class="auth-aviso auth-aviso--exito">
+        <span>
+          Listo, <strong>{{ usuario.nombre }}</strong>. Tu cuenta de
+          <strong>{{ usuario.rol }}</strong> quedó creada con el correo
+          {{ usuario.correo }}.
+        </span>
       </div>
 
-      <div class="campo">
-        <label for="correo">Correo</label>
-        <input
-          id="correo"
-          name="correo"
-          type="email"
-          autocomplete="email"
-          placeholder="tucorreo@ejemplo.com"
-          required
-          [pattern]="patronCorreo"
-          [ngModel]="correo"
-          (ngModelChange)="onCorreoChange($event)"
-          #correoInput="ngModel"
-        />
-        @if (correoInput.invalid && correoInput.touched) {
-          <p class="campo__error">Ingrese un correo válido</p>
-        }
-      </div>
-
-      <div class="campo">
-        <label for="telefono">Teléfono</label>
-        <input
-          id="telefono"
-          name="telefono"
-          type="tel"
-          inputmode="numeric"
-          autocomplete="tel"
-          placeholder="Tu número de teléfono"
-          required
-          pattern="^[0-9]{10,10}$"
-          maxlength="15"
-          [ngModel]="telefono"
-          (ngModelChange)="onTelefonoChange($event)"
-          #telefonoInput="ngModel"
-        />
-        @if (telefonoInput.invalid && telefonoInput.touched) {
-          <p class="campo__error">Ingresa un número de teléfono válido (10 dígitos)</p>
-        }
-      </div>
-
-      <div class="campo">
-        <label for="contrasena">Contraseña</label>
-        <div class="campo-contrasena">
-          <input
-            id="contrasena"
-            name="contrasena"
-            [type]="mostrarContrasena() ? 'text' : 'password'"
-            autocomplete="new-password"
-            placeholder="••••••••"
-            required
-            [pattern]="patronContrasena"
-            [(ngModel)]="contrasena"
-            #contrasenaInput="ngModel"
-          />
-          <app-icono-ojo [visible]="mostrarContrasena()" (alternar)="alternarContrasena()" />
+      <p class="auth-alt">Ya puedes <a routerLink="/">iniciar sesión</a></p>
+    } @else {
+      @if (errorServidor(); as mensaje) {
+        <div class="auth-aviso auth-aviso--error">
+          <span>{{ mensaje }}</span>
         </div>
-        @if (contrasenaInput.invalid && contrasenaInput.touched) {
-          <p class="campo__error">Mínimo 6 caracteres, con un número y un carácter especial</p>
-        }
-      </div>
-
-      <div class="campo">
-        <label for="confirmarContrasena">Confirmar contraseña</label>
-        <input
-          id="confirmarContrasena"
-          name="confirmarContrasena"
-          type="password"
-          autocomplete="new-password"
-          placeholder="••••••••"
-          required
-          [(ngModel)]="confirmarContrasena"
-          #confirmarInput="ngModel"
-        />
-        @if (confirmarInput.dirty && !contrasenasCoinciden) {
-          <p class="campo__error">Las contraseñas no coinciden</p>
-        }
-      </div>
-
-      <div class="campo">
-        <span class="campo-label">Registrarme como</span>
-        <div class="segmentado" role="tablist">
-          <button
-            type="button"
-            class="segmentado__opcion"
-            role="tab"
-            [class.activo]="rol() === 'usuario'"
-            [attr.aria-selected]="rol() === 'usuario'"
-            (click)="seleccionarRol('usuario')"
-          >
-            Usuario
-          </button>
-          <button
-            type="button"
-            class="segmentado__opcion"
-            role="tab"
-            [class.activo]="rol() === 'mecanico'"
-            [attr.aria-selected]="rol() === 'mecanico'"
-            (click)="seleccionarRol('mecanico')"
-          >
-            Mecánico
-          </button>
-        </div>
-      </div>
-
-      <button type="submit" class="boton-primario" [disabled]="formulario.invalid || !contrasenasCoinciden">
-        Crear cuenta
-      </button>
-
-      @if (enviado()) {
-        <p class="auth-mensaje">Cuenta creada como {{ rol() }}: {{ correo }}</p>
       }
 
+      <form [formGroup]="formulario" (ngSubmit)="registrar()" novalidate>
+        <!-- ¿Quién se registra? Va primero porque cambia el resto del formulario -->
+        <div class="campo">
+          <span class="campo-label" id="etiqueta-rol">Registrarme como</span>
+          <div class="segmentado" role="radiogroup" aria-labelledby="etiqueta-rol">
+            <button
+              type="button"
+              class="segmentado__opcion"
+              role="radio"
+              [class.activo]="!esMecanico"
+              [attr.aria-checked]="!esMecanico"
+              (click)="seleccionarRol('usuario')"
+            >
+              Usuario
+            </button>
+            <button
+              type="button"
+              class="segmentado__opcion"
+              role="radio"
+              [class.activo]="esMecanico"
+              [attr.aria-checked]="esMecanico"
+              (click)="seleccionarRol('mecanico')"
+            >
+              Mecánico
+            </button>
+          </div>
+          <p class="campo__ayuda">
+            @if (esMecanico) {
+              Los mecánicos reciben solicitudes de servicio.
+            } @else {
+              Los usuarios piden mecánicos a domicilio.
+            }
+          </p>
+        </div>
+
+        <div class="campo">
+          <label for="nombre">Nombre completo</label>
+          <input
+            id="nombre"
+            type="text"
+            formControlName="nombre"
+            autocomplete="name"
+            placeholder="Ej. Ana Cruz Vásquez"
+          />
+          @if (mostrarError('nombre')) {
+            <p class="campo__error">Escribe tu nombre completo, solo letras (mínimo 3 letras)</p>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="correo">Correo</label>
+          <input
+            id="correo"
+            type="email"
+            formControlName="correo"
+            autocomplete="email"
+            placeholder="tucorreo@ejemplo.com"
+          />
+          @if (mostrarError('correo')) {
+            <p class="campo__error">Escribe un correo válido, por ejemplo ana&#64;correo.com</p>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="telefono">Teléfono</label>
+          <input
+            id="telefono"
+            type="tel"
+            inputmode="numeric"
+            formControlName="telefono"
+            appSoloNumeros
+            [maxDigitos]="10"
+            autocomplete="tel"
+            placeholder="9511234567"
+          />
+          @if (mostrarError('telefono')) {
+            <p class="campo__error">El teléfono debe tener 10 dígitos</p>
+          } @else {
+            <p class="campo__ayuda">Solo números, 10 dígitos. Las letras no se pueden escribir.</p>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="contrasena">Contraseña</label>
+          <div class="campo-contrasena">
+            <input
+              id="contrasena"
+              [type]="mostrarContrasena() ? 'text' : 'password'"
+              formControlName="contrasena"
+              autocomplete="new-password"
+              placeholder="Mínimo 8 caracteres"
+            />
+            <app-icono-ojo [visible]="mostrarContrasena()" (alternar)="alternarContrasena()" />
+          </div>
+          @if (mostrarError('contrasena')) {
+            <p class="campo__error">
+              La contraseña necesita al menos 8 caracteres, una letra y un número
+            </p>
+          } @else {
+            <p class="campo__ayuda">Al menos 8 caracteres, una letra y un número.</p>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="confirmarContrasena">Confirmar contraseña</label>
+          <input
+            id="confirmarContrasena"
+            type="password"
+            formControlName="confirmarContrasena"
+            autocomplete="new-password"
+            placeholder="Repite tu contraseña"
+          />
+          @if (noCoinciden) {
+            <p class="campo__error">Las dos contraseñas no son iguales</p>
+          }
+        </div>
+
+        <!-- Solo para mecánicos -->
+        @if (esMecanico) {
+          <div class="bloque-mecanico">
+            <h2 class="bloque-mecanico__titulo">Datos de tu servicio</h2>
+
+            <div class="campo">
+              <span class="campo-label">¿Qué servicios das?</span>
+              <div class="chips">
+                @for (especialidad of especialidades; track especialidad.valor) {
+                  <label class="chip" [class.chip--activo]="estaMarcada(especialidad.valor)">
+                    <input
+                      type="checkbox"
+                      [checked]="estaMarcada(especialidad.valor)"
+                      (change)="alternarEspecialidad(especialidad.valor)"
+                    />
+                    {{ especialidad.nombre }}
+                  </label>
+                }
+              </div>
+              @if (mostrarError('especialidades')) {
+                <p class="campo__error">Marca al menos un servicio</p>
+              }
+            </div>
+
+            <div class="fila-doble">
+              <div class="campo">
+                <label for="experiencia">Años de experiencia</label>
+                <input
+                  id="experiencia"
+                  type="tel"
+                  inputmode="numeric"
+                  formControlName="experiencia"
+                  appSoloNumeros
+                  [maxDigitos]="2"
+                  placeholder="5"
+                />
+                @if (mostrarError('experiencia')) {
+                  <p class="campo__error">Pon un número entre 0 y 60</p>
+                }
+              </div>
+
+              <div class="campo">
+                <label for="tarifaBase">Tarifa base (MXN)</label>
+                <input
+                  id="tarifaBase"
+                  type="tel"
+                  inputmode="numeric"
+                  formControlName="tarifaBase"
+                  appSoloNumeros
+                  [maxDigitos]="5"
+                  placeholder="350"
+                />
+                @if (mostrarError('tarifaBase')) {
+                  <p class="campo__error">Pon cuánto cobras por la visita</p>
+                }
+              </div>
+            </div>
+
+            <div class="campo">
+              <label for="zonaTrabajo">¿En qué zona atiendes?</label>
+              <input
+                id="zonaTrabajo"
+                type="text"
+                formControlName="zonaTrabajo"
+                placeholder="Ej. Centro y Colonia Reforma, Oaxaca"
+              />
+              @if (mostrarError('zonaTrabajo')) {
+                <p class="campo__error">Escribe la colonia o zona donde das servicio</p>
+              }
+            </div>
+          </div>
+        }
+
+        <button type="submit" class="boton-primario" [disabled]="enviando()">
+          @if (enviando()) {
+            <span class="cargador"></span>Creando cuenta...
+          } @else {
+            Crear cuenta
+          }
+        </button>
+      </form>
+
       <p class="auth-alt">¿Ya tienes cuenta? <a routerLink="/">Inicia sesión</a></p>
-    </form>
+    }
   </div>
 </div>
