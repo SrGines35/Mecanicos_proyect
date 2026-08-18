@@ -1,0 +1,144 @@
+<div class="auth-pagina">
+  <div class="auth-tarjeta">
+    <div class="auth-marca">
+      <span class="auth-marca__icono">🔧</span>
+      <h1>Oaxicanicos</h1>
+      <p class="auth-subtitulo">Crea tu cuenta</p>
+    </div>
+
+    <form class="auth-formulario" (ngSubmit)="registrar()" #formulario="ngForm">
+      <div class="campo">
+        <label for="nombre">Nombre</label>
+        <input
+          id="nombre"
+          name="nombre"
+          type="text"
+          autocomplete="name"
+          placeholder="Tu nombre completo"
+          required
+          [pattern]="patronNombre"
+          [ngModel]="nombre"
+          (ngModelChange)="onNombreChange($event)"
+          #nombreInput="ngModel"
+        />
+        @if (nombreInput.invalid && nombreInput.touched) {
+          <p class="campo__error">Solo letras, entre 4 y 14 caracteres</p>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="correo">Correo</label>
+        <input
+          id="correo"
+          name="correo"
+          type="email"
+          autocomplete="email"
+          placeholder="tucorreo@ejemplo.com"
+          required
+          [pattern]="patronCorreo"
+          [ngModel]="correo"
+          (ngModelChange)="onCorreoChange($event)"
+          #correoInput="ngModel"
+        />
+        @if (correoInput.invalid && correoInput.touched) {
+          <p class="campo__error">Ingrese un correo válido</p>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="telefono">Teléfono</label>
+        <input
+          id="telefono"
+          name="telefono"
+          type="tel"
+          inputmode="numeric"
+          autocomplete="tel"
+          placeholder="Tu número de teléfono"
+          required
+          pattern="^[0-9]{10,10}$"
+          maxlength="15"
+          [ngModel]="telefono"
+          (ngModelChange)="onTelefonoChange($event)"
+          #telefonoInput="ngModel"
+        />
+        @if (telefonoInput.invalid && telefonoInput.touched) {
+          <p class="campo__error">Ingresa un número de teléfono válido (10 dígitos)</p>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="contrasena">Contraseña</label>
+        <div class="campo-contrasena">
+          <input
+            id="contrasena"
+            name="contrasena"
+            [type]="mostrarContrasena() ? 'text' : 'password'"
+            autocomplete="new-password"
+            placeholder="••••••••"
+            required
+            [pattern]="patronContrasena"
+            [(ngModel)]="contrasena"
+            #contrasenaInput="ngModel"
+          />
+          <app-icono-ojo [visible]="mostrarContrasena()" (alternar)="alternarContrasena()" />
+        </div>
+        @if (contrasenaInput.invalid && contrasenaInput.touched) {
+          <p class="campo__error">Mínimo 6 caracteres, con un número y un carácter especial</p>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="confirmarContrasena">Confirmar contraseña</label>
+        <input
+          id="confirmarContrasena"
+          name="confirmarContrasena"
+          type="password"
+          autocomplete="new-password"
+          placeholder="••••••••"
+          required
+          [(ngModel)]="confirmarContrasena"
+          #confirmarInput="ngModel"
+        />
+        @if (confirmarInput.dirty && !contrasenasCoinciden) {
+          <p class="campo__error">Las contraseñas no coinciden</p>
+        }
+      </div>
+
+      <div class="campo">
+        <span class="campo-label">Registrarme como</span>
+        <div class="segmentado" role="tablist">
+          <button
+            type="button"
+            class="segmentado__opcion"
+            role="tab"
+            [class.activo]="rol() === 'usuario'"
+            [attr.aria-selected]="rol() === 'usuario'"
+            (click)="seleccionarRol('usuario')"
+          >
+            Usuario
+          </button>
+          <button
+            type="button"
+            class="segmentado__opcion"
+            role="tab"
+            [class.activo]="rol() === 'mecanico'"
+            [attr.aria-selected]="rol() === 'mecanico'"
+            (click)="seleccionarRol('mecanico')"
+          >
+            Mecánico
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="boton-primario" [disabled]="formulario.invalid || !contrasenasCoinciden">
+        Crear cuenta
+      </button>
+
+      @if (enviado()) {
+        <p class="auth-mensaje">Cuenta creada como {{ rol() }}: {{ correo }}</p>
+      }
+
+      <p class="auth-alt">¿Ya tienes cuenta? <a routerLink="/">Inicia sesión</a></p>
+    </form>
+  </div>
+</div>

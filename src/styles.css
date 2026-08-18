@@ -1,45 +1,18 @@
 /* =========================================================
-   Estilos base de MecaGo
-   Paleta en tonos cafe / ambar: se ve calida y "de taller"
-   sin caer en el naranja chillante.
+   Estilos base de Oaxicanicos
+   Paleta: negro / rojo intenso, texto blanco (estilo automotriz)
    ========================================================= */
 
 :root {
-  /* Fondos */
-  --fondo: #faf6f1;
-  --superficie: #ffffff;
-  --superficie-suave: #f3ebe2;
-
-  /* Cafes */
-  --cafe-900: #2a1c12;
-  --cafe-700: #4b3524;
-  --cafe-500: #7a5a3d;
-  --cafe-300: #b39a86;
-  --cafe-200: #e4d5c5;
-
-  /* Ambar (color de acento) */
-  --ambar-600: #b06a1c;
-  --ambar-500: #d1841f;
-  --ambar-300: #e9b96b;
-  --ambar-100: #f7e7cd;
-
-  /* Estados */
-  --verde: #4a7c59;
-  --verde-suave: #e3efe6;
-  --rojo: #a5453b;
-  --rojo-suave: #f6e3e1;
-  --gris: #8b8178;
-
-  /* Texto */
-  --texto: #2a1c12;
-  --texto-suave: #6f6259;
-
-  /* Otros */
-  --radio: 16px;
-  --radio-chico: 10px;
-  --sombra: 0 2px 8px rgba(42, 28, 18, 0.07);
-  --sombra-alta: 0 8px 24px rgba(42, 28, 18, 0.12);
-  --transicion: 180ms ease;
+  --negro: #050505;
+  --superficie: #161616;
+  --superficie-alta: #1f1f1f;
+  --borde: rgba(255, 255, 255, 0.08);
+  --rojo: #e2231a;
+  --rojo-claro: #ff4d3d;
+  --rojo-oscuro: #9c1811;
+  --blanco: #ffffff;
+  --gris: #a3a3a3;
 }
 
 * {
@@ -54,8 +27,8 @@ body {
 }
 
 body {
-  background: var(--fondo);
-  color: var(--texto);
+  background: var(--negro);
+  color: var(--blanco);
   font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
   font-size: 16px;
   line-height: 1.5;
@@ -69,15 +42,7 @@ h4 {
   margin: 0 0 0.4em;
   font-weight: 600;
   letter-spacing: -0.01em;
-  color: var(--cafe-900);
-}
-
-h1 {
-  font-size: 1.75rem;
-}
-
-h2 {
-  font-size: 1.3rem;
+  color: var(--blanco);
 }
 
 p {
@@ -85,158 +50,216 @@ p {
 }
 
 a {
-  color: var(--ambar-600);
+  color: var(--rojo-claro);
   text-decoration: none;
 }
 
-/* ---------- Contenedor tipo app movil ---------- */
+/* ---------- Autenticación (login / registro) ---------- */
 
-.contenedor {
+.auth-pagina {
+  min-height: 100vh;
   width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 0 20px 96px;
-}
-
-/* ---------- Botones ---------- */
-
-.boton {
-  display: inline-flex;
+  display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  padding: 24px;
+  background:
+    radial-gradient(circle at 50% 0%, rgba(226, 35, 26, 0.22), transparent 55%),
+    linear-gradient(180deg, #000000 0%, #0d0d0d 100%);
+}
+
+.auth-tarjeta {
   width: 100%;
-  padding: 14px 20px;
-  border: none;
-  border-radius: var(--radio-chico);
-  font-family: inherit;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background var(--transicion), transform var(--transicion);
-}
-
-.boton:active {
-  transform: scale(0.985);
-}
-
-.boton:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.boton--primario {
-  background: var(--ambar-500);
-  color: #fff;
-}
-
-.boton--primario:hover:not(:disabled) {
-  background: var(--ambar-600);
-}
-
-.boton--secundario {
-  background: var(--superficie-suave);
-  color: var(--cafe-700);
-}
-
-.boton--secundario:hover:not(:disabled) {
-  background: var(--cafe-200);
-}
-
-.boton--fantasma {
-  background: transparent;
-  color: var(--cafe-500);
-  border: 1px solid var(--cafe-200);
-}
-
-/* ---------- Tarjetas ---------- */
-
-.tarjeta {
+  max-width: 380px;
   background: var(--superficie);
-  border: 1px solid var(--cafe-200);
-  border-radius: var(--radio);
-  padding: 16px;
-  box-shadow: var(--sombra);
+  border: 1px solid var(--borde);
+  border-radius: 24px;
+  padding: 40px 32px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
 }
 
-/* ---------- Formularios ---------- */
-
-.campo {
-  margin-bottom: 16px;
+.auth-marca {
+  text-align: center;
+  margin-bottom: 32px;
 }
 
-.campo label {
+.auth-marca__icono {
+  display: inline-block;
+  font-size: 2rem;
+  margin-bottom: 8px;
+}
+
+.auth-marca h1 {
+  margin: 0 0 4px;
+  font-size: 1.75rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.auth-subtitulo {
+  margin: 0;
+  color: var(--gris);
+  font-size: 0.9rem;
+}
+
+.auth-formulario .campo {
+  margin-bottom: 20px;
+}
+
+.auth-formulario label {
   display: block;
   margin-bottom: 6px;
   font-size: 0.85rem;
   font-weight: 600;
-  color: var(--texto-suave);
-}
-
-.campo input,
-.campo textarea,
-.campo select {
-  width: 100%;
-  padding: 12px 14px;
-  border: 1px solid var(--cafe-200);
-  border-radius: var(--radio-chico);
-  background: var(--superficie);
-  font-family: inherit;
-  font-size: 1rem;
-  color: var(--texto);
-  transition: border-color var(--transicion);
-}
-
-.campo input:focus,
-.campo textarea:focus,
-.campo select:focus {
-  outline: none;
-  border-color: var(--ambar-500);
-}
-
-.campo textarea {
-  min-height: 96px;
-  resize: vertical;
-}
-
-.campo__error {
-  margin-top: 6px;
-  font-size: 0.8rem;
-  color: var(--rojo);
-}
-
-/* ---------- Etiquetas de estado ---------- */
-
-.etiqueta {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.etiqueta--disponible {
-  background: var(--verde-suave);
-  color: var(--verde);
-}
-
-.etiqueta--ocupado {
-  background: var(--ambar-100);
-  color: var(--ambar-600);
-}
-
-.etiqueta--desconectado {
-  background: var(--superficie-suave);
   color: var(--gris);
 }
 
-/* ---------- Utilidades ---------- */
-
-.texto-suave {
-  color: var(--texto-suave);
-  font-size: 0.9rem;
+.auth-formulario input {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--borde);
+  border-radius: 10px;
+  background: var(--superficie-alta);
+  color: var(--blanco);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color 180ms ease;
 }
 
-.centrado {
+.auth-formulario input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.auth-formulario input:focus {
+  outline: none;
+  border-color: var(--rojo);
+}
+
+.campo {
+  margin-bottom: 20px;
+}
+
+.campo__error {
+  margin: 6px 0 0;
+  font-size: 0.8rem;
+  color: var(--rojo-claro);
+}
+
+.campo-label {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gris);
+}
+
+.campo-contrasena {
+  position: relative;
+}
+
+.campo-contrasena input {
+  padding-right: 44px;
+}
+
+.boton-ojo {
+  position: absolute;
+  top: 50%;
+  right: 6px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  background: transparent;
+  color: var(--gris);
+  cursor: pointer;
+  border-radius: 8px;
+  transition: color 180ms ease;
+}
+
+.boton-ojo svg {
+  width: 20px;
+  height: 20px;
+}
+
+.boton-ojo:hover {
+  color: var(--blanco);
+}
+
+.segmentado {
+  display: flex;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  overflow: hidden;
+  background: var(--superficie-alta);
+}
+
+.segmentado__opcion {
+  flex: 1;
+  padding: 12px 14px;
+  border: none;
+  background: transparent;
+  color: var(--gris);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 180ms ease, color 180ms ease;
+}
+
+.segmentado__opcion.activo {
+  background: var(--rojo);
+  color: var(--blanco);
+}
+
+.boton-primario {
+  width: 100%;
+  padding: 14px 20px;
+  margin-top: 8px;
+  border: none;
+  border-radius: 999px;
+  background: linear-gradient(180deg, var(--rojo-claro) 0%, var(--rojo) 100%);
+  color: var(--blanco);
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: filter 180ms ease, transform 180ms ease;
+}
+
+.boton-primario:hover:not(:disabled) {
+  filter: brightness(1.1);
+}
+
+.boton-primario:active:not(:disabled) {
+  transform: scale(0.985);
+}
+
+.boton-primario:disabled {
+  background: var(--superficie-alta);
+  color: var(--gris);
+  opacity: 1;
+  cursor: not-allowed;
+}
+
+.auth-mensaje {
+  margin: 16px 0 0;
   text-align: center;
+  font-size: 0.85rem;
+  color: var(--rojo-claro);
+}
+
+.auth-alt {
+  margin: 16px 0 0;
+  text-align: center;
+  font-size: 0.85rem;
+  color: var(--gris);
+}
+
+.auth-alt a {
+  font-weight: 600;
 }

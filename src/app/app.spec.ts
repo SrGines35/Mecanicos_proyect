@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 
 import { App } from './app';
 import { routes } from './app.routes';
@@ -18,10 +18,11 @@ describe('App', () => {
     expect(app).toBeTruthy();
   });
 
-  it('debe renderizar el contenedor principal', async () => {
+  it('debe renderizar la pantalla de login', async () => {
     const fixture = TestBed.createComponent(App);
-    await fixture.whenStable();
+    await TestBed.inject(Router).navigateByUrl('/');
+    fixture.detectChanges();
     const compiled = fixture.nativeElement as HTMLElement;
-    expect(compiled.querySelector('main.contenedor')).toBeTruthy();
+    expect(compiled.querySelector('.auth-tarjeta')).toBeTruthy();
   });
 });
