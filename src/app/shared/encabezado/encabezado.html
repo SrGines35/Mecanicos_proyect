@@ -1,0 +1,14 @@
+<header class="encabezado">
+  @if (mostrarRegresar()) {
+    <button
+      class="encabezado__regresar"
+      type="button"
+      aria-label="Regresar"
+      (click)="regresar()"
+    >
+      &#8592;
+    </button>
+  }
+
+  <span class="encabezado__titulo">{{ titulo() }}</span>
+</header>
