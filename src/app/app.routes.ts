@@ -22,6 +22,12 @@ export const routes: Routes = [
       import('./features/mecanicos-cercanos/mecanicos-cercanos').then((m) => m.MecanicosCercanos),
     title: 'Mecanicos cerca de ti',
   },
+  {
+    path: 'mecanicos/:id',
+    loadComponent: () =>
+      import('./features/detalle-mecanico/detalle-mecanico').then((m) => m.DetalleMecanico),
+    title: 'Detalle del mecanico',
+  },
   // Cualquier ruta que no exista regresa al inicio
   { path: '**', redirectTo: '' },
 ];

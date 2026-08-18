@@ -1,0 +1,85 @@
+<app-encabezado titulo="Detalle del mecanico" [mostrarRegresar]="true" />
+
+@if (cargando()) {
+  <div class="estado">
+    <div class="cargador"></div>
+    <p class="texto-suave">Cargando informacion...</p>
+  </div>
+} @else if (!mecanico()) {
+  <div class="estado">
+    <span class="estado__icono">😕</span>
+    <h2>No encontramos a este mecanico</h2>
+    <button class="boton boton--secundario" type="button" (click)="volverALista()">
+      Ver otros mecanicos
+    </button>
+  </div>
+} @else {
+  <section class="perfil">
+    <div class="perfil__avatar">{{ iniciales() }}</div>
+    <h1 class="perfil__nombre">{{ mecanico()!.nombre }}</h1>
+    <span class="etiqueta etiqueta--{{ mecanico()!.estado }}">{{ mecanico()!.estado }}</span>
+    <p class="perfil__desc">{{ mecanico()!.descripcion }}</p>
+  </section>
+
+  <div class="datos">
+    <div class="dato">
+      <span class="dato__valor">&#9733; {{ mecanico()!.calificacion }}</span>
+      <span class="dato__etiqueta">{{ mecanico()!.totalServicios }} servicios</span>
+    </div>
+    <div class="dato">
+      <span class="dato__valor">{{ distanciaKm() | distancia }}</span>
+      <span class="dato__etiqueta">~{{ tiempoEstimado() }} min</span>
+    </div>
+    <div class="dato">
+      <span class="dato__valor">{{ mecanico()!.experiencia }} años</span>
+      <span class="dato__etiqueta">de experiencia</span>
+    </div>
+  </div>
+
+  <div class="tarjeta bloque">
+    <h2 class="bloque__titulo">Especialidades</h2>
+    <div class="lista-especialidades">
+      @for (especialidad of mecanico()!.especialidades; track especialidad) {
+        <span class="chip-especialidad">{{ especialidad }}</span>
+      }
+    </div>
+  </div>
+
+  <div class="tarjeta bloque">
+    <h2 class="bloque__titulo">Donde esta</h2>
+    <p class="texto-suave">{{ mecanico()!.ubicacion.direccion }}</p>
+    <p class="texto-suave">Telefono: {{ mecanico()!.telefono }}</p>
+  </div>
+
+  @if (borrador(); as datos) {
+    <div class="tarjeta bloque">
+      <h2 class="bloque__titulo">Tu solicitud</h2>
+      <p class="texto-suave"><strong>Servicio:</strong> {{ nombreServicio() }}</p>
+      <p class="texto-suave"><strong>Vehiculo:</strong> {{ datos.vehiculo }}</p>
+      <p class="texto-suave"><strong>Problema:</strong> {{ datos.descripcionProblema }}</p>
+    </div>
+  }
+
+  <div class="resumen-pago">
+    <span>Tarifa base de la visita</span>
+    <strong>${{ mecanico()!.tarifaBase }} MXN</strong>
+  </div>
+  <p class="texto-suave nota">
+    Las refacciones y la mano de obra extra se cotizan al momento con el mecanico.
+  </p>
+
+  <button
+    class="boton boton--primario"
+    type="button"
+    [disabled]="confirmando() || mecanico()!.estado !== 'disponible'"
+    (click)="confirmar()"
+  >
+    @if (confirmando()) {
+      Confirmando...
+    } @else if (mecanico()!.estado !== 'disponible') {
+      No disponible ahorita
+    } @else {
+      Pedir este mecanico
+    }
+  </button>
+}
