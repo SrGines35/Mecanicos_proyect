@@ -103,10 +103,6 @@ a:hover {
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
 }
 
-.auth-tarjeta--ancha {
-  max-width: 460px;
-}
-
 /* ---------- Marca ---------- */
 
 .auth-marca {
@@ -307,73 +303,6 @@ a:hover {
   color: #1a1200;
 }
 
-/* ---------- Bloque de campos del mecanico ---------- */
-
-.bloque-mecanico {
-  padding: 18px 16px 4px;
-  margin-bottom: 18px;
-  border: 1px solid rgba(240, 149, 31, 0.22);
-  border-radius: 14px;
-  background: rgba(240, 149, 31, 0.05);
-}
-
-.bloque-mecanico__titulo {
-  margin: 0 0 14px;
-  font-size: 0.78rem;
-  font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  color: var(--ambar);
-}
-
-.fila-doble {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-}
-
-/* ---------- Especialidades (checkboxes tipo chip) ---------- */
-
-.chips {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 7px;
-}
-
-.chip {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 8px 13px;
-  border: 1px solid var(--borde);
-  border-radius: 999px;
-  background: var(--superficie-alta);
-  color: var(--gris);
-  font-size: 0.85rem;
-  cursor: pointer;
-  user-select: none;
-  transition: border-color var(--transicion), color var(--transicion),
-    background var(--transicion);
-}
-
-.chip:hover {
-  border-color: var(--borde-fuerte);
-  color: var(--blanco);
-}
-
-.chip input {
-  position: absolute;
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
-
-.chip--activo {
-  border-color: var(--ambar);
-  background: var(--ambar-tenue);
-  color: var(--ambar-claro);
-}
-
 /* ---------- Botones ---------- */
 
 .boton-primario {
@@ -465,9 +394,5 @@ a:hover {
 @media (max-width: 420px) {
   .auth-tarjeta {
     padding: 28px 20px;
-  }
-
-  .fila-doble {
-    grid-template-columns: 1fr;
   }
 }
