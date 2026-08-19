@@ -1,5 +1,5 @@
 <div class="auth-pagina">
-  <div class="auth-tarjeta auth-tarjeta--ancha">
+  <div class="auth-tarjeta">
     <div class="auth-marca">
       <app-logo />
       <h1>Oaxi<span>canicos</span></h1>
@@ -7,7 +7,6 @@
     </div>
 
     @if (sesion(); as usuario) {
-      <!-- Registro completado -->
       <div class="auth-aviso auth-aviso--exito">
         <span>
           Listo, <strong>{{ usuario.nombre }}</strong>. Tu cuenta de
@@ -25,7 +24,6 @@
       }
 
       <form [formGroup]="formulario" (ngSubmit)="registrar()" novalidate>
-        <!-- ¿Quién se registra? Va primero porque cambia el resto del formulario -->
         <div class="campo">
           <span class="campo-label" id="etiqueta-rol">Registrarme como</span>
           <div class="segmentado" role="radiogroup" aria-labelledby="etiqueta-rol">
@@ -52,7 +50,7 @@
           </div>
           <p class="campo__ayuda">
             @if (esMecanico) {
-              Los mecánicos reciben solicitudes de servicio.
+              Después vas a completar tu perfil desde el panel.
             } @else {
               Los usuarios piden mecánicos a domicilio.
             }
@@ -140,79 +138,6 @@
             <p class="campo__error">Las dos contraseñas no son iguales</p>
           }
         </div>
-
-        <!-- Solo para mecánicos -->
-        @if (esMecanico) {
-          <div class="bloque-mecanico">
-            <h2 class="bloque-mecanico__titulo">Datos de tu servicio</h2>
-
-            <div class="campo">
-              <span class="campo-label">¿Qué servicios das?</span>
-              <div class="chips">
-                @for (especialidad of especialidades; track especialidad.valor) {
-                  <label class="chip" [class.chip--activo]="estaMarcada(especialidad.valor)">
-                    <input
-                      type="checkbox"
-                      [checked]="estaMarcada(especialidad.valor)"
-                      (change)="alternarEspecialidad(especialidad.valor)"
-                    />
-                    {{ especialidad.nombre }}
-                  </label>
-                }
-              </div>
-              @if (mostrarError('especialidades')) {
-                <p class="campo__error">Marca al menos un servicio</p>
-              }
-            </div>
-
-            <div class="fila-doble">
-              <div class="campo">
-                <label for="experiencia">Años de experiencia</label>
-                <input
-                  id="experiencia"
-                  type="tel"
-                  inputmode="numeric"
-                  formControlName="experiencia"
-                  appSoloNumeros
-                  [maxDigitos]="2"
-                  placeholder="5"
-                />
-                @if (mostrarError('experiencia')) {
-                  <p class="campo__error">Pon un número entre 0 y 60</p>
-                }
-              </div>
-
-              <div class="campo">
-                <label for="tarifaBase">Tarifa base (MXN)</label>
-                <input
-                  id="tarifaBase"
-                  type="tel"
-                  inputmode="numeric"
-                  formControlName="tarifaBase"
-                  appSoloNumeros
-                  [maxDigitos]="5"
-                  placeholder="350"
-                />
-                @if (mostrarError('tarifaBase')) {
-                  <p class="campo__error">Pon cuánto cobras por la visita</p>
-                }
-              </div>
-            </div>
-
-            <div class="campo">
-              <label for="zonaTrabajo">¿En qué zona atiendes?</label>
-              <input
-                id="zonaTrabajo"
-                type="text"
-                formControlName="zonaTrabajo"
-                placeholder="Ej. Centro y Colonia Reforma, Oaxaca"
-              />
-              @if (mostrarError('zonaTrabajo')) {
-                <p class="campo__error">Escribe la colonia o zona donde das servicio</p>
-              }
-            </div>
-          </div>
-        }
 
         <button type="submit" class="boton-primario" [disabled]="enviando()">
           @if (enviando()) {

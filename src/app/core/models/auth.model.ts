@@ -5,37 +5,25 @@
 
 export type Rol = 'usuario' | 'mecanico';
 
-export type Especialidad = 'general' | 'electrico' | 'llantas' | 'frenos' | 'motor' | 'grua';
-
 /** Lo que se manda a POST /auth/login */
 export interface Credenciales {
   correo: string;
   contrasena: string;
 }
 
-/** Campos que comparten los dos registros */
-interface RegistroBase {
+/**
+ * Lo que se manda a POST /auth/registro.
+ * Los dos roles piden exactamente los mismos datos. Lo que distingue a un
+ * mecanico (descripcion, ubicacion, especialidades, precio) se llena
+ * despues, desde su perfil en el dashboard.
+ */
+export interface DatosRegistro {
   nombre: string;
   correo: string;
   telefono: string;
   contrasena: string;
+  rol: Rol;
 }
-
-/** POST /auth/registro/usuario */
-export interface RegistroUsuario extends RegistroBase {
-  rol: 'usuario';
-}
-
-/** POST /auth/registro/mecanico */
-export interface RegistroMecanico extends RegistroBase {
-  rol: 'mecanico';
-  especialidades: Especialidad[];
-  experiencia: number;
-  tarifaBase: number;
-  zonaTrabajo: string;
-}
-
-export type DatosRegistro = RegistroUsuario | RegistroMecanico;
 
 /** Lo que el back debe devolver al iniciar sesion o registrarse */
 export interface SesionUsuario {
