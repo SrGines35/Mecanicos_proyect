@@ -35,8 +35,7 @@ Se abre en `http://localhost:4200/`.
 ```
 src/app/
   core/
-    models/       -> las interfaces (Rol, Credenciales, RegistroUsuario, ...)
-    data/         -> catálogo de especialidades
+    models/       -> las interfaces (Rol, Credenciales, DatosRegistro, ...)
     services/     -> AuthService (hoy simulado)
     validadores/  -> todas las reglas de validación en un solo archivo
   shared/
@@ -60,10 +59,11 @@ de negocio adentro. Todo lo de validar, guardar o consultar vive en `core`.
 | Teléfono | Exactamente 10 dígitos. No deja escribir letras. |
 | Contraseña | Mínimo 8 caracteres, con al menos una letra y un número. |
 | Confirmar | Debe ser igual a la contraseña. |
-| Especialidades | Al menos una (solo mecánicos). |
-| Experiencia | Número de 0 a 60 (solo mecánicos). |
-| Tarifa base | Mayor a 0 (solo mecánicos). |
-| Zona | Mínimo 4 caracteres (solo mecánicos). |
+
+El registro pide **los mismos datos para usuario y para mecánico**. Lo único
+que cambia es el rol. Los datos propios del mecánico (descripción, ubicación,
+especialidades y precio de revisión) se llenan después, desde su perfil en el
+dashboard: así el registro queda corto y nadie abandona a la mitad.
 
 Los mensajes de error solo aparecen cuando el usuario ya tocó el campo, o
 cuando le da al botón de enviar. Así no lo recibe todo en rojo desde el inicio.
@@ -81,9 +81,8 @@ se tocan.**
 ## Endpoints que necesitamos del back
 
 ```
-POST /auth/login              -> { correo, contrasena }
-POST /auth/registro/usuario   -> { nombre, correo, telefono, contrasena, rol }
-POST /auth/registro/mecanico  -> lo anterior + { especialidades, experiencia, tarifaBase, zonaTrabajo }
+POST /auth/login      -> { correo, contrasena }
+POST /auth/registro   -> { nombre, correo, telefono, contrasena, rol }
 GET  /auth/perfil
 ```
 
