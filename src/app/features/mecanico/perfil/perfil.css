@@ -1,0 +1,53 @@
+.intro {
+  margin-bottom: 20px;
+}
+
+.ubicacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px dashed var(--borde-fuerte);
+  border-radius: 12px;
+  background: var(--superficie-alta);
+}
+
+.ubicacion--lista {
+  border-style: solid;
+  border-color: rgba(74, 222, 128, 0.35);
+  background: rgba(74, 222, 128, 0.06);
+}
+
+.ubicacion__dato {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.ubicacion__dato strong {
+  font-size: 0.9rem;
+  color: var(--blanco);
+}
+
+.ubicacion--lista .ubicacion__dato strong {
+  color: var(--exito);
+}
+
+.ubicacion__dato code {
+  font-size: 0.76rem;
+  color: var(--gris);
+  font-family: 'Cascadia Code', Consolas, monospace;
+}
+
+.ubicacion__dato span {
+  font-size: 0.76rem;
+}
+
+@media (max-width: 460px) {
+  .ubicacion {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}

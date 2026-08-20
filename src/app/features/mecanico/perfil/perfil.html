@@ -1,0 +1,99 @@
+<app-barra-superior titulo="Mi perfil" [mostrarRegresar]="true" />
+
+<main class="contenedor">
+  @if (cargando()) {
+    <div class="estado-vacio">
+      <div class="cargador cargador--gris"></div>
+      <p class="texto-suave">Cargando tu perfil...</p>
+    </div>
+  } @else {
+    @if (errorServidor(); as mensaje) {
+      <div class="auth-aviso auth-aviso--error">
+        <span>{{ mensaje }}</span>
+      </div>
+    }
+
+    <p class="texto-suave intro">
+      Estos datos son los que van a ver los clientes cuando te encuentren.
+    </p>
+
+    <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+      <div class="campo">
+        <label for="descripcion">¿Qué haces y en qué eres bueno?</label>
+        <textarea
+          id="descripcion"
+          formControlName="descripcion"
+          maxlength="200"
+          placeholder="Ej. Taller propio en Reforma. Especialista en motor y afinación. Servicio a domicilio."
+        ></textarea>
+        @if (mostrarError('descripcion')) {
+          <p class="campo__error">Escribe una descripción (máximo 200 caracteres)</p>
+        } @else {
+          <p class="campo__ayuda">Te quedan {{ caracteresRestantes }} caracteres.</p>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="zonaTrabajo">¿En qué zona atiendes?</label>
+        <input
+          id="zonaTrabajo"
+          type="text"
+          formControlName="zonaTrabajo"
+          placeholder="Ej. Centro y Colonia Reforma, Oaxaca"
+        />
+        @if (mostrarError('zonaTrabajo')) {
+          <p class="campo__error">Escribe la colonia o zona donde das servicio</p>
+        }
+      </div>
+
+      <div class="campo">
+        <span class="campo-label">Tu ubicación</span>
+
+        <div class="ubicacion" [class.ubicacion--lista]="tieneUbicacion">
+          @if (tieneUbicacion) {
+            <div class="ubicacion__dato">
+              <strong>Ubicación marcada</strong>
+              <code>{{ coordenadas }}</code>
+            </div>
+          } @else {
+            <div class="ubicacion__dato">
+              <strong>Sin ubicación</strong>
+              <span class="texto-suave">Sin esto no puedes aparecer en las búsquedas</span>
+            </div>
+          }
+
+          <button
+            type="button"
+            class="boton-secundario"
+            [disabled]="buscandoUbicacion()"
+            (click)="usarMiUbicacion()"
+          >
+            @if (buscandoUbicacion()) {
+              <span class="cargador cargador--gris"></span>Buscando...
+            } @else if (tieneUbicacion) {
+              Actualizar
+            } @else {
+              Usar mi ubicación
+            }
+          </button>
+        </div>
+
+        @if (avisoUbicacion(); as aviso) {
+          <p class="campo__error">{{ aviso }}</p>
+        }
+
+        <p class="campo__ayuda">
+          Con esta ubicación se calcula qué tan lejos estás de cada cliente.
+        </p>
+      </div>
+
+      <button type="submit" class="boton-primario" [disabled]="guardando()">
+        @if (guardando()) {
+          <span class="cargador"></span>Guardando...
+        } @else {
+          Guardar perfil
+        }
+      </button>
+    </form>
+  }
+</main>
