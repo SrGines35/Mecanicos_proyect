@@ -1,1 +1,95 @@
-<p>perfil works!</p>
+<section class="perfil">
+
+  <div class="profile-header">
+
+    <div class="profile-icon">
+      👤
+    </div>
+
+    <h1>Mi perfil</h1>
+
+    <p>
+      Administra tu información personal
+    </p>
+
+  </div>
+
+
+  <div class="profile-card">
+
+    <div class="form-group">
+
+      <label>Nombre</label>
+
+      <input
+        type="text"
+        [(ngModel)]="usuario.nombre"
+        [disabled]="!editando">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Correo electrónico</label>
+
+      <input
+        type="email"
+        [(ngModel)]="usuario.correo"
+        [disabled]="!editando">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Teléfono</label>
+
+      <input
+        type="tel"
+        [(ngModel)]="usuario.telefono"
+        [disabled]="!editando">
+
+    </div>
+
+
+    <div class="form-group">
+
+      <label>Vehículo</label>
+
+      <input
+        type="text"
+        [(ngModel)]="usuario.vehiculo"
+        [disabled]="!editando">
+
+    </div>
+
+
+    @if (!editando) {
+
+      <button
+        class="primary-button"
+        (click)="editar()">
+
+        Editar información
+
+      </button>
+
+    }
+
+
+    @if (editando) {
+
+      <button
+        class="primary-button"
+        (click)="guardar()">
+
+        Guardar cambios
+
+      </button>
+
+    }
+
+  </div>
+
+</section>

@@ -1,1 +1,36 @@
-<p>layout works!</p>
+<div class="app-container">
+
+  <main class="content">
+
+    <router-outlet></router-outlet>
+
+  </main>
+
+
+  <nav class="bottom-navbar">
+
+    <a
+      routerLink="/usuario/home"
+      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      class="nav-item">
+
+      <span class="nav-icon">⌂</span>
+      <span>Home</span>
+
+    </a>
+
+
+    <a
+      routerLink="/usuario/perfil"
+      routerLinkActive="active"
+      class="nav-item">
+
+      <span class="nav-icon">♙</span>
+      <span>Perfil</span>
+
+    </a>
+
+  </nav>
+
+</div>
