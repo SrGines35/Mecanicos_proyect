@@ -1,0 +1,190 @@
+.aviso-perfil {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 18px;
+  margin-bottom: 20px;
+  border: 1px solid rgba(240, 149, 31, 0.3);
+  border-radius: 14px;
+  background: var(--ambar-tenue);
+}
+
+.aviso-perfil__texto {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.aviso-perfil__texto strong {
+  color: var(--ambar-claro);
+  font-size: 0.98rem;
+}
+
+.aviso-perfil__texto span {
+  font-size: 0.86rem;
+  color: var(--gris);
+  line-height: 1.5;
+}
+
+.aviso-perfil .boton-primario {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  margin-top: 0;
+}
+
+/* ---------- Selector de estado ---------- */
+
+.estados {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+
+.estado {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  border: 1px solid var(--borde);
+  border-radius: 999px;
+  background: var(--superficie-alta);
+  color: var(--gris);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+}
+
+.estado:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.estado__punto {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--gris-tenue);
+  transition: background 180ms ease;
+}
+
+.estado:hover:not(.activo):not(:disabled) {
+  color: var(--blanco);
+  border-color: var(--borde-fuerte);
+}
+
+.estado--disponible.activo {
+  border-color: rgba(74, 222, 128, 0.5);
+  background: rgba(74, 222, 128, 0.12);
+  color: var(--exito);
+}
+
+.estado--disponible.activo .estado__punto {
+  background: var(--exito);
+  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.18);
+}
+
+.estado--ocupado.activo {
+  border-color: rgba(240, 149, 31, 0.5);
+  background: var(--ambar-tenue);
+  color: var(--ambar-claro);
+}
+
+.estado--ocupado.activo .estado__punto {
+  background: var(--ambar);
+}
+
+.estado--no_disponible.activo {
+  border-color: var(--borde-fuerte);
+  background: var(--superficie-alta);
+  color: var(--blanco);
+}
+
+.estado--no_disponible.activo .estado__punto {
+  background: var(--gris);
+}
+
+/* ---------- Tarjeta de solicitud ---------- */
+
+.tarjeta-solicitud {
+  display: block;
+  width: 100%;
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid var(--borde);
+  border-radius: 14px;
+  background: var(--superficie);
+  font-family: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 180ms ease, transform 180ms ease;
+}
+
+.tarjeta-solicitud:hover {
+  border-color: rgba(240, 149, 31, 0.4);
+}
+
+.tarjeta-solicitud:active {
+  transform: scale(0.99);
+}
+
+.tarjeta-solicitud__fila {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 3px;
+}
+
+.tarjeta-solicitud__cliente {
+  font-weight: 600;
+  color: var(--blanco);
+}
+
+.tarjeta-solicitud__tiempo {
+  flex-shrink: 0;
+  font-size: 0.76rem;
+  color: var(--gris-tenue);
+}
+
+.tarjeta-solicitud__vehiculo {
+  font-size: 0.85rem;
+  color: var(--ambar-claro);
+  margin-bottom: 6px;
+}
+
+.tarjeta-solicitud__falla {
+  font-size: 0.85rem;
+  color: var(--gris);
+  line-height: 1.45;
+}
+
+.tarjeta-solicitud__pie {
+  margin-top: 10px;
+}
+
+.etiqueta-distancia {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--superficie-alta);
+  font-size: 0.76rem;
+  color: var(--gris);
+}
+
+.contador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--ambar);
+  color: #1a1200;
+  font-size: 0.78rem;
+  font-weight: 800;
+}

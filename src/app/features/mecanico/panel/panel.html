@@ -1,0 +1,83 @@
+<app-barra-superior titulo="Panel del mecánico" />
+
+<main class="contenedor">
+  <!-- Aviso cuando falta llenar el perfil -->
+  @if (!cargando() && !perfilCompleto()) {
+    <div class="aviso-perfil">
+      <div class="aviso-perfil__texto">
+        <strong>Completa tu perfil</strong>
+        <span>
+          Necesitamos tu ubicación y tu descripción para que los clientes te
+          encuentren. Sin eso no apareces en las búsquedas.
+        </span>
+      </div>
+      <a class="boton-primario" routerLink="/mecanico/perfil">Completar perfil</a>
+    </div>
+  }
+
+  <!-- Estado -->
+  <section class="bloque">
+    <h2 class="bloque__titulo">Tu estado</h2>
+
+    <div class="estados" role="radiogroup" aria-label="Estado del mecánico">
+      @for (estado of estados; track estado) {
+        <button
+          type="button"
+          role="radio"
+          class="estado estado--{{ estado }}"
+          [class.activo]="estadoActual() === estado"
+          [attr.aria-checked]="estadoActual() === estado"
+          [disabled]="cambiandoEstado()"
+          (click)="cambiarEstado(estado)"
+        >
+          <span class="estado__punto"></span>
+          {{ textoEstado[estado] }}
+        </button>
+      }
+    </div>
+
+    <p class="campo__ayuda">{{ ayudaEstado[estadoActual()] }}</p>
+  </section>
+
+  <!-- Solicitudes -->
+  <section class="bloque">
+    <div class="bloque__encabezado">
+      <h2 class="bloque__titulo">Solicitudes nuevas</h2>
+      @if (!cargando()) {
+        <span class="contador">{{ solicitudes().length }}</span>
+      }
+    </div>
+
+    @if (cargando()) {
+      <div class="estado-vacio">
+        <div class="cargador cargador--gris"></div>
+        <p class="texto-suave">Buscando solicitudes...</p>
+      </div>
+    } @else if (solicitudes().length === 0) {
+      <div class="estado-vacio">
+        <p class="texto-suave">
+          No tienes solicitudes por ahora. Cuando alguien pida un mecánico cerca de
+          ti, va a aparecer aquí.
+        </p>
+      </div>
+    } @else {
+      @for (solicitud of solicitudes(); track solicitud.id) {
+        <button class="tarjeta-solicitud" type="button" (click)="abrirSolicitud(solicitud.id)">
+          <div class="tarjeta-solicitud__fila">
+            <span class="tarjeta-solicitud__cliente">{{ solicitud.cliente.nombre }}</span>
+            <span class="tarjeta-solicitud__tiempo">{{ cuando(solicitud.fechaCreacion) }}</span>
+          </div>
+
+          <div class="tarjeta-solicitud__vehiculo">{{ solicitud.vehiculo }}</div>
+          <div class="tarjeta-solicitud__falla">"{{ solicitud.descripcionFalla }}"</div>
+
+          @if (perfilCompleto()) {
+            <div class="tarjeta-solicitud__pie">
+              <span class="etiqueta-distancia">a {{ distancia(solicitud.distanciaKm) }}</span>
+            </div>
+          }
+        </button>
+      }
+    }
+  </section>
+</main>
