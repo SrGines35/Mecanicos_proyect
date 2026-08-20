@@ -1,44 +1,36 @@
 /* =========================================================
-   Estilos base de MecaGo
-   Paleta en tonos cafe / ambar: se ve calida y "de taller"
-   sin caer en el naranja chillante.
+   Estilos base de Oaxicanicos
+   Paleta: negro / ambar (color de herramienta y señalizacion).
+   El rojo se reserva UNICAMENTE para errores, para que cuando
+   algo este mal el usuario lo distinga de la marca.
    ========================================================= */
 
 :root {
   /* Fondos */
-  --fondo: #faf6f1;
-  --superficie: #ffffff;
-  --superficie-suave: #f3ebe2;
+  --negro: #0a0a0b;
+  --superficie: #151517;
+  --superficie-alta: #1e1e22;
 
-  /* Cafes */
-  --cafe-900: #2a1c12;
-  --cafe-700: #4b3524;
-  --cafe-500: #7a5a3d;
-  --cafe-300: #b39a86;
-  --cafe-200: #e4d5c5;
+  /* Bordes */
+  --borde: rgba(255, 255, 255, 0.08);
+  --borde-fuerte: rgba(255, 255, 255, 0.16);
 
-  /* Ambar (color de acento) */
-  --ambar-600: #b06a1c;
-  --ambar-500: #d1841f;
-  --ambar-300: #e9b96b;
-  --ambar-100: #f7e7cd;
-
-  /* Estados */
-  --verde: #4a7c59;
-  --verde-suave: #e3efe6;
-  --rojo: #a5453b;
-  --rojo-suave: #f6e3e1;
-  --gris: #8b8178;
+  /* Marca */
+  --ambar: #f0951f;
+  --ambar-claro: #fbbf3c;
+  --ambar-oscuro: #b96a08;
+  --ambar-tenue: rgba(240, 149, 31, 0.12);
 
   /* Texto */
-  --texto: #2a1c12;
-  --texto-suave: #6f6259;
+  --blanco: #f4f4f5;
+  --gris: #9b9ba3;
+  --gris-tenue: #6b6b73;
 
-  /* Otros */
-  --radio: 16px;
-  --radio-chico: 10px;
-  --sombra: 0 2px 8px rgba(42, 28, 18, 0.07);
-  --sombra-alta: 0 8px 24px rgba(42, 28, 18, 0.12);
+  /* Estados */
+  --error: #ff6b5e;
+  --error-tenue: rgba(255, 107, 94, 0.1);
+  --exito: #4ade80;
+
   --transicion: 180ms ease;
 }
 
@@ -54,8 +46,8 @@ body {
 }
 
 body {
-  background: var(--fondo);
-  color: var(--texto);
+  background: var(--negro);
+  color: var(--blanco);
   font-family: 'Segoe UI', system-ui, -apple-system, 'Helvetica Neue', sans-serif;
   font-size: 16px;
   line-height: 1.5;
@@ -69,15 +61,7 @@ h4 {
   margin: 0 0 0.4em;
   font-weight: 600;
   letter-spacing: -0.01em;
-  color: var(--cafe-900);
-}
-
-h1 {
-  font-size: 1.75rem;
-}
-
-h2 {
-  font-size: 1.3rem;
+  color: var(--blanco);
 }
 
 p {
@@ -85,158 +69,330 @@ p {
 }
 
 a {
-  color: var(--ambar-600);
+  color: var(--ambar-claro);
   text-decoration: none;
 }
 
-/* ---------- Contenedor tipo app movil ---------- */
+a:hover {
+  text-decoration: underline;
+}
 
-.contenedor {
+/* =========================================================
+   Autenticacion (login / registro)
+   ========================================================= */
+
+.auth-pagina {
+  min-height: 100vh;
   width: 100%;
-  max-width: 480px;
-  margin: 0 auto;
-  padding: 0 20px 96px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 32px 20px;
+  background:
+    radial-gradient(ellipse 80% 50% at 50% -10%, rgba(240, 149, 31, 0.13), transparent 70%),
+    linear-gradient(180deg, #0a0a0b 0%, #101012 100%);
+}
+
+.auth-tarjeta {
+  width: 100%;
+  max-width: 400px;
+  background: var(--superficie);
+  border: 1px solid var(--borde);
+  border-radius: 20px;
+  padding: 36px 30px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
+}
+
+/* ---------- Marca ---------- */
+
+.auth-marca {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.auth-marca__insignia {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  margin-bottom: 14px;
+  border-radius: 15px;
+  background: var(--ambar-tenue);
+  border: 1px solid rgba(240, 149, 31, 0.28);
+  color: var(--ambar);
+}
+
+.auth-marca__insignia svg {
+  width: 26px;
+  height: 26px;
+}
+
+.auth-marca h1 {
+  margin: 0 0 5px;
+  font-size: 1.6rem;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.auth-marca h1 span {
+  color: var(--ambar);
+}
+
+.auth-subtitulo {
+  margin: 0;
+  color: var(--gris);
+  font-size: 0.88rem;
+}
+
+/* ---------- Campos ---------- */
+
+.campo {
+  margin-bottom: 18px;
+}
+
+.campo label,
+.campo-label {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gris);
+  letter-spacing: 0.01em;
+}
+
+.campo input,
+.campo select,
+.campo textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid var(--borde);
+  border-radius: 11px;
+  background: var(--superficie-alta);
+  color: var(--blanco);
+  font-family: inherit;
+  font-size: 1rem;
+  transition: border-color var(--transicion), background var(--transicion);
+}
+
+.campo input::placeholder,
+.campo textarea::placeholder {
+  color: var(--gris-tenue);
+}
+
+.campo input:focus,
+.campo select:focus,
+.campo textarea:focus {
+  outline: none;
+  border-color: var(--ambar);
+  background: #232329;
+}
+
+/* Solo se pinta de rojo cuando el campo YA se toco y esta mal */
+.campo input.ng-invalid.ng-touched,
+.campo select.ng-invalid.ng-touched {
+  border-color: var(--error);
+}
+
+.campo textarea {
+  min-height: 78px;
+  resize: vertical;
+}
+
+.campo__ayuda {
+  margin: 7px 0 0;
+  font-size: 0.76rem;
+  color: var(--gris-tenue);
+}
+
+.campo__error {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin: 7px 0 0;
+  font-size: 0.78rem;
+  color: var(--error);
+}
+
+.campo__error::before {
+  content: '!';
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--error-tenue);
+  font-size: 0.65rem;
+  font-weight: 700;
+}
+
+/* ---------- Contraseña con ojito ---------- */
+
+.campo-contrasena {
+  position: relative;
+}
+
+.campo-contrasena input {
+  padding-right: 46px;
+}
+
+.boton-ojo {
+  position: absolute;
+  top: 50%;
+  right: 7px;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--gris-tenue);
+  cursor: pointer;
+  transition: color var(--transicion), background var(--transicion);
+}
+
+.boton-ojo svg {
+  width: 19px;
+  height: 19px;
+}
+
+.boton-ojo:hover {
+  color: var(--ambar);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+/* ---------- Selector de rol ---------- */
+
+.segmentado {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid var(--borde);
+  border-radius: 13px;
+  background: var(--superficie-alta);
+}
+
+.segmentado__opcion {
+  flex: 1;
+  padding: 11px 12px;
+  border: none;
+  border-radius: 9px;
+  background: transparent;
+  color: var(--gris);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transicion), color var(--transicion);
+}
+
+.segmentado__opcion:hover:not(.activo) {
+  color: var(--blanco);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.segmentado__opcion.activo {
+  background: var(--ambar);
+  color: #1a1200;
 }
 
 /* ---------- Botones ---------- */
 
-.boton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
+.boton-primario {
   width: 100%;
   padding: 14px 20px;
+  margin-top: 6px;
   border: none;
-  border-radius: var(--radio-chico);
+  border-radius: 12px;
+  background: linear-gradient(180deg, var(--ambar-claro) 0%, var(--ambar) 100%);
+  color: #1a1200;
   font-family: inherit;
   font-size: 1rem;
-  font-weight: 600;
+  font-weight: 700;
+  letter-spacing: 0.01em;
   cursor: pointer;
-  transition: background var(--transicion), transform var(--transicion);
+  transition: filter var(--transicion), transform var(--transicion);
 }
 
-.boton:active {
+.boton-primario:hover:not(:disabled) {
+  filter: brightness(1.08);
+}
+
+.boton-primario:active:not(:disabled) {
   transform: scale(0.985);
 }
 
-.boton:disabled {
-  opacity: 0.5;
+.boton-primario:disabled {
+  filter: grayscale(0.6) brightness(0.7);
   cursor: not-allowed;
 }
 
-.boton--primario {
-  background: var(--ambar-500);
-  color: #fff;
-}
+/* ---------- Mensajes ---------- */
 
-.boton--primario:hover:not(:disabled) {
-  background: var(--ambar-600);
-}
-
-.boton--secundario {
-  background: var(--superficie-suave);
-  color: var(--cafe-700);
-}
-
-.boton--secundario:hover:not(:disabled) {
-  background: var(--cafe-200);
-}
-
-.boton--fantasma {
-  background: transparent;
-  color: var(--cafe-500);
-  border: 1px solid var(--cafe-200);
-}
-
-/* ---------- Tarjetas ---------- */
-
-.tarjeta {
-  background: var(--superficie);
-  border: 1px solid var(--cafe-200);
-  border-radius: var(--radio);
-  padding: 16px;
-  box-shadow: var(--sombra);
-}
-
-/* ---------- Formularios ---------- */
-
-.campo {
-  margin-bottom: 16px;
-}
-
-.campo label {
-  display: block;
-  margin-bottom: 6px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--texto-suave);
-}
-
-.campo input,
-.campo textarea,
-.campo select {
-  width: 100%;
+.auth-aviso {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
   padding: 12px 14px;
-  border: 1px solid var(--cafe-200);
-  border-radius: var(--radio-chico);
-  background: var(--superficie);
-  font-family: inherit;
-  font-size: 1rem;
-  color: var(--texto);
-  transition: border-color var(--transicion);
+  margin: 0 0 18px;
+  border-radius: 11px;
+  font-size: 0.84rem;
 }
 
-.campo input:focus,
-.campo textarea:focus,
-.campo select:focus {
-  outline: none;
-  border-color: var(--ambar-500);
+.auth-aviso--error {
+  border: 1px solid rgba(255, 107, 94, 0.3);
+  background: var(--error-tenue);
+  color: var(--error);
 }
 
-.campo textarea {
-  min-height: 96px;
-  resize: vertical;
+.auth-aviso--exito {
+  border: 1px solid rgba(74, 222, 128, 0.28);
+  background: rgba(74, 222, 128, 0.08);
+  color: var(--exito);
 }
 
-.campo__error {
-  margin-top: 6px;
-  font-size: 0.8rem;
-  color: var(--rojo);
-}
-
-/* ---------- Etiquetas de estado ---------- */
-
-.etiqueta {
-  display: inline-block;
-  padding: 3px 10px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-  font-weight: 600;
-}
-
-.etiqueta--disponible {
-  background: var(--verde-suave);
-  color: var(--verde);
-}
-
-.etiqueta--ocupado {
-  background: var(--ambar-100);
-  color: var(--ambar-600);
-}
-
-.etiqueta--desconectado {
-  background: var(--superficie-suave);
+.auth-alt {
+  margin: 18px 0 0;
+  padding-top: 18px;
+  border-top: 1px solid var(--borde);
+  text-align: center;
+  font-size: 0.86rem;
   color: var(--gris);
+}
+
+.auth-alt a {
+  font-weight: 600;
 }
 
 /* ---------- Utilidades ---------- */
 
-.texto-suave {
-  color: var(--texto-suave);
-  font-size: 0.9rem;
+.cargador {
+  display: inline-block;
+  width: 15px;
+  height: 15px;
+  margin-right: 8px;
+  border: 2px solid rgba(26, 18, 0, 0.3);
+  border-top-color: #1a1200;
+  border-radius: 50%;
+  vertical-align: -2px;
+  animation: girar 700ms linear infinite;
 }
 
-.centrado {
-  text-align: center;
+@keyframes girar {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (max-width: 420px) {
+  .auth-tarjeta {
+    padding: 28px 20px;
+  }
 }

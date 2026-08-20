@@ -1,91 +1,116 @@
-# Avance del Front — MecaGo
+# Avance del Front — Oaxicanicos
 
-Este archivo explica que se hizo en la rama `front-freidy`, como correrlo y que falta.
-La idea es que Luz y el equipo de back puedan continuar sin tener que preguntar nada.
+Estado del front al día de hoy. La idea es que cualquiera del equipo pueda
+seguirle sin tener que preguntar nada.
 
-## Que es la app
+## Qué es la app
 
-Una aplicacion web estilo DiDi pero de mecanicos: el usuario dice que se le
-descompuso, la app busca mecanicos cerca de el, los ordena del mas cercano al
-mas lejano y le asigna uno.
+Una aplicación web estilo DiDi pero de mecánicos: el usuario dice qué se le
+descompuso y la app le manda al mecánico disponible más cercano.
 
-## Como correrlo
+## Cómo correrlo
 
 ```bash
 npm install
-ng serve
+npm start
 ```
 
-Y se abre en `http://localhost:4200/`.
+Se abre en `http://localhost:4200/`.
 
-## Pantallas que ya estan
+## Pantallas que hay ahorita
 
-| Ruta | Que hace |
+| Ruta | Pantalla |
 |---|---|
-| `/` | Inicio. El usuario elige que servicio necesita (general, electrico, llantas, frenos, motor, grua). |
-| `/solicitar` | Formulario: vehiculo, descripcion del problema y direccion. Tiene boton para llenar la direccion con el GPS. |
-| `/mecanicos` | Lista de mecanicos ordenados por cercania. Se puede filtrar por especialidad y por disponibilidad, y ampliar el radio de busqueda. |
-| `/mecanicos/:id` | Perfil completo del mecanico y boton para confirmar el servicio. |
-| `/seguimiento/:id` | Los 4 pasos del servicio: aceptada, en camino, atendiendo, terminado. |
+| `/` | Iniciar sesión |
+| `/registro` | Crear cuenta, como usuario o como mecánico |
 
-## Como esta organizado el codigo
+> El flujo de pedir mecánico (inicio, solicitud, lista de cercanos, detalle y
+> seguimiento) se hizo en una etapa anterior y se sacó del proyecto para
+> enfocarse primero en la autenticación. **No se perdió**: sigue en el historial
+> de git, en los commits de la rama `front-freidy`. Se puede recuperar cuando
+> se necesite.
+
+## Cómo está organizado el código
 
 ```
 src/app/
   core/
-    models/      -> las interfaces (Mecanico, Solicitud, Ubicacion)
-    data/        -> datos simulados y catalogo de servicios
-    utils/       -> calculo de distancia
-    services/    -> geolocalizacion, mecanicos y solicitudes
-  shared/        -> componentes que se repiten (encabezado, tarjeta, pipe)
-  features/      -> una carpeta por pantalla
+    models/       -> las interfaces (Rol, Credenciales, DatosRegistro, ...)
+    services/     -> AuthService (hoy simulado)
+    validadores/  -> todas las reglas de validación en un solo archivo
+  shared/
+    logo/         -> la llave inglesa en SVG
+    icono-ojo/    -> botón de mostrar/ocultar contraseña
+    directivas/   -> SoloNumeros, para campos que solo aceptan dígitos
+  features/
+    login/
+    registro/
 ```
 
-La regla es sencilla: **`core` no sabe nada de las pantallas, y las pantallas no
-tienen logica de negocio adentro**. Todo lo que sea "buscar", "calcular" o
-"guardar" vive en un servicio.
+La regla: `core` no sabe nada de las pantallas, y las pantallas no traen reglas
+de negocio adentro. Todo lo de validar, guardar o consultar vive en `core`.
 
-## Lo que esta simulado (y hay que cambiar cuando el back este listo)
+## Reglas de validación (están en `core/validadores/validadores.ts`)
 
-Estos tres puntos son los unicos que tocan datos falsos:
+| Campo | Regla |
+|---|---|
+| Nombre | Solo letras, acentos, espacios y guiones. De 3 a 60 caracteres. |
+| Correo | Cualquier dominio, no solo Gmail. |
+| Teléfono | Exactamente 10 dígitos. No deja escribir letras. |
+| Contraseña | Mínimo 8 caracteres, con al menos una letra y un número. |
+| Confirmar | Debe ser igual a la contraseña. |
 
-1. `core/data/mecanicos.mock.ts` — diez mecanicos inventados con coordenadas
-   reales de Oaxaca. Se borra cuando exista el endpoint.
-2. `core/services/mecanico.service.ts` — hoy devuelve el mock con un retardo
-   artificial. Solo hay que cambiar el cuerpo de los metodos por llamadas con
-   `HttpClient`; **las firmas ya devuelven `Observable`, asi que las pantallas
-   no se tocan**.
-3. `features/seguimiento/seguimiento.ts` — el metodo `simularAvance()` mueve los
-   pasos con un temporizador cada 4 segundos. Ahi va el WebSocket o el polling real.
+El registro pide **los mismos datos para usuario y para mecánico**. Lo único
+que cambia es el rol. Los datos propios del mecánico (descripción, ubicación,
+especialidades y precio de revisión) se llenan después, desde su perfil en el
+dashboard: así el registro queda corto y nadie abandona a la mitad.
+
+Los mensajes de error solo aparecen cuando el usuario ya tocó el campo, o
+cuando le da al botón de enviar. Así no lo recibe todo en rojo desde el inicio.
+
+## Lo que está simulado
+
+Un solo punto: `core/services/auth.service.ts`. Hoy guarda las cuentas en
+memoria (se pierden al recargar la página) y responde con un retardo falso
+para que se vea el "cargando".
+
+Cuando exista el back, se cambia el cuerpo de esos métodos por llamadas con
+`HttpClient`. **Las firmas ya devuelven `Observable`, así que las pantallas no
+se tocan.**
 
 ## Endpoints que necesitamos del back
 
-Para que esto conecte sin cambiar nada de la estructura:
+```
+POST /auth/login      -> { correo, contrasena }
+POST /auth/registro   -> { nombre, correo, telefono, contrasena, rol }
+GET  /auth/perfil
+```
 
-- `GET /mecanicos` — todos los mecanicos.
-- `GET /mecanicos/:id` — uno solo.
-- `GET /mecanicos/cercanos?lat=&lng=&especialidad=&radioKm=` — los cercanos ya
-  ordenados (o nos los mandan todos y el front calcula, como esta ahorita).
-- `POST /solicitudes` — crea la solicitud y regresa el id.
-- `GET /solicitudes/:id` — el estado actual del servicio.
+Los tres deben devolver: `{ token, id, nombre, correo, rol }`.
 
-La forma de los objetos esta en `src/app/core/models/`. Si el back respeta esos
-nombres de campo, el front no necesita ningun ajuste.
+El `rol` es la pieza clave: con eso la app decide a qué pantallas mandar a cada
+quien y protege las rutas.
 
-## Que falta (para repartirnos)
+La forma exacta de los objetos está en `src/app/core/models/auth.model.ts`. Si
+el back respeta esos nombres de campo, el front no necesita ningún ajuste.
 
-- [ ] Mapa real con Leaflet u OpenStreetMap en `/mecanicos` (hoy solo es lista).
-- [ ] Pantalla de calificar al mecanico al terminar el servicio.
-- [ ] Login y registro.
-- [ ] Historial de servicios del usuario.
-- [ ] Conectar con la API real (los 3 puntos de arriba).
-- [ ] Que la solicitud no se pierda al recargar la pagina (hoy vive en memoria).
+## Lo que falta
 
-## Notas tecnicas
+- [ ] Guard que proteja las rutas según el rol.
+- [ ] Guardar la sesión para que no se pierda al recargar (hoy vive en memoria).
+- [ ] Recuperar contraseña.
+- [ ] Pantallas internas del usuario y del mecánico (recuperar el flujo anterior).
+- [ ] Conectar con la API real.
 
-- El proyecto es **Angular 21** con componentes standalone y sin zone.js
-  (zoneless). Por eso el estado se maneja con **signals** y no con `BehaviorSubject`.
-- Las plantillas usan el control de flujo nuevo (`@if`, `@for`), no `*ngIf` ni `*ngFor`.
-- El diseño esta pensado para celular (contenedor de 480px). Los colores estan en
-  variables CSS al inicio de `src/styles.css`, asi que cambiar la paleta es
-  modificar un solo bloque.
+## Notas técnicas
+
+- Angular 21, componentes standalone, sin zone.js (zoneless). El estado se
+  maneja con **signals**.
+- Los formularios son **Reactive Forms**, no `ngModel`. Se cambió a propósito:
+  con `ngModel` de una sola vía, limpiar un valor en el componente no borraba
+  lo que ya se veía escrito en la pantalla (por eso antes se quedaban las
+  letras en el campo de teléfono).
+- Las plantillas usan el control de flujo nuevo (`@if`, `@for`).
+- La paleta está en variables CSS al inicio de `src/styles.css`. El **rojo se
+  reserva solo para errores**; el color de la marca es el ámbar. Si la marca
+  fuera roja, un campo mal llenado se confundiría con el diseño normal.

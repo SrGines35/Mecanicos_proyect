@@ -1,0 +1,72 @@
+<div class="auth-pagina">
+  <div class="auth-tarjeta">
+    <div class="auth-marca">
+      <app-logo />
+      <h1>Oaxi<span>canicos</span></h1>
+      <p class="auth-subtitulo">Encuentra tu solución mecánica</p>
+    </div>
+
+    @if (sesion(); as usuario) {
+      <!-- Ya inició sesión -->
+      <div class="auth-aviso auth-aviso--exito">
+        <span>
+          Bienvenido, <strong>{{ usuario.nombre }}</strong>. Entraste como
+          <strong>{{ usuario.rol }}</strong>.
+        </span>
+      </div>
+
+      <button type="button" class="boton-primario" (click)="cerrarSesion()">
+        Cerrar sesión
+      </button>
+    } @else {
+      @if (errorServidor(); as mensaje) {
+        <div class="auth-aviso auth-aviso--error">
+          <span>{{ mensaje }}</span>
+        </div>
+      }
+
+      <form [formGroup]="formulario" (ngSubmit)="iniciarSesion()" novalidate>
+        <div class="campo">
+          <label for="correo">Correo</label>
+          <input
+            id="correo"
+            type="email"
+            formControlName="correo"
+            autocomplete="email"
+            placeholder="tucorreo@ejemplo.com"
+          />
+          @if (mostrarError('correo')) {
+            <p class="campo__error">Escribe un correo válido, por ejemplo ana&#64;correo.com</p>
+          }
+        </div>
+
+        <div class="campo">
+          <label for="contrasena">Contraseña</label>
+          <div class="campo-contrasena">
+            <input
+              id="contrasena"
+              [type]="mostrarContrasena() ? 'text' : 'password'"
+              formControlName="contrasena"
+              autocomplete="current-password"
+              placeholder="Tu contraseña"
+            />
+            <app-icono-ojo [visible]="mostrarContrasena()" (alternar)="alternarContrasena()" />
+          </div>
+          @if (mostrarError('contrasena')) {
+            <p class="campo__error">Escribe tu contraseña</p>
+          }
+        </div>
+
+        <button type="submit" class="boton-primario" [disabled]="enviando()">
+          @if (enviando()) {
+            <span class="cargador"></span>Entrando...
+          } @else {
+            Iniciar sesión
+          }
+        </button>
+      </form>
+
+      <p class="auth-alt">¿No tienes cuenta? <a routerLink="/registro">Regístrate</a></p>
+    }
+  </div>
+</div>
