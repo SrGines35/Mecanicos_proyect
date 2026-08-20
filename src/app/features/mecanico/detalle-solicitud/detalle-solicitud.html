@@ -1,0 +1,182 @@
+<app-barra-superior titulo="Solicitud" [mostrarRegresar]="true" />
+
+<main class="contenedor">
+  @if (cargando()) {
+    <div class="estado-vacio">
+      <div class="cargador cargador--gris"></div>
+      <p class="texto-suave">Cargando...</p>
+    </div>
+  } @else if (!solicitud()) {
+    <div class="estado-vacio">
+      <p class="texto-suave">No encontramos esa solicitud.</p>
+      <button class="boton-secundario" type="button" (click)="volver()">Volver al panel</button>
+    </div>
+  } @else {
+    @if (error(); as mensaje) {
+      <div class="auth-aviso auth-aviso--error">
+        <span>{{ mensaje }}</span>
+      </div>
+    }
+
+    <!-- Progreso, solo cuando ya se aceptó -->
+    @if (!esPendiente()) {
+      <div class="progreso">
+        @for (paso of pasos; track paso) {
+          <div class="progreso__paso" [class.alcanzado]="pasoAlcanzado(paso)">
+            <span class="progreso__punto"></span>
+            <span class="progreso__texto">{{ textoEstado[paso] }}</span>
+          </div>
+        }
+      </div>
+    }
+
+    <!-- Cliente -->
+    <section class="bloque">
+      <h2 class="bloque__titulo">Cliente</h2>
+      <div class="dato">
+        <span class="dato__valor">{{ solicitud()!.cliente.nombre }}</span>
+        <a class="dato__enlace" [href]="'tel:' + solicitud()!.cliente.telefono">
+          {{ solicitud()!.cliente.telefono }}
+        </a>
+      </div>
+    </section>
+
+    <!-- Vehículo y falla -->
+    <section class="bloque">
+      <h2 class="bloque__titulo">El problema</h2>
+      <p class="vehiculo">{{ solicitud()!.vehiculo }}</p>
+      <p class="falla">"{{ solicitud()!.descripcionFalla }}"</p>
+    </section>
+
+    <!-- Ubicación -->
+    <section class="bloque">
+      <h2 class="bloque__titulo">Dónde está</h2>
+      <div class="mapa-pendiente">
+        <span class="texto-suave">
+          Coordenadas: {{ solicitud()!.latitudOrigen }}, {{ solicitud()!.longitudOrigen }}
+        </span>
+        @if (distancia(); as km) {
+          <span class="etiqueta-distancia">a {{ km }} de ti</span>
+        }
+      </div>
+    </section>
+
+    <!-- Aceptar o rechazar -->
+    @if (esPendiente()) {
+      <div class="acciones">
+        <button
+          class="boton-primario"
+          type="button"
+          [disabled]="procesando()"
+          (click)="aceptar()"
+        >
+          @if (procesando()) {
+            <span class="cargador"></span>Aceptando...
+          } @else {
+            Aceptar solicitud
+          }
+        </button>
+        <button
+          class="boton-peligro"
+          type="button"
+          [disabled]="procesando()"
+          (click)="rechazar()"
+        >
+          Rechazar
+        </button>
+      </div>
+    }
+
+    <!-- Costos, mientras el servicio está activo -->
+    @if (estaActiva()) {
+      <section class="bloque">
+        <h2 class="bloque__titulo">Costos del servicio</h2>
+
+        <form [formGroup]="formularioCostos" (ngSubmit)="guardarCostos()" novalidate>
+          <div class="fila-doble">
+            <div class="campo">
+              <label for="costoPiezas">Piezas (MXN)</label>
+              <input
+                id="costoPiezas"
+                type="tel"
+                inputmode="numeric"
+                formControlName="costoPiezas"
+                appSoloNumeros
+                [maxDigitos]="6"
+              />
+            </div>
+
+            <div class="campo">
+              <label for="costoManoObra">Mano de obra (MXN)</label>
+              <input
+                id="costoManoObra"
+                type="tel"
+                inputmode="numeric"
+                formControlName="costoManoObra"
+                appSoloNumeros
+                [maxDigitos]="6"
+              />
+            </div>
+          </div>
+
+          <p class="campo__ayuda">
+            La app cobra 10%: ${{ tarifaCalculada() }} MXN sobre lo que capturas.
+          </p>
+
+          <button
+            class="boton-secundario"
+            type="submit"
+            [disabled]="procesando() || formularioCostos.invalid"
+          >
+            Guardar costos
+          </button>
+        </form>
+      </section>
+
+      <div class="resumen">
+        <div class="resumen__linea">
+          <span>Piezas</span><span>${{ solicitud()!.costoPiezas }}</span>
+        </div>
+        <div class="resumen__linea">
+          <span>Mano de obra</span><span>${{ solicitud()!.costoManoObra }}</span>
+        </div>
+        <div class="resumen__linea">
+          <span>Tarifa de la app</span><span>${{ solicitud()!.tarifaApp }}</span>
+        </div>
+        <div class="resumen__total">
+          <span>Total a pagar</span><strong>${{ total() }} MXN</strong>
+        </div>
+        <p class="texto-suave nota-pago">El cliente paga en efectivo al terminar.</p>
+      </div>
+
+      @if (textoSiguientePaso; as texto) {
+        <button
+          class="boton-primario"
+          type="button"
+          [disabled]="procesando()"
+          (click)="avanzar()"
+        >
+          @if (procesando()) {
+            <span class="cargador"></span>Actualizando...
+          } @else {
+            {{ texto }}
+          }
+        </button>
+      }
+    }
+
+    <!-- Ya terminó -->
+    @if (termino()) {
+      <div class="auth-aviso auth-aviso--exito">
+        <span>
+          Servicio {{ textoEstado[solicitud()!.estado].toLowerCase() }}.
+          @if (solicitud()!.estado === 'completada') {
+            Total cobrado: ${{ total() }} MXN.
+          }
+        </span>
+      </div>
+
+      <button class="boton-secundario" type="button" (click)="volver()">Volver al panel</button>
+    }
+  }
+</main>

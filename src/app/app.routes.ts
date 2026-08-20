@@ -22,5 +22,28 @@ export const routes: Routes = [
       import('./features/cliente/inicio-cliente/inicio-cliente').then((m) => m.InicioCliente),
     title: 'Oaxicanicos - Inicio',
   },
+  {
+    path: 'mecanico',
+    canActivate: [sesionGuard, rolGuard('mecanico')],
+    loadComponent: () =>
+      import('./features/mecanico/panel/panel').then((m) => m.Panel),
+    title: 'Oaxicanicos - Panel',
+  },
+  {
+    path: 'mecanico/perfil',
+    canActivate: [sesionGuard, rolGuard('mecanico')],
+    loadComponent: () =>
+      import('./features/mecanico/perfil/perfil').then((m) => m.Perfil),
+    title: 'Oaxicanicos - Mi perfil',
+  },
+  {
+    path: 'mecanico/solicitud/:id',
+    canActivate: [sesionGuard, rolGuard('mecanico')],
+    loadComponent: () =>
+      import('./features/mecanico/detalle-solicitud/detalle-solicitud').then(
+        (m) => m.DetalleSolicitud
+      ),
+    title: 'Oaxicanicos - Solicitud',
+  },
   { path: '**', redirectTo: '' },
 ];
