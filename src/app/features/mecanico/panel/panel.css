@@ -1,3 +1,83 @@
+/* =========================================================
+   Entrada de los bloques
+
+   Cada bloque aparece un poquito despues del anterior. Es lo que
+   hace que la pantalla se sienta viva sin que nada se mueva de mas.
+   ========================================================= */
+
+.entra {
+  animation: entrar 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--retraso, 0ms);
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Hay gente a la que el movimiento le marea, y el sistema operativo
+   permite pedir que no haya animaciones. Aqui se respeta. */
+@media (prefers-reduced-motion: reduce) {
+  .entra,
+  .estado--disponible.activo .estado__punto,
+  .vacio__pulso,
+  .esqueleto__linea {
+    animation: none !important;
+  }
+}
+
+/* =========================================================
+   Saludo
+   ========================================================= */
+
+.saludo {
+  margin-bottom: 22px;
+}
+
+.saludo__hola {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--gris);
+}
+
+.saludo__nombre {
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  background: linear-gradient(100deg, var(--blanco) 20%, var(--ambar-claro));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.saludo__zona {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 7px 0 0;
+  font-size: 0.82rem;
+  color: var(--gris-tenue);
+}
+
+.saludo__zona svg {
+  flex-shrink: 0;
+  width: 14px;
+  height: 14px;
+  color: var(--ambar);
+}
+
+/* =========================================================
+   Aviso de perfil incompleto
+   ========================================================= */
+
 .aviso-perfil {
   display: flex;
   flex-direction: column;
@@ -6,7 +86,9 @@
   margin-bottom: 20px;
   border: 1px solid rgba(240, 149, 31, 0.3);
   border-radius: 14px;
-  background: var(--ambar-tenue);
+  background:
+    radial-gradient(120% 100% at 0% 0%, rgba(240, 149, 31, 0.16), transparent 60%),
+    var(--ambar-tenue);
 }
 
 .aviso-perfil__texto {
@@ -33,7 +115,9 @@
   margin-top: 0;
 }
 
-/* ---------- Selector de estado ---------- */
+/* =========================================================
+   Selector de estado
+   ========================================================= */
 
 .estados {
   display: flex;
@@ -55,12 +139,17 @@
   font-size: 0.88rem;
   font-weight: 600;
   cursor: pointer;
-  transition: border-color 180ms ease, color 180ms ease, background 180ms ease;
+  transition: border-color 180ms ease, color 180ms ease, background 180ms ease,
+    transform 180ms ease;
 }
 
 .estado:disabled {
   opacity: 0.6;
   cursor: wait;
+}
+
+.estado:active:not(:disabled) {
+  transform: scale(0.96);
 }
 
 .estado__punto {
@@ -82,9 +171,21 @@
   color: var(--exito);
 }
 
+/* El punto late solo cuando esta disponible. Es la señal de "estas en
+   linea": si no late, no le van a llegar solicitudes. */
 .estado--disponible.activo .estado__punto {
   background: var(--exito);
-  box-shadow: 0 0 0 3px rgba(74, 222, 128, 0.18);
+  animation: latir 2s ease-in-out infinite;
+}
+
+@keyframes latir {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgba(74, 222, 128, 0.5);
+  }
+  70% {
+    box-shadow: 0 0 0 7px rgba(74, 222, 128, 0);
+  }
 }
 
 .estado--ocupado.activo {
@@ -107,9 +208,60 @@
   background: var(--gris);
 }
 
-/* ---------- Tarjeta de solicitud ---------- */
+/* =========================================================
+   Resumen de cifras
+   ========================================================= */
+
+.resumen-cifras {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.cifra {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding: 14px 12px;
+  border: 1px solid var(--borde);
+  border-radius: 14px;
+  background: var(--superficie);
+  text-align: center;
+}
+
+.cifra__numero {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--ambar-claro);
+  letter-spacing: -0.02em;
+}
+
+.cifra__numero--estrella {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+}
+
+.cifra__numero--estrella svg {
+  width: 15px;
+  height: 15px;
+  color: var(--ambar);
+}
+
+.cifra__texto {
+  font-size: 0.7rem;
+  color: var(--gris-tenue);
+  line-height: 1.3;
+}
+
+/* =========================================================
+   Tarjeta de solicitud
+   ========================================================= */
 
 .tarjeta-solicitud {
+  position: relative;
   display: block;
   width: 100%;
   padding: 15px;
@@ -120,15 +272,31 @@
   font-family: inherit;
   text-align: left;
   cursor: pointer;
-  transition: border-color 180ms ease, transform 180ms ease;
+  transition: border-color 180ms ease, transform 180ms ease, box-shadow 180ms ease;
 }
 
 .tarjeta-solicitud:hover {
   border-color: rgba(240, 149, 31, 0.4);
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0, 0, 0, 0.35);
 }
 
 .tarjeta-solicitud:active {
   transform: scale(0.99);
+}
+
+.insignia-cerca {
+  position: absolute;
+  top: -8px;
+  right: 13px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--ambar);
+  color: #1a1200;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
 }
 
 .tarjeta-solicitud__fila {
@@ -187,4 +355,97 @@
   color: #1a1200;
   font-size: 0.78rem;
   font-weight: 800;
+}
+
+/* =========================================================
+   Esqueletos mientras carga
+   ========================================================= */
+
+.esqueleto {
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid var(--borde);
+  border-radius: 14px;
+  background: var(--superficie);
+}
+
+.esqueleto__linea {
+  height: 11px;
+  margin-bottom: 9px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--superficie-alta) 25%,
+    rgba(255, 255, 255, 0.07) 37%,
+    var(--superficie-alta) 63%
+  );
+  background-size: 400% 100%;
+  animation: brillar 1.4s ease-in-out infinite;
+}
+
+.esqueleto__linea:last-child {
+  margin-bottom: 0;
+}
+
+.esqueleto__linea--corta {
+  width: 42%;
+}
+
+.esqueleto__linea--media {
+  width: 68%;
+}
+
+@keyframes brillar {
+  from {
+    background-position: 100% 50%;
+  }
+  to {
+    background-position: 0 50%;
+  }
+}
+
+/* =========================================================
+   Estado vacio
+   ========================================================= */
+
+.vacio {
+  padding: 26px 16px 20px;
+  text-align: center;
+}
+
+.vacio__dibujo {
+  width: 130px;
+  height: auto;
+  margin-bottom: 14px;
+  color: var(--ambar);
+}
+
+.vacio__pulso {
+  animation: subir 2.4s ease-in-out infinite;
+  transform-origin: center;
+}
+
+@keyframes subir {
+  0%,
+  100% {
+    opacity: 0.25;
+    transform: translateY(2px);
+  }
+  50% {
+    opacity: 0.9;
+    transform: translateY(-4px);
+  }
+}
+
+.vacio__titulo {
+  margin: 0 0 6px;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--blanco);
+}
+
+.vacio .texto-suave {
+  margin: 0;
+  max-width: 34ch;
+  margin-inline: auto;
 }

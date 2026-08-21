@@ -8,6 +8,7 @@ import {
 } from '../../../core/models/mecanico.model';
 import { Solicitud, SolicitudCercana } from '../../../core/models/solicitud.model';
 import { MecanicoService } from '../../../core/services/mecanico.service';
+import { SesionService } from '../../../core/services/sesion.service';
 import { SolicitudService } from '../../../core/services/solicitud.service';
 import { calcularDistanciaKm, formatearDistancia, haceCuanto } from '../../../core/utils/distancia.util';
 import { BarraSuperior } from '../../../shared/barra-superior/barra-superior';
@@ -23,6 +24,7 @@ const ESTADOS: EstadoMecanico[] = ['disponible', 'ocupado', 'no_disponible'];
 export class Panel implements OnInit {
   private readonly mecanicoService = inject(MecanicoService);
   private readonly solicitudService = inject(SolicitudService);
+  private readonly sesion = inject(SesionService);
   private readonly router = inject(Router);
 
   protected readonly estados = ESTADOS;
@@ -41,6 +43,39 @@ export class Panel implements OnInit {
   protected readonly estadoActual = computed<EstadoMecanico>(
     () => this.perfil()?.estado ?? 'no_disponible'
   );
+
+  /** Solo el primer nombre: "Buenas tardes, Juan" se lee mejor que el nombre completo */
+  protected readonly primerNombre = computed(
+    () => this.sesion.usuario()?.nombre?.trim().split(' ')[0] ?? ''
+  );
+
+  /**
+   * Saludo segun la hora del reloj del celular.
+   * No necesita al back para nada.
+   */
+  protected readonly saludo = computed(() => {
+    const hora = new Date().getHours();
+    if (hora < 12) return 'Buenos días';
+    if (hora < 19) return 'Buenas tardes';
+    return 'Buenas noches';
+  });
+
+  // ---- Numeros del resumen. Todos salen de lo que el front ya tiene ----
+
+  protected readonly cuantasSolicitudes = computed(() => this.solicitudes().length);
+
+  /** La lista viene ordenada por cercania, asi que la primera es la mas cerca */
+  protected readonly masCercana = computed(() => {
+    const primera = this.solicitudes()[0];
+    if (!primera || !this.perfilCompleto()) {
+      return null;
+    }
+    return formatearDistancia(primera.distanciaKm);
+  });
+
+  protected readonly calificacion = computed(() => this.perfil()?.calificacion ?? null);
+
+  protected readonly zonaTrabajo = computed(() => this.perfil()?.zonaTrabajo ?? '');
 
   ngOnInit(): void {
     this.mecanicoService.cargarPerfil().subscribe(() => {

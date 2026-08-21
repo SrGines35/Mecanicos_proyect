@@ -1,9 +1,25 @@
 <app-barra-superior titulo="Panel del mecánico" />
 
 <main class="contenedor">
+  <!-- Saludo -->
+  <header class="saludo entra" style="--retraso: 0ms">
+    <p class="saludo__hola">{{ saludo() }},</p>
+    <h1 class="saludo__nombre">{{ primerNombre() }}</h1>
+    @if (zonaTrabajo()) {
+      <p class="saludo__zona">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z" />
+          <circle cx="12" cy="10" r="3" />
+        </svg>
+        {{ zonaTrabajo() }}
+      </p>
+    }
+  </header>
+
   <!-- Aviso cuando falta llenar el perfil -->
   @if (!cargando() && !perfilCompleto()) {
-    <div class="aviso-perfil">
+    <div class="aviso-perfil entra" style="--retraso: 60ms">
       <div class="aviso-perfil__texto">
         <strong>Completa tu perfil</strong>
         <span>
@@ -16,7 +32,7 @@
   }
 
   <!-- Estado -->
-  <section class="bloque">
+  <section class="bloque entra" style="--retraso: 120ms">
     <h2 class="bloque__titulo">Tu estado</h2>
 
     <div class="estados" role="radiogroup" aria-label="Estado del mecánico">
@@ -39,30 +55,90 @@
     <p class="campo__ayuda">{{ ayudaEstado[estadoActual()] }}</p>
   </section>
 
+  <!-- Resumen. Todos estos numeros salen de lo que el front ya calcula. -->
+  @if (perfilCompleto()) {
+    <section class="resumen-cifras entra" style="--retraso: 180ms">
+      <div class="cifra">
+        <span class="cifra__numero">{{ cuantasSolicitudes() }}</span>
+        <span class="cifra__texto">
+          {{ cuantasSolicitudes() === 1 ? 'solicitud' : 'solicitudes' }}
+        </span>
+      </div>
+
+      <div class="cifra">
+        <span class="cifra__numero">{{ masCercana() ?? '—' }}</span>
+        <span class="cifra__texto">la más cerca</span>
+      </div>
+
+      <div class="cifra">
+        <span class="cifra__numero cifra__numero--estrella">
+          {{ calificacion() ?? '—' }}
+          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.3l6.5-.9z" />
+          </svg>
+        </span>
+        <span class="cifra__texto">tu calificación</span>
+      </div>
+    </section>
+  }
+
   <!-- Solicitudes -->
-  <section class="bloque">
+  <section class="bloque entra" style="--retraso: 300ms">
     <div class="bloque__encabezado">
       <h2 class="bloque__titulo">Solicitudes nuevas</h2>
-      @if (!cargando()) {
-        <span class="contador">{{ solicitudes().length }}</span>
+      @if (!cargando() && cuantasSolicitudes() > 0) {
+        <span class="contador">{{ cuantasSolicitudes() }}</span>
       }
     </div>
 
     @if (cargando()) {
-      <div class="estado-vacio">
-        <div class="cargador cargador--gris"></div>
-        <p class="texto-suave">Buscando solicitudes...</p>
-      </div>
-    } @else if (solicitudes().length === 0) {
-      <div class="estado-vacio">
+      <!-- Esqueletos en vez de una ruedita: se ve la forma de lo que va a llegar -->
+      @for (hueco of [1, 2]; track hueco) {
+        <div class="esqueleto">
+          <div class="esqueleto__linea esqueleto__linea--corta"></div>
+          <div class="esqueleto__linea esqueleto__linea--media"></div>
+          <div class="esqueleto__linea"></div>
+        </div>
+      }
+    } @else if (cuantasSolicitudes() === 0) {
+      <div class="vacio">
+        <svg class="vacio__dibujo" viewBox="0 0 120 80" fill="none" aria-hidden="true">
+          <path d="M18 54h84" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                opacity="0.35" />
+          <path d="M28 54V42l8-12h30l10 12h12a6 6 0 0 1 6 6v6"
+                stroke="currentColor" stroke-width="2" stroke-linejoin="round"
+                stroke-linecap="round" opacity="0.55" />
+          <circle cx="40" cy="56" r="6" stroke="currentColor" stroke-width="2" opacity="0.7" />
+          <circle cx="82" cy="56" r="6" stroke="currentColor" stroke-width="2" opacity="0.7" />
+          <path d="M52 30v12M66 30v12" stroke="currentColor" stroke-width="2" opacity="0.35" />
+          <circle class="vacio__pulso" cx="60" cy="20" r="4" fill="currentColor" />
+        </svg>
+
+        <p class="vacio__titulo">Todo tranquilo por ahora</p>
         <p class="texto-suave">
-          No tienes solicitudes por ahora. Cuando alguien pida un mecánico cerca de
-          ti, va a aparecer aquí.
+          @if (estadoActual() === 'disponible') {
+            Estás disponible. En cuanto alguien pida un mecánico cerca de ti, la
+            solicitud va a aparecer aquí.
+          } @else {
+            No apareces en las búsquedas. Ponte <strong>disponible</strong> para
+            empezar a recibir solicitudes.
+          }
         </p>
       </div>
     } @else {
-      @for (solicitud of solicitudes(); track solicitud.id) {
-        <button class="tarjeta-solicitud" type="button" (click)="abrirSolicitud(solicitud.id)">
+      @for (solicitud of solicitudes(); track solicitud.id; let i = $index) {
+        <!-- El retraso va contado desde que llega la lista, no desde que abre
+             la pantalla: las solicitudes tardan en responder. -->
+        <button
+          class="tarjeta-solicitud entra"
+          [style.--retraso]="i * 70 + 'ms'"
+          type="button"
+          (click)="abrirSolicitud(solicitud.id)"
+        >
+          @if (i === 0 && perfilCompleto()) {
+            <span class="insignia-cerca">La más cerca</span>
+          }
+
           <div class="tarjeta-solicitud__fila">
             <span class="tarjeta-solicitud__cliente">{{ solicitud.cliente.nombre }}</span>
             <span class="tarjeta-solicitud__tiempo">{{ cuando(solicitud.fechaCreacion) }}</span>
