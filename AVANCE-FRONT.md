@@ -42,7 +42,6 @@ más: los servicios ya apuntan a los endpoints correctos.
 |---|---|---|
 | `/` | todos | Iniciar sesión |
 | `/registro` | todos | Crear cuenta, como cliente o como mecánico |
-| `/recuperar` | todos | Recuperar contraseña *(simulada, falta el back)* |
 | `/cliente` | cliente | Inicio del cliente *(le toca a Luz)* |
 | `/mecanico` | mecánico | Panel: estado y solicitudes nuevas |
 | `/mecanico/perfil` | mecánico | Descripción, zona y ubicación |
@@ -81,11 +80,10 @@ src/app/
     interceptores/ -> el que renueva el token
     validadores/   -> las reglas de validación
     utils/         -> cálculo de distancia (Haversine)
-  shared/          -> logo, ojito de contraseña, barra superior, mapa, directivas
+  shared/          -> logo, ojito, barra superior, menú inferior, mapa, directivas
   features/
     login/
     registro/
-    recuperar/
     no-encontrada/
     cliente/       -> LE TOCA A LUZ
     mecanico/      -> panel, perfil, detalle-solicitud
@@ -119,7 +117,7 @@ El rol se llama **`cliente`** o **`mecanico`** (no "usuario").
 ### Endpoints que todavía faltan del back
 
 ```
-POST   /auth/recuperar
+PATCH  /auth/me
 DELETE /auth/me
 GET    /mecanicos/mi-perfil
 PUT    /mecanicos/mi-perfil
@@ -155,6 +153,12 @@ Al terminar de llenar el perfil **por primera vez**, el mecánico queda
 que él elija: si se pone en `no_disponible` y luego edita su descripción, no se
 le vuelve a prender.
 
+### Lo que se quitó
+
+**Recuperar contraseña.** La pantalla existía y funcionaba, pero el equipo
+decidió no incluirla en esta entrega. Si algún día se retoma, está en el
+historial de git.
+
 ### Dos cosas que el back tiene pendientes
 
 1. **`GET /auth/me` no devuelve el `nombre`**, solo id, correo y role. Por eso
@@ -185,16 +189,21 @@ Local Storage → borrar las llaves que empiezan con `oaxicanicos.`
 - [ ] Pantallas del cliente: mapa, lista de mecánicos, crear solicitud (Luz)
 - [ ] Conectar con los endpoints reales cuando existan
 - [ ] Historial de servicios y ganancias del mecánico
-- [ ] Que el correo de recuperar contraseña se mande de verdad
-      (falta `POST /auth/recuperar` del lado del back)
 - [ ] Que eliminar cuenta borre de verdad en la base de datos
       (falta `DELETE /auth/me` del lado del back)
+- [ ] Que editar el teléfono se guarde de verdad
+      (falta `PATCH /auth/me` del lado del back)
 - [ ] Eliminar cuenta también desde las pantallas del cliente (Luz)
 - [ ] Que el cliente pueda calificar al mecánico al terminar
-- [ ] Recuperar contraseña
 
 ## Notas técnicas
 
+- La navegación del mecánico es un **menú fijo abajo** (`shared/menu-inferior`)
+  con Inicio y Perfil, como las apps del celular. El botón de Salir se queda en
+  la barra de arriba.
+- El **teléfono vive en el usuario**, no en el perfil del mecánico, porque lo
+  tienen las dos clases de usuario. Por eso se guarda con otro endpoint y en la
+  pantalla va en su propio bloque, separado del perfil de trabajo.
 - Angular 21, componentes standalone, sin zone.js. El estado se maneja con
   **signals**.
 - Formularios **reactivos**, no `ngModel`.
