@@ -51,5 +51,12 @@ export const routes: Routes = [
       ),
     title: 'Oaxicanicos - Solicitud',
   },
-  { path: '**', redirectTo: '' },
+  // Cualquier direccion que no exista. Antes mandaba al login sin decir nada,
+  // lo cual confundia: parecia que la app te habia sacado.
+  {
+    path: '**',
+    loadComponent: () =>
+      import('./features/no-encontrada/no-encontrada').then((m) => m.NoEncontrada),
+    title: 'Oaxicanicos - Página no encontrada',
+  },
 ];
