@@ -81,3 +81,39 @@
 .zona-riesgo .boton-peligro {
   margin-top: 0;
 }
+
+/* ---------- Datos de la cuenta que no se pueden cambiar ---------- */
+
+.dato-fijo {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.dato-fijo:first-of-type {
+  padding-top: 0;
+}
+
+.dato-fijo__etiqueta {
+  flex-shrink: 0;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gris);
+}
+
+.dato-fijo__valor {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  color: var(--blanco);
+}
+
+/* El primer campo despues de los datos fijos necesita aire */
+.dato-fijo + form .campo {
+  margin-top: 16px;
+}

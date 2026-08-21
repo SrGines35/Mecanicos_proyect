@@ -7,6 +7,8 @@ import { MecanicoService } from '../../../core/services/mecanico.service';
 import { SesionService } from '../../../core/services/sesion.service';
 import { BarraSuperior } from '../../../shared/barra-superior/barra-superior';
 import { MenuInferior } from '../../../shared/menu-inferior/menu-inferior';
+import { SoloNumeros } from '../../../shared/directivas/solo-numeros';
+import { PATRON_TELEFONO } from '../../../core/validadores/validadores';
 import { Coordenadas, MapaUbicacion } from '../../../shared/mapa-ubicacion/mapa-ubicacion';
 
 /** Centro de Oaxaca. Solo sirve para que el mapa arranque en algun lado. */
@@ -15,7 +17,7 @@ const OAXACA_LNG = -96.7237;
 
 @Component({
   selector: 'app-perfil',
-  imports: [ReactiveFormsModule, BarraSuperior, MapaUbicacion, MenuInferior],
+  imports: [ReactiveFormsModule, BarraSuperior, MapaUbicacion, MenuInferior, SoloNumeros],
   templateUrl: './perfil.html',
   styleUrl: './perfil.css',
 })
@@ -47,6 +49,22 @@ export class Perfil implements OnInit {
     zonaTrabajo: ['', [Validators.required, Validators.minLength(4)]],
   });
 
+  /**
+   * Los datos de la cuenta van en su propio formulario, aparte del perfil
+   * de trabajo. Son cosas distintas: el telefono es del usuario y lo tienen
+   * las dos clases (cliente y mecanico); la descripcion y la zona solo las
+   * tiene el mecanico. Ademas se guardan en endpoints distintos.
+   */
+  protected readonly formularioDatos = this.fb.nonNullable.group({
+    telefono: ['', [Validators.required, Validators.pattern(PATRON_TELEFONO)]],
+  });
+
+  protected readonly guardandoDatos = signal(false);
+  protected readonly datosGuardados = signal(false);
+
+  protected readonly correo = computed(() => this.sesion.usuario()?.correo ?? '');
+  protected readonly nombre = computed(() => this.sesion.usuario()?.nombre ?? '');
+
   protected readonly tieneUbicacion = computed(
     () => this.latitud() !== 0 && this.longitud() !== 0
   );
@@ -65,6 +83,10 @@ export class Perfil implements OnInit {
   );
 
   ngOnInit(): void {
+    this.formularioDatos.patchValue({
+      telefono: this.sesion.usuario()?.telefono ?? '',
+    });
+
     this.mecanicoService.cargarPerfil().subscribe({
       next: (perfil) => {
         if (perfil) {
@@ -155,6 +177,37 @@ export class Perfil implements OnInit {
         error: () => {
           this.guardando.set(false);
           this.errorServidor.set('No pudimos guardar tu perfil. Intenta de nuevo.');
+        },
+      });
+  }
+
+  protected mostrarErrorTelefono(): boolean {
+    const control = this.formularioDatos.controls.telefono;
+    return control.invalid && control.touched;
+  }
+
+  protected guardarDatos(): void {
+    this.errorServidor.set(null);
+    this.datosGuardados.set(false);
+
+    if (this.formularioDatos.invalid || this.guardandoDatos()) {
+      this.formularioDatos.markAllAsTouched();
+      return;
+    }
+
+    this.guardandoDatos.set(true);
+
+    this.auth
+      .actualizarDatos({ telefono: this.formularioDatos.getRawValue().telefono })
+      .subscribe({
+        next: () => {
+          this.guardandoDatos.set(false);
+          this.datosGuardados.set(true);
+          this.formularioDatos.markAsPristine();
+        },
+        error: () => {
+          this.guardandoDatos.set(false);
+          this.errorServidor.set('No pudimos guardar tu teléfono. Intenta de nuevo.');
         },
       });
   }

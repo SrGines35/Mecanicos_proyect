@@ -3,7 +3,13 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, delay, of, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { Credenciales, DatosRegistro, RespuestaAuth, Tokens } from '../models/auth.model';
+import {
+  Credenciales,
+  DatosRegistro,
+  RespuestaAuth,
+  Tokens,
+  Usuario,
+} from '../models/auth.model';
 import { SesionService } from './sesion.service';
 
 /**
@@ -79,6 +85,36 @@ export class AuthService {
 
   cerrarSesion(): void {
     this.sesion.limpiar();
+  }
+
+  /**
+   * Cambia datos de la cuenta. Por ahora solo el telefono.
+   *
+   * El telefono vive en el usuario, no en el perfil del mecanico, porque lo
+   * tienen las dos clases de usuario: el cliente tambien lo necesita para
+   * que el mecanico le pueda marcar.
+   *
+   * PENDIENTE DEL BACK: falta PATCH /auth/me.
+   */
+  actualizarDatos(cambios: { telefono: string }): Observable<Usuario> {
+    if (!environment.usarApiReal) {
+      const cuentas = this.cuentasSimuladas;
+      const correo = this.sesion.usuario()?.correo?.toLowerCase();
+      const cuenta = correo ? cuentas.get(correo) : undefined;
+
+      if (cuenta) {
+        cuentas.set(correo!, { ...cuenta, telefono: cambios.telefono });
+        this.guardarCuentas(cuentas);
+      }
+
+      this.sesion.actualizarUsuario(cambios);
+
+      return of(this.sesion.usuario()!).pipe(delay(this.RETARDO_MS));
+    }
+
+    return this.http
+      .patch<Usuario>(`${this.base}/me`, cambios)
+      .pipe(tap((u) => this.sesion.actualizarUsuario(u)));
   }
 
   /**

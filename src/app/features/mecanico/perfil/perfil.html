@@ -13,6 +13,61 @@
       </div>
     }
 
+    <!-- Datos de la cuenta. Van aparte porque se guardan en otro lado. -->
+    <section class="bloque">
+      <h2 class="bloque__titulo">Tus datos</h2>
+
+      <div class="dato-fijo">
+        <span class="dato-fijo__etiqueta">Nombre</span>
+        <span class="dato-fijo__valor">{{ nombre() }}</span>
+      </div>
+
+      <div class="dato-fijo">
+        <span class="dato-fijo__etiqueta">Correo</span>
+        <span class="dato-fijo__valor">{{ correo() }}</span>
+      </div>
+
+      <form [formGroup]="formularioDatos" (ngSubmit)="guardarDatos()" novalidate>
+        <div class="campo">
+          <label for="telefono">Teléfono</label>
+          <input
+            id="telefono"
+            type="tel"
+            inputmode="numeric"
+            formControlName="telefono"
+            appSoloNumeros
+            [maxDigitos]="10"
+            placeholder="9511234567"
+          />
+          @if (mostrarErrorTelefono()) {
+            <p class="campo__error">Escribe un teléfono de 10 dígitos</p>
+          } @else {
+            <p class="campo__ayuda">
+              Es el número al que te va a marcar el cliente. Si te cambia, actualízalo aquí.
+            </p>
+          }
+        </div>
+
+        @if (datosGuardados()) {
+          <div class="auth-aviso auth-aviso--exito">
+            <span>Tu teléfono quedó actualizado.</span>
+          </div>
+        }
+
+        <button
+          type="submit"
+          class="boton-secundario"
+          [disabled]="guardandoDatos() || formularioDatos.pristine"
+        >
+          @if (guardandoDatos()) {
+            <span class="cargador cargador--gris"></span>Guardando...
+          } @else {
+            Guardar teléfono
+          }
+        </button>
+      </form>
+    </section>
+
     <p class="texto-suave intro">
       Estos datos son los que van a ver los clientes cuando te encuentren.
     </p>

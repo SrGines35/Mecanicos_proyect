@@ -31,6 +31,21 @@ export class SesionService {
     this.usuario.set(usuario);
   }
 
+  /**
+   * Cambia datos del usuario guardado sin tocar los tokens.
+   * Se usa al editar el telefono desde el perfil.
+   */
+  actualizarUsuario(cambios: Partial<Usuario>): void {
+    const actual = this.usuario();
+    if (!actual) {
+      return;
+    }
+
+    const nuevo = { ...actual, ...cambios };
+    localStorage.setItem(CLAVE_USUARIO, JSON.stringify(nuevo));
+    this.usuario.set(nuevo);
+  }
+
   /** Guarda solo los tokens nuevos, sin tocar el usuario */
   actualizarTokens(tokens: Tokens): void {
     localStorage.setItem(CLAVE_ACCESS, tokens.accessToken);
