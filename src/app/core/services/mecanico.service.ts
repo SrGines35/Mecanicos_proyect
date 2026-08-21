@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, delay, of, tap } from 'rxjs';
+import { Observable, delay, of, switchMap, tap } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
@@ -87,12 +87,27 @@ export class MecanicoService {
   }
 
   guardarPerfil(datos: DatosPerfilMecanico): Observable<PerfilMecanico> {
+    const previo = this.perfilSimulado ?? this.perfil();
+
+    /**
+     * Al terminar de llenar el perfil por primera vez, el mecanico queda
+     * disponible sin tener que ir a prenderlo a mano.
+     *
+     * Solo pasa la primera vez, cuando el perfil pasa de incompleto a
+     * completo. Si despues el mecanico se pone en no_disponible y luego
+     * edita su descripcion, se respeta lo que el eligio: seria muy molesto
+     * que la app lo volviera a poner disponible sin avisarle.
+     */
+    const seCompletoAhora =
+      !this.perfilCompleto(previo) &&
+      this.perfilCompleto({ ...(previo ?? this.perfilVacio()), ...datos });
+
     if (!environment.usarApiReal) {
       const actualizado: PerfilMecanico = {
-        usuarioId: this.sesion.usuario()?.id ?? 'sim',
+        usuarioId: this.idActual(),
         ...datos,
-        estado: this.perfilSimulado?.estado ?? 'no_disponible',
-        calificacion: this.perfilSimulado?.calificacion ?? 5,
+        estado: seCompletoAhora ? 'disponible' : previo?.estado ?? 'no_disponible',
+        calificacion: previo?.calificacion ?? 5,
       };
       this.perfilSimulado = actualizado;
 
@@ -102,9 +117,24 @@ export class MecanicoService {
       );
     }
 
-    return this.http
-      .put<PerfilMecanico>(`${this.base}/mi-perfil`, datos)
-      .pipe(tap((p) => this.perfil.set(p)));
+    return this.http.put<PerfilMecanico>(`${this.base}/mi-perfil`, datos).pipe(
+      // Son dos llamadas porque el back guarda el perfil y el estado por
+      // separado. Si falla la segunda, el perfil ya quedo guardado.
+      switchMap((p) => (seCompletoAhora ? this.cambiarEstado('disponible') : of(p))),
+      tap((p) => this.perfil.set(p))
+    );
+  }
+
+  private perfilVacio(): PerfilMecanico {
+    return {
+      usuarioId: this.idActual(),
+      descripcion: '',
+      zonaTrabajo: '',
+      latitud: 0,
+      longitud: 0,
+      estado: 'no_disponible',
+      calificacion: 5,
+    };
   }
 
   cambiarEstado(estado: EstadoMecanico): Observable<PerfilMecanico> {
@@ -131,6 +161,25 @@ export class MecanicoService {
     return this.http
       .patch<PerfilMecanico>(`${this.base}/estado`, { estado })
       .pipe(tap((p) => this.perfil.set(p)));
+  }
+
+  /**
+   * Borra el perfil guardado de un mecanico.
+   *
+   * Recibe el id en vez de sacarlo de la sesion porque se usa al eliminar
+   * la cuenta, cuando la sesion ya se cerro y no habria de donde sacarlo.
+   */
+  olvidarPerfil(usuarioId: string): void {
+    const perfiles = this.leerPerfiles();
+    delete perfiles[usuarioId];
+
+    try {
+      localStorage.setItem(this.LLAVE_PERFILES, JSON.stringify(perfiles));
+    } catch {
+      // Si el navegador no deja guardar, no pasa nada grave.
+    }
+
+    this.perfil.set(null);
   }
 
   /**
