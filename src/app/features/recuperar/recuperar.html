@@ -1,0 +1,55 @@
+<div class="auth-pagina">
+  <div class="auth-tarjeta">
+    <div class="auth-marca">
+      <app-logo />
+      <h1>Oaxi<span>canicos</span></h1>
+      <p class="auth-subtitulo">Recuperar tu contraseña</p>
+    </div>
+
+    @if (enviado()) {
+      <div class="auth-aviso auth-aviso--exito">
+        <span>
+          Si hay una cuenta con <strong>{{ correoEscrito }}</strong>, te llegará un
+          correo con las instrucciones para cambiar tu contraseña.
+        </span>
+      </div>
+
+      <p class="texto-suave nota-revisa">
+        Revisa también la carpeta de spam. El enlace dura una hora.
+      </p>
+
+      <p class="auth-alt"><a routerLink="/">Volver a iniciar sesión</a></p>
+    } @else {
+      <p class="texto-suave intro">
+        Escribe el correo con el que te registraste y te mandamos un enlace para
+        crear una contraseña nueva.
+      </p>
+
+      <form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+        <div class="campo">
+          <label for="correo">Correo</label>
+          <input
+            id="correo"
+            type="email"
+            formControlName="correo"
+            autocomplete="email"
+            placeholder="tucorreo@ejemplo.com"
+          />
+          @if (mostrarError()) {
+            <p class="campo__error">Escribe un correo válido, por ejemplo ana&#64;correo.com</p>
+          }
+        </div>
+
+        <button type="submit" class="boton-primario" [disabled]="enviando()">
+          @if (enviando()) {
+            <span class="cargador"></span>Enviando...
+          } @else {
+            Enviar enlace
+          }
+        </button>
+      </form>
+
+      <p class="auth-alt">¿Ya te acordaste? <a routerLink="/">Inicia sesión</a></p>
+    }
+  </div>
+</div>
