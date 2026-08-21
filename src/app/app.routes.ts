@@ -16,12 +16,6 @@ export const routes: Routes = [
     title: 'Oaxicanicos - Crear cuenta',
   },
   {
-    path: 'recuperar',
-    canActivate: [invitadoGuard],
-    loadComponent: () => import('./features/recuperar/recuperar').then((m) => m.Recuperar),
-    title: 'Oaxicanicos - Recuperar contraseña',
-  },
-  {
     path: 'cliente',
     canActivate: [sesionGuard, rolGuard('cliente')],
     loadComponent: () =>
