@@ -42,7 +42,7 @@ más: los servicios ya apuntan a los endpoints correctos.
 |---|---|---|
 | `/` | todos | Iniciar sesión |
 | `/registro` | todos | Crear cuenta, como cliente o como mecánico |
-| `/cliente` | cliente | Inicio del cliente *(le toca a Luz)* |
+
 | `/mecanico` | mecánico | Panel: estado y solicitudes nuevas |
 | `/mecanico/perfil` | mecánico | Descripción, zona y ubicación |
 | `/mecanico/solicitud/:id` | mecánico | Detalle, mapa, costos y avance del servicio |
@@ -121,6 +121,7 @@ PATCH  /auth/me
 DELETE /auth/me
 GET    /mecanicos/mi-perfil
 PUT    /mecanicos/mi-perfil
+GET    /mecanicos/disponibles
 PATCH  /mecanicos/estado
 POST   /solicitudes
 GET    /solicitudes

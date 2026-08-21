@@ -11,6 +11,47 @@ import {
 import { SesionService } from './sesion.service';
 
 /**
+ * Mecanicos de ejemplo, para que la pantalla del cliente no se vea vacia
+ * antes de que alguien se registre como mecanico en esta computadora.
+ * Estan alrededor de San Pablo Huixtepec.
+ */
+const MECANICOS_EJEMPLO: PerfilMecanico[] = [
+  {
+    usuarioId: 'ej-1',
+    nombre: 'Juan Ramírez Cruz',
+    telefono: '9515551001',
+    descripcion: 'Taller propio sobre la carretera. Motor, afinación y diagnóstico.',
+    zonaTrabajo: 'Centro de San Pablo Huixtepec',
+    latitud: 16.8215,
+    longitud: -96.7851,
+    estado: 'disponible',
+    calificacion: 4.8,
+  },
+  {
+    usuarioId: 'ej-2',
+    nombre: 'Lucía Hernández Gómez',
+    telefono: '9515552002',
+    descripcion: 'Servicio a domicilio. Sistema eléctrico, alternador y marcha.',
+    zonaTrabajo: 'San Pablo Huixtepec y Zimatlán',
+    latitud: 16.8178,
+    longitud: -96.7802,
+    estado: 'disponible',
+    calificacion: 4.6,
+  },
+  {
+    usuarioId: 'ej-3',
+    nombre: 'Rosa Jiménez Santos',
+    telefono: '9515554004',
+    descripcion: 'Vulcanizadora y auxilio vial. Cambio de llanta a domicilio.',
+    zonaTrabajo: 'Agencias cercanas',
+    latitud: 16.8302,
+    longitud: -96.7889,
+    estado: 'disponible',
+    calificacion: 4.9,
+  },
+];
+
+/**
  * Perfil del mecanico que inicio sesion.
  *
  * Endpoints del back:
@@ -103,8 +144,12 @@ export class MecanicoService {
       this.perfilCompleto({ ...(previo ?? this.perfilVacio()), ...datos });
 
     if (!environment.usarApiReal) {
+      const usuario = this.sesion.usuario();
+
       const actualizado: PerfilMecanico = {
         usuarioId: this.idActual(),
+        nombre: usuario?.nombre,
+        telefono: usuario?.telefono,
         ...datos,
         estado: seCompletoAhora ? 'disponible' : previo?.estado ?? 'no_disponible',
         calificacion: previo?.calificacion ?? 5,
@@ -161,6 +206,28 @@ export class MecanicoService {
     return this.http
       .patch<PerfilMecanico>(`${this.base}/estado`, { estado })
       .pipe(tap((p) => this.perfil.set(p)));
+  }
+
+  /**
+   * Los mecanicos que el cliente puede ver: disponibles y con el perfil
+   * completo. La pantalla del cliente los ordena por cercania.
+   *
+   * En modo simulado salen de los perfiles guardados en el navegador, o
+   * sea de los mecanicos que de verdad se registraron en esta computadora.
+   * Si todavia no hay ninguno, se devuelven los de ejemplo para que la
+   * pantalla no se vea vacia.
+   */
+  listarDisponibles(): Observable<PerfilMecanico[]> {
+    if (!environment.usarApiReal) {
+      const registrados = Object.values(this.leerPerfiles()).filter(
+        (p) => p.estado === 'disponible' && this.perfilCompleto(p)
+      );
+
+      const lista = registrados.length > 0 ? registrados : MECANICOS_EJEMPLO;
+      return of(lista.map((p) => ({ ...p }))).pipe(delay(this.RETARDO_MS));
+    }
+
+    return this.http.get<PerfilMecanico[]>(`${this.base}/disponibles`);
   }
 
   /**
