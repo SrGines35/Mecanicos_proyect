@@ -49,11 +49,11 @@
       <div class="campo">
         <span class="campo-label">Tu ubicación</span>
 
-        <div class="ubicacion" [class.ubicacion--lista]="tieneUbicacion">
-          @if (tieneUbicacion) {
+        <div class="ubicacion" [class.ubicacion--lista]="tieneUbicacion()">
+          @if (tieneUbicacion()) {
             <div class="ubicacion__dato">
               <strong>Ubicación marcada</strong>
-              <code>{{ coordenadas }}</code>
+              <code>{{ coordenadas() }}</code>
             </div>
           } @else {
             <div class="ubicacion__dato">
@@ -70,13 +70,21 @@
           >
             @if (buscandoUbicacion()) {
               <span class="cargador cargador--gris"></span>Buscando...
-            } @else if (tieneUbicacion) {
-              Actualizar
+            } @else if (tieneUbicacion()) {
+              Usar mi GPS
             } @else {
               Usar mi ubicación
             }
           </button>
         </div>
+
+        <app-mapa-ubicacion
+          [latitud]="centroLat()"
+          [longitud]="centroLng()"
+          [editable]="true"
+          [zoom]="tieneUbicacion() ? 16 : 13"
+          (ubicacionCambiada)="moverPin($event)"
+        />
 
         @if (avisoUbicacion(); as aviso) {
           <p class="campo__error">{{ aviso }}</p>
