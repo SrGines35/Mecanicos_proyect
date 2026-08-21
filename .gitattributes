@@ -1,0 +1,12 @@
+# Todos los archivos de texto se guardan con finales de linea de Unix (LF).
+#
+# Sin esto, Windows los guarda con CRLF y git cree que el archivo entero
+# cambio aunque no hayas tocado nada. Eso ensucia los commits y provoca
+# conflictos falsos al juntar el trabajo con el de los demas.
+* text=auto eol=lf
+
+# Estos son binarios, no se les toca nada.
+*.png binary
+*.jpg binary
+*.ico binary
+*.gz  binary
