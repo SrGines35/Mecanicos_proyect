@@ -16,7 +16,6 @@ export class Perfil {
     nombre: 'Usuario',
     correo: 'correo@ejemplo.com',
     telefono: '9510000000',
-    vehiculo: 'Nissan Versa 2018 blanco'
   };
 
 

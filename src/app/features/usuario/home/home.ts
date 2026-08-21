@@ -10,6 +10,6 @@ import { RouterLink } from '@angular/router';
 })
 export class Home {
 
-  nombre = 'Usuario';
+  nombreUsuario = 'Usuario';
 
 }

@@ -1,11 +1,9 @@
 import { Component } from '@angular/core';
 
 @Component({
-  selector: 'app-solicitar-servicio',
-  imports: [],
-  templateUrl: './solicitar-servicio.html',
-  styleUrl: './solicitar-servicio.css',
+	selector: 'app-solicitar-servicio',
+	standalone: true,
+	templateUrl: './solicitar-servicio.html',
+	styleUrl: './solicitar-servicio.css'
 })
-export class SolicitarServicio {
-
-}
+export class SolicitarServicio {}
