@@ -1,0 +1,7 @@
+<div class="mapa" [class.mapa--editable]="editable()">
+  <div class="mapa__lienzo" #lienzo></div>
+
+  @if (editable()) {
+    <p class="mapa__ayuda">Arrastra el pin o toca el mapa para corregir tu ubicación.</p>
+  }
+</div>
