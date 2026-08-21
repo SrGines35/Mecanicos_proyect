@@ -2,7 +2,9 @@ import { Component, OnInit, computed, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
+import { AuthService } from '../../../core/services/auth.service';
 import { MecanicoService } from '../../../core/services/mecanico.service';
+import { SesionService } from '../../../core/services/sesion.service';
 import { BarraSuperior } from '../../../shared/barra-superior/barra-superior';
 import { Coordenadas, MapaUbicacion } from '../../../shared/mapa-ubicacion/mapa-ubicacion';
 
@@ -19,6 +21,8 @@ const OAXACA_LNG = -96.7237;
 export class Perfil implements OnInit {
   private readonly fb = inject(FormBuilder);
   private readonly mecanicoService = inject(MecanicoService);
+  private readonly auth = inject(AuthService);
+  private readonly sesion = inject(SesionService);
   private readonly router = inject(Router);
 
   protected readonly cargando = signal(true);
@@ -152,5 +156,46 @@ export class Perfil implements OnInit {
           this.errorServidor.set('No pudimos guardar tu perfil. Intenta de nuevo.');
         },
       });
+  }
+
+  // -----------------------------------------------------------------
+  // Eliminar cuenta
+  // -----------------------------------------------------------------
+
+  protected readonly confirmando = signal(false);
+  protected readonly eliminando = signal(false);
+
+  protected pedirConfirmacion(): void {
+    this.confirmando.set(true);
+  }
+
+  protected cancelarEliminar(): void {
+    this.confirmando.set(false);
+  }
+
+  protected eliminarCuenta(): void {
+    if (this.eliminando()) {
+      return;
+    }
+
+    this.eliminando.set(true);
+
+    // Se guarda antes: al eliminar la cuenta la sesion se cierra y despues
+    // ya no habria de donde sacar el id.
+    const usuarioId = this.sesion.usuario()?.id;
+
+    this.auth.eliminarCuenta().subscribe({
+      next: () => {
+        if (usuarioId) {
+          this.mecanicoService.olvidarPerfil(usuarioId);
+        }
+        void this.router.navigate(['/']);
+      },
+      error: () => {
+        this.eliminando.set(false);
+        this.confirmando.set(false);
+        this.errorServidor.set('No pudimos eliminar la cuenta. Intenta de nuevo.');
+      },
+    });
   }
 }

@@ -81,6 +81,37 @@ export class AuthService {
     this.sesion.limpiar();
   }
 
+  /**
+   * Borra la cuenta para siempre.
+   *
+   * Es distinto de cerrar sesion: al cerrar sesion la cuenta sigue ahi y
+   * puedes volver a entrar con tu correo. Al eliminarla, el correo queda
+   * libre y habria que registrarse de nuevo desde cero.
+   *
+   * PENDIENTE DEL BACK: falta DELETE /auth/me. Mientras no exista, esto
+   * solo borra la cuenta simulada del navegador.
+   */
+  eliminarCuenta(): Observable<void> {
+    if (!environment.usarApiReal) {
+      const cuentas = this.cuentasSimuladas;
+      const correo = this.sesion.usuario()?.correo?.toLowerCase();
+
+      if (correo) {
+        cuentas.delete(correo);
+        this.guardarCuentas(cuentas);
+      }
+
+      return of(undefined).pipe(
+        delay(this.RETARDO_MS),
+        tap(() => this.sesion.limpiar())
+      );
+    }
+
+    return this.http
+      .delete<void>(`${this.base}/me`)
+      .pipe(tap(() => this.sesion.limpiar()));
+  }
+
   // ---------------------------------------------------------------
   // Modo simulado
   // ---------------------------------------------------------------

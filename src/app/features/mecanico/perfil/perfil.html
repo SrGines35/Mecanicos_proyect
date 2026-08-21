@@ -103,5 +103,51 @@
         }
       </button>
     </form>
+
+    <!-- Eliminar cuenta. Va aparte y hasta abajo: no debe quedar
+         pegado al boton de guardar ni al de salir. -->
+    <section class="zona-riesgo">
+      <h2 class="zona-riesgo__titulo">Eliminar cuenta</h2>
+
+      @if (confirmando()) {
+        <p class="texto-suave">
+          Se va a borrar tu cuenta, tu perfil y tu ubicación. Tu correo queda
+          libre y tendrías que registrarte otra vez desde cero.
+          <strong>Esto no se puede deshacer.</strong>
+        </p>
+
+        <div class="fila-doble">
+          <button
+            type="button"
+            class="boton-secundario"
+            [disabled]="eliminando()"
+            (click)="cancelarEliminar()"
+          >
+            Mejor no
+          </button>
+          <button
+            type="button"
+            class="boton-peligro"
+            [disabled]="eliminando()"
+            (click)="eliminarCuenta()"
+          >
+            @if (eliminando()) {
+              <span class="cargador cargador--gris"></span>Eliminando...
+            } @else {
+              Sí, eliminar
+            }
+          </button>
+        </div>
+      } @else {
+        <p class="texto-suave">
+          Si solo quieres salir por ahora, usa el botón <strong>Salir</strong> de
+          arriba: tu cuenta se queda y puedes volver a entrar con tu correo.
+        </p>
+
+        <button type="button" class="boton-peligro" (click)="pedirConfirmacion()">
+          Eliminar mi cuenta
+        </button>
+      }
+    </section>
   }
 </main>
