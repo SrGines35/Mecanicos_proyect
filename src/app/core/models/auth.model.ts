@@ -1,35 +1,45 @@
 /**
  * Modelos de autenticacion.
- * Esta es la forma que debe tener lo que mande y devuelva el back.
+ *
+ * Los nombres de los campos son EXACTAMENTE los que usa el back
+ * (repo App_Mecanicos, rama Dropxni). Si algo aqui no coincide
+ * con lo de alla, la app truena aunque el codigo este bien.
  */
 
-export type Rol = 'usuario' | 'mecanico';
+export type Rol = 'cliente' | 'mecanico';
 
-/** Lo que se manda a POST /auth/login */
+/** Body de POST /auth/login */
 export interface Credenciales {
   correo: string;
-  contrasena: string;
+  password: string;
 }
 
-/**
- * Lo que se manda a POST /auth/registro.
- * Los dos roles piden exactamente los mismos datos. Lo que distingue a un
- * mecanico (descripcion, ubicacion, especialidades, precio) se llena
- * despues, desde su perfil en el dashboard.
- */
+/** Body de POST /auth/register */
 export interface DatosRegistro {
   nombre: string;
   correo: string;
   telefono: string;
-  contrasena: string;
-  rol: Rol;
+  password: string;
+  role: Rol;
 }
 
-/** Lo que el back debe devolver al iniciar sesion o registrarse */
-export interface SesionUsuario {
-  token: string;
+/** El usuario tal como lo devuelve el back */
+export interface Usuario {
   id: string;
   nombre: string;
   correo: string;
-  rol: Rol;
+  telefono?: string;
+  role: Rol;
+}
+
+/** Los dos tokens que devuelve el back */
+export interface Tokens {
+  accessToken: string;
+  refreshToken: string;
+}
+
+/** Respuesta de /auth/register y /auth/login */
+export interface RespuestaAuth {
+  user: Usuario;
+  tokens: Tokens;
 }

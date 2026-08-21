@@ -1,0 +1,30 @@
+.perdido {
+  text-align: center;
+}
+
+.perdido__icono {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  margin-bottom: 18px;
+  border-radius: 16px;
+  background: var(--ambar-tenue);
+  border: 1px solid rgba(240, 149, 31, 0.28);
+  color: var(--ambar);
+}
+
+.perdido__icono svg {
+  width: 28px;
+  height: 28px;
+}
+
+.perdido h1 {
+  font-size: 1.3rem;
+  margin-bottom: 10px;
+}
+
+.perdido .auth-subtitulo {
+  margin-bottom: 24px;
+}

@@ -1,0 +1,210 @@
+<app-barra-superior titulo="Mi perfil" [mostrarRegresar]="true" />
+
+<main class="contenedor contenedor--con-menu">
+  @if (cargando()) {
+    <div class="estado-vacio">
+      <div class="cargador cargador--gris"></div>
+      <p class="texto-suave">Cargando tu perfil...</p>
+    </div>
+  } @else {
+    @if (errorServidor(); as mensaje) {
+      <div class="auth-aviso auth-aviso--error">
+        <span>{{ mensaje }}</span>
+      </div>
+    }
+
+    <!-- Datos de la cuenta. Van aparte porque se guardan en otro lado. -->
+    <section class="bloque">
+      <h2 class="bloque__titulo">Tus datos</h2>
+
+      <div class="dato-fijo">
+        <span class="dato-fijo__etiqueta">Nombre</span>
+        <span class="dato-fijo__valor">{{ nombre() }}</span>
+      </div>
+
+      <div class="dato-fijo">
+        <span class="dato-fijo__etiqueta">Correo</span>
+        <span class="dato-fijo__valor">{{ correo() }}</span>
+      </div>
+
+      <form [formGroup]="formularioDatos" (ngSubmit)="guardarDatos()" novalidate>
+        <div class="campo">
+          <label for="telefono">Teléfono</label>
+          <input
+            id="telefono"
+            type="tel"
+            inputmode="numeric"
+            formControlName="telefono"
+            appSoloNumeros
+            [maxDigitos]="10"
+            placeholder="9511234567"
+          />
+          @if (mostrarErrorTelefono()) {
+            <p class="campo__error">Escribe un teléfono de 10 dígitos</p>
+          } @else {
+            <p class="campo__ayuda">
+              Es el número al que te va a marcar el cliente. Si te cambia, actualízalo aquí.
+            </p>
+          }
+        </div>
+
+        @if (datosGuardados()) {
+          <div class="auth-aviso auth-aviso--exito">
+            <span>Tu teléfono quedó actualizado.</span>
+          </div>
+        }
+
+        <button
+          type="submit"
+          class="boton-secundario"
+          [disabled]="guardandoDatos() || formularioDatos.pristine"
+        >
+          @if (guardandoDatos()) {
+            <span class="cargador cargador--gris"></span>Guardando...
+          } @else {
+            Guardar teléfono
+          }
+        </button>
+      </form>
+    </section>
+
+    <p class="texto-suave intro">
+      Estos datos son los que van a ver los clientes cuando te encuentren.
+    </p>
+
+    <form [formGroup]="formulario" (ngSubmit)="guardar()" novalidate>
+      <div class="campo">
+        <label for="descripcion">¿Qué haces y en qué eres bueno?</label>
+        <textarea
+          id="descripcion"
+          formControlName="descripcion"
+          maxlength="200"
+          placeholder="Ej. Taller propio en Reforma. Especialista en motor y afinación. Servicio a domicilio."
+        ></textarea>
+        @if (mostrarError('descripcion')) {
+          <p class="campo__error">Escribe una descripción (máximo 200 caracteres)</p>
+        } @else {
+          <p class="campo__ayuda">Te quedan {{ caracteresRestantes }} caracteres.</p>
+        }
+      </div>
+
+      <div class="campo">
+        <label for="zonaTrabajo">¿En qué zona atiendes?</label>
+        <input
+          id="zonaTrabajo"
+          type="text"
+          formControlName="zonaTrabajo"
+          placeholder="Ej. Centro y Colonia Reforma, Oaxaca"
+        />
+        @if (mostrarError('zonaTrabajo')) {
+          <p class="campo__error">Escribe la colonia o zona donde das servicio</p>
+        }
+      </div>
+
+      <div class="campo">
+        <span class="campo-label">Tu ubicación</span>
+
+        <div class="ubicacion" [class.ubicacion--lista]="tieneUbicacion()">
+          @if (tieneUbicacion()) {
+            <div class="ubicacion__dato">
+              <strong>Ubicación marcada</strong>
+              <code>{{ coordenadas() }}</code>
+            </div>
+          } @else {
+            <div class="ubicacion__dato">
+              <strong>Sin ubicación</strong>
+              <span class="texto-suave">Sin esto no puedes aparecer en las búsquedas</span>
+            </div>
+          }
+
+          <button
+            type="button"
+            class="boton-secundario"
+            [disabled]="buscandoUbicacion()"
+            (click)="usarMiUbicacion()"
+          >
+            @if (buscandoUbicacion()) {
+              <span class="cargador cargador--gris"></span>Buscando...
+            } @else if (tieneUbicacion()) {
+              Usar mi GPS
+            } @else {
+              Usar mi ubicación
+            }
+          </button>
+        </div>
+
+        <app-mapa-ubicacion
+          [latitud]="centroLat()"
+          [longitud]="centroLng()"
+          [editable]="true"
+          [zoom]="tieneUbicacion() ? 16 : 13"
+          (ubicacionCambiada)="moverPin($event)"
+        />
+
+        @if (avisoUbicacion(); as aviso) {
+          <p class="campo__error">{{ aviso }}</p>
+        }
+
+        <p class="campo__ayuda">
+          Con esta ubicación se calcula qué tan lejos estás de cada cliente.
+        </p>
+      </div>
+
+      <button type="submit" class="boton-primario" [disabled]="guardando()">
+        @if (guardando()) {
+          <span class="cargador"></span>Guardando...
+        } @else {
+          Guardar perfil
+        }
+      </button>
+    </form>
+
+    <!-- Eliminar cuenta. Va aparte y hasta abajo: no debe quedar
+         pegado al boton de guardar ni al de salir. -->
+    <section class="zona-riesgo">
+      <h2 class="zona-riesgo__titulo">Eliminar cuenta</h2>
+
+      @if (confirmando()) {
+        <p class="texto-suave">
+          Se va a borrar tu cuenta, tu perfil y tu ubicación. Tu correo queda
+          libre y tendrías que registrarte otra vez desde cero.
+          <strong>Esto no se puede deshacer.</strong>
+        </p>
+
+        <div class="fila-doble">
+          <button
+            type="button"
+            class="boton-secundario"
+            [disabled]="eliminando()"
+            (click)="cancelarEliminar()"
+          >
+            Mejor no
+          </button>
+          <button
+            type="button"
+            class="boton-peligro"
+            [disabled]="eliminando()"
+            (click)="eliminarCuenta()"
+          >
+            @if (eliminando()) {
+              <span class="cargador cargador--gris"></span>Eliminando...
+            } @else {
+              Sí, eliminar
+            }
+          </button>
+        </div>
+      } @else {
+        <p class="texto-suave">
+          Si solo quieres salir por ahora, usa el botón <strong>Salir</strong> de
+          arriba: tu cuenta se queda y puedes volver a entrar con tu correo.
+        </p>
+
+        <button type="button" class="boton-peligro" (click)="pedirConfirmacion()">
+          Eliminar mi cuenta
+        </button>
+      }
+    </section>
+  }
+</main>
+
+<app-menu-inferior />

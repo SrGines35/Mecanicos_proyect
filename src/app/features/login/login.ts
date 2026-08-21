@@ -1,9 +1,9 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
-import { SesionUsuario } from '../../core/models/auth.model';
 import { AuthService } from '../../core/services/auth.service';
+import { SesionService } from '../../core/services/sesion.service';
 import { PATRON_CORREO } from '../../core/validadores/validadores';
 import { IconoOjo } from '../../shared/icono-ojo/icono-ojo';
 import { Logo } from '../../shared/logo/logo';
@@ -16,19 +16,19 @@ import { Logo } from '../../shared/logo/logo';
 export class Login {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
+  private readonly sesion = inject(SesionService);
+  private readonly router = inject(Router);
 
   protected readonly mostrarContrasena = signal(false);
   protected readonly enviando = signal(false);
   protected readonly errorServidor = signal<string | null>(null);
-  protected readonly sesion = signal<SesionUsuario | null>(null);
 
   protected readonly formulario = this.fb.nonNullable.group({
     correo: ['', [Validators.required, Validators.pattern(PATRON_CORREO)]],
-    contrasena: ['', Validators.required],
+    password: ['', Validators.required],
   });
 
-  /** Muestra el error de un campo solo si el usuario ya lo toco */
-  protected mostrarError(campo: 'correo' | 'contrasena'): boolean {
+  protected mostrarError(campo: 'correo' | 'password'): boolean {
     const control = this.formulario.controls[campo];
     return control.invalid && control.touched;
   }
@@ -41,7 +41,6 @@ export class Login {
     this.errorServidor.set(null);
 
     if (this.formulario.invalid) {
-      // Marca todo como tocado para que se vean los mensajes de una vez
       this.formulario.markAllAsTouched();
       return;
     }
@@ -50,24 +49,37 @@ export class Login {
     const datos = this.formulario.getRawValue();
 
     this.auth
-      .iniciarSesion({ correo: datos.correo.trim().toLowerCase(), contrasena: datos.contrasena })
+      .iniciarSesion({
+        correo: datos.correo.trim().toLowerCase(),
+        password: datos.password,
+      })
       .subscribe({
-        next: (sesion) => {
+        next: (respuesta) => {
           this.enviando.set(false);
-          this.sesion.set(sesion);
-          // TODO: cuando existan las pantallas internas, aqui va el
-          // router.navigate() segun el rol (usuario o mecanico).
+          // Cada quien a su pantalla, segun su rol
+          void this.router.navigate([this.sesion.rutaSegunRol(respuesta.user.role)]);
         },
-        error: (error: Error) => {
+        error: (error: unknown) => {
           this.enviando.set(false);
-          this.errorServidor.set(error.message);
+          this.errorServidor.set(this.mensajeDeError(error));
         },
       });
   }
 
-  protected cerrarSesion(): void {
-    this.auth.cerrarSesion();
-    this.sesion.set(null);
-    this.formulario.reset();
+  /** Traduce el error del back a algo que el usuario entienda */
+  private mensajeDeError(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    const http = error as { status?: number; error?: { message?: string } };
+
+    if (http.status === 401) {
+      return 'El correo o la contraseña no son correctos';
+    }
+    if (http.status === 0) {
+      return 'No pudimos conectar con el servidor. Revisa que esté encendido.';
+    }
+    return http.error?.message ?? 'Algo salió mal, intenta de nuevo';
   }
 }

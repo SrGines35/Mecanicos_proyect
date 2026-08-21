@@ -1,9 +1,10 @@
 import { Component, inject, signal } from '@angular/core';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 
-import { Rol, SesionUsuario } from '../../core/models/auth.model';
+import { Rol } from '../../core/models/auth.model';
 import { AuthService } from '../../core/services/auth.service';
+import { SesionService } from '../../core/services/sesion.service';
 import {
   PATRON_CONTRASENA,
   PATRON_CORREO,
@@ -15,7 +16,7 @@ import { SoloNumeros } from '../../shared/directivas/solo-numeros';
 import { IconoOjo } from '../../shared/icono-ojo/icono-ojo';
 import { Logo } from '../../shared/logo/logo';
 
-type CampoRegistro = 'nombre' | 'correo' | 'telefono' | 'contrasena' | 'confirmarContrasena';
+type CampoRegistro = 'nombre' | 'correo' | 'telefono' | 'password' | 'confirmarPassword';
 
 @Component({
   selector: 'app-registro',
@@ -25,41 +26,43 @@ type CampoRegistro = 'nombre' | 'correo' | 'telefono' | 'contrasena' | 'confirma
 export class Registro {
   private readonly fb = inject(FormBuilder);
   private readonly auth = inject(AuthService);
+  private readonly sesion = inject(SesionService);
+  private readonly router = inject(Router);
 
   protected readonly mostrarContrasena = signal(false);
   protected readonly enviando = signal(false);
   protected readonly errorServidor = signal<string | null>(null);
-  protected readonly sesion = signal<SesionUsuario | null>(null);
 
   protected readonly formulario = this.fb.nonNullable.group(
     {
       nombre: ['', [Validators.required, Validators.pattern(PATRON_NOMBRE)]],
       correo: ['', [Validators.required, Validators.pattern(PATRON_CORREO)]],
       telefono: ['', [Validators.required, Validators.pattern(PATRON_TELEFONO)]],
-      contrasena: ['', [Validators.required, Validators.pattern(PATRON_CONTRASENA)]],
-      confirmarContrasena: ['', Validators.required],
-      rol: ['usuario' as Rol, Validators.required],
+      password: ['', [Validators.required, Validators.pattern(PATRON_CONTRASENA)]],
+      confirmarPassword: ['', Validators.required],
+      role: ['cliente' as Rol, Validators.required],
     },
-    { validators: contrasenasCoinciden('contrasena', 'confirmarContrasena') }
+    { validators: contrasenasCoinciden('password', 'confirmarPassword') }
   );
 
   protected get esMecanico(): boolean {
-    return this.formulario.controls.rol.value === 'mecanico';
+    return this.formulario.controls.role.value === 'mecanico';
   }
 
-  /** Muestra el error de un campo solo si ya se toco */
   protected mostrarError(campo: CampoRegistro): boolean {
     const control = this.formulario.controls[campo];
     return control.invalid && control.touched;
   }
 
   protected get noCoinciden(): boolean {
-    return this.formulario.hasError('noCoinciden') &&
-      this.formulario.controls.confirmarContrasena.touched;
+    return (
+      this.formulario.hasError('noCoinciden') &&
+      this.formulario.controls.confirmarPassword.touched
+    );
   }
 
-  protected seleccionarRol(rol: Rol): void {
-    this.formulario.controls.rol.setValue(rol);
+  protected seleccionarRol(role: Rol): void {
+    this.formulario.controls.role.setValue(role);
   }
 
   protected alternarContrasena(): void {
@@ -82,18 +85,41 @@ export class Registro {
         nombre: datos.nombre.trim(),
         correo: datos.correo.trim().toLowerCase(),
         telefono: datos.telefono,
-        contrasena: datos.contrasena,
-        rol: datos.rol,
+        password: datos.password,
+        role: datos.role,
       })
       .subscribe({
-        next: (sesion) => {
+        next: (respuesta) => {
           this.enviando.set(false);
-          this.sesion.set(sesion);
+          // Al registrarse ya queda con la sesion abierta: se va
+          // directo a su pantalla, sin pasar otra vez por el login.
+          void this.router.navigate([this.sesion.rutaSegunRol(respuesta.user.role)]);
         },
-        error: (error: Error) => {
+        error: (error: unknown) => {
           this.enviando.set(false);
-          this.errorServidor.set(error.message);
+          this.errorServidor.set(this.mensajeDeError(error));
         },
       });
+  }
+
+  private mensajeDeError(error: unknown): string {
+    if (error instanceof Error) {
+      return error.message;
+    }
+
+    const http = error as { status?: number; error?: { message?: string | string[] } };
+
+    if (http.status === 409) {
+      return 'Ya existe una cuenta con ese correo';
+    }
+    if (http.status === 0) {
+      return 'No pudimos conectar con el servidor. Revisa que esté encendido.';
+    }
+
+    const mensaje = http.error?.message;
+    if (Array.isArray(mensaje)) {
+      return mensaje[0];
+    }
+    return mensaje ?? 'Algo salió mal, intenta de nuevo';
   }
 }
