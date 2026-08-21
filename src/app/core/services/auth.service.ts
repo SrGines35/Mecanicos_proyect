@@ -27,9 +27,35 @@ export class AuthService {
 
   private readonly base = `${environment.apiUrl}/auth`;
 
-  /** Cuentas de prueba mientras no hay back. Se pierden al recargar. */
-  private readonly cuentasSimuladas = new Map<string, DatosRegistro>();
   private readonly RETARDO_MS = 700;
+
+  /**
+   * Cuentas de prueba mientras no hay back.
+   *
+   * Se guardan en el navegador a proposito. Antes vivian nada mas en
+   * memoria y se borraban al recargar la pagina, asi que no habia forma de
+   * registrar varios mecanicos y luego ir cambiando de uno a otro para
+   * probar. Cuando el back este listo esto ya no se usa.
+   */
+  private readonly LLAVE_CUENTAS = 'oaxicanicos.cuentasSimuladas';
+
+  private get cuentasSimuladas(): Map<string, DatosRegistro> {
+    try {
+      const guardado = localStorage.getItem(this.LLAVE_CUENTAS);
+      return new Map(guardado ? (JSON.parse(guardado) as [string, DatosRegistro][]) : []);
+    } catch {
+      return new Map();
+    }
+  }
+
+  private guardarCuentas(cuentas: Map<string, DatosRegistro>): void {
+    try {
+      localStorage.setItem(this.LLAVE_CUENTAS, JSON.stringify([...cuentas]));
+    } catch {
+      // Si el navegador no deja guardar, la app sigue funcionando;
+      // nada mas se pierden las cuentas al recargar.
+    }
+  }
 
   registrar(datos: DatosRegistro): Observable<RespuestaAuth> {
     if (!environment.usarApiReal) {
@@ -61,19 +87,22 @@ export class AuthService {
 
   private registrarSimulado(datos: DatosRegistro): Observable<RespuestaAuth> {
     const correo = datos.correo.toLowerCase();
+    const cuentas = this.cuentasSimuladas;
 
-    if (this.cuentasSimuladas.has(correo)) {
+    if (cuentas.has(correo)) {
       return throwError(() => new Error('Ya existe una cuenta con ese correo')).pipe(
         delay(this.RETARDO_MS)
       );
     }
 
-    this.cuentasSimuladas.set(correo, datos);
-    return this.respuestaSimulada(datos);
+    cuentas.set(correo, { ...datos, correo });
+    this.guardarCuentas(cuentas);
+    return this.respuestaSimulada(datos, cuentas.size);
   }
 
   private iniciarSesionSimulado(credenciales: Credenciales): Observable<RespuestaAuth> {
-    const cuenta = this.cuentasSimuladas.get(credenciales.correo.toLowerCase());
+    const cuentas = this.cuentasSimuladas;
+    const cuenta = cuentas.get(credenciales.correo.toLowerCase());
 
     if (!cuenta) {
       return throwError(
@@ -87,13 +116,13 @@ export class AuthService {
       );
     }
 
-    return this.respuestaSimulada(cuenta);
+    return this.respuestaSimulada(cuenta, [...cuentas.keys()].indexOf(cuenta.correo) + 1);
   }
 
-  private respuestaSimulada(datos: DatosRegistro): Observable<RespuestaAuth> {
+  private respuestaSimulada(datos: DatosRegistro, numero: number): Observable<RespuestaAuth> {
     const respuesta: RespuestaAuth = {
       user: {
-        id: `sim-${this.cuentasSimuladas.size}`,
+        id: `sim-${numero}`,
         nombre: datos.nombre,
         correo: datos.correo,
         telefono: datos.telefono,

@@ -31,8 +31,47 @@ export class MecanicoService {
   /** El perfil cargado, o null si todavia no lo llena */
   readonly perfil = signal<PerfilMecanico | null>(null);
 
-  /** Perfil simulado mientras no hay back */
-  private perfilSimulado: PerfilMecanico | null = null;
+  /**
+   * Perfiles simulados, guardados en el navegador y separados por usuario.
+   *
+   * Antes habia un solo perfil en memoria: si registrabas dos mecanicos se
+   * pisaban entre ellos, y al recargar la pagina se perdia. Asi no se podia
+   * probar con varios mecanicos en distintas ubicaciones.
+   */
+  private readonly LLAVE_PERFILES = 'oaxicanicos.perfilesSimulados';
+
+  private get perfilSimulado(): PerfilMecanico | null {
+    return this.leerPerfiles()[this.idActual()] ?? null;
+  }
+
+  private set perfilSimulado(perfil: PerfilMecanico | null) {
+    const perfiles = this.leerPerfiles();
+
+    if (perfil) {
+      perfiles[this.idActual()] = perfil;
+    } else {
+      delete perfiles[this.idActual()];
+    }
+
+    try {
+      localStorage.setItem(this.LLAVE_PERFILES, JSON.stringify(perfiles));
+    } catch {
+      // Si el navegador no deja guardar, la app sigue funcionando.
+    }
+  }
+
+  private idActual(): string {
+    return this.sesion.usuario()?.id ?? 'sim';
+  }
+
+  private leerPerfiles(): Record<string, PerfilMecanico> {
+    try {
+      const guardado = localStorage.getItem(this.LLAVE_PERFILES);
+      return guardado ? (JSON.parse(guardado) as Record<string, PerfilMecanico>) : {};
+    } catch {
+      return {};
+    }
+  }
 
   cargarPerfil(): Observable<PerfilMecanico | null> {
     if (!environment.usarApiReal) {
@@ -81,9 +120,9 @@ export class MecanicoService {
           calificacion: 5,
         };
       }
-      this.perfilSimulado = { ...this.perfilSimulado, estado };
+      this.perfilSimulado = { ...this.perfilSimulado!, estado };
 
-      return of(this.perfilSimulado).pipe(
+      return of(this.perfilSimulado!).pipe(
         delay(300),
         tap((p) => this.perfil.set(p))
       );
