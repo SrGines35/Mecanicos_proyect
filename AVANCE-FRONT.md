@@ -42,10 +42,12 @@ más: los servicios ya apuntan a los endpoints correctos.
 |---|---|---|
 | `/` | todos | Iniciar sesión |
 | `/registro` | todos | Crear cuenta, como cliente o como mecánico |
+| `/recuperar` | todos | Recuperar contraseña *(simulada, falta el back)* |
 | `/cliente` | cliente | Inicio del cliente *(le toca a Luz)* |
 | `/mecanico` | mecánico | Panel: estado y solicitudes nuevas |
 | `/mecanico/perfil` | mecánico | Descripción, zona y ubicación |
-| `/mecanico/solicitud/:id` | mecánico | Detalle, costos y avance del servicio |
+| `/mecanico/solicitud/:id` | mecánico | Detalle, mapa, costos y avance del servicio |
+| cualquier otra | todos | Página no encontrada |
 
 ## Cómo funciona la sesión
 
@@ -79,10 +81,12 @@ src/app/
     interceptores/ -> el que renueva el token
     validadores/   -> las reglas de validación
     utils/         -> cálculo de distancia (Haversine)
-  shared/          -> logo, ojito de contraseña, barra superior, directivas
+  shared/          -> logo, ojito de contraseña, barra superior, mapa, directivas
   features/
     login/
     registro/
+    recuperar/
+    no-encontrada/
     cliente/       -> LE TOCA A LUZ
     mecanico/      -> panel, perfil, detalle-solicitud
 ```
@@ -115,6 +119,7 @@ El rol se llama **`cliente`** o **`mecanico`** (no "usuario").
 ### Endpoints que todavía faltan del back
 
 ```
+POST  /auth/recuperar
 GET   /mecanicos/mi-perfil
 PUT   /mecanicos/mi-perfil
 PATCH /mecanicos/estado
@@ -155,19 +160,27 @@ calcular la distancia.
 
 Todo lo que está detrás del interruptor `usarApiReal`:
 
-- `core/services/auth.service.ts` — cuentas en memoria
-- `core/services/mecanico.service.ts` — perfil en memoria
+- `core/services/auth.service.ts` — cuentas guardadas en el navegador
+- `core/services/mecanico.service.ts` — perfil guardado en el navegador, uno
+  por usuario
 - `core/services/solicitud.service.ts` — usa `core/data/solicitudes.mock.ts`
 
 Las tres devuelven `Observable`, igual que las llamadas reales, así que cambiar
 de uno a otro no obliga a tocar ninguna pantalla.
 
+**Para probar con varias cuentas:** regístrate, usa el botón **Salir** de la
+barra de arriba, y regístrate otra vez con otro correo. Las cuentas se quedan
+guardadas en el navegador, así que puedes ir cambiando de una a otra. Para
+borrarlas todas y empezar de cero, en el navegador: F12 → Application →
+Local Storage → borrar las llaves que empiezan con `oaxicanicos.`
+
 ## Lo que falta
 
 - [ ] Pantallas del cliente: mapa, lista de mecánicos, crear solicitud (Luz)
-- [ ] Mapa con Leaflet. Por ahora el mecánico marca su ubicación con el GPS del
-      navegador, sin mapa. Falta poder ajustar el pin a mano
 - [ ] Conectar con los endpoints reales cuando existan
+- [ ] Historial de servicios y ganancias del mecánico
+- [ ] Que el correo de recuperar contraseña se mande de verdad
+      (falta `POST /auth/recuperar` del lado del back)
 - [ ] Que el cliente pueda calificar al mecánico al terminar
 - [ ] Recuperar contraseña
 
@@ -179,8 +192,16 @@ de uno a otro no obliga a tocar ninguna pantalla.
 - Plantillas con el control de flujo nuevo (`@if`, `@for`).
 - La paleta está en variables CSS al inicio de `src/styles.css`. El **rojo se
   usa solo para errores**; el color de la marca es el ámbar.
-- El mapa va a ser **Leaflet + OpenStreetMap**, no Google Maps: Google pide
-  tarjeta de crédito para la llave de la API.
+- El mapa es **Leaflet + OpenStreetMap**, no Google Maps: Google pide tarjeta
+  de crédito para la llave de la API. OpenStreetMap no pide nada.
+- El componente del mapa es `shared/mapa-ubicacion`. Se usa de dos formas: con
+  `[editable]="true"` el pin se arrastra (perfil del mecánico), y sin eso queda
+  de solo lectura (detalle de la solicitud).
+- El pin del mapa es un SVG dibujado a mano. Leaflet trae sus propias imágenes,
+  pero al compilar con Angular las busca en una ruta que no existe y salen
+  rotas.
+- Después de un `git pull` que traiga cambios en `package.json`, hay que correr
+  `npm install` otra vez, porque Leaflet es una dependencia nueva.
 - La distancia la calcula el front con Haversine
   (`core/utils/distancia.util.ts`), así el back no tiene que hacer consultas
   geográficas.
