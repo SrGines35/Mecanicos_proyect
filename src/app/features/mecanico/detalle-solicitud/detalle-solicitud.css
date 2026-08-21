@@ -87,18 +87,19 @@
   line-height: 1.5;
 }
 
-.mapa-pendiente {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  flex-wrap: wrap;
-  padding: 16px;
-  border: 1px dashed var(--borde-fuerte);
-  border-radius: 12px;
-  background:
-    repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.02) 0 8px, transparent 8px 16px),
-    var(--superficie-alta);
+/* El boton de "como llegar" es un enlace, no un <button>, porque abre
+   otra pestaña. Hay que centrarle el texto a mano. */
+.boton-enlace {
+  display: block;
+  margin-top: 12px;
+  text-align: center;
+  text-decoration: none;
+  color: var(--blanco);
+}
+
+.boton-enlace:hover {
+  text-decoration: none;
+  color: var(--ambar);
 }
 
 .etiqueta-distancia {

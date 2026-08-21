@@ -17,10 +17,11 @@ import { SolicitudService } from '../../../core/services/solicitud.service';
 import { calcularDistanciaKm, formatearDistancia } from '../../../core/utils/distancia.util';
 import { SoloNumeros } from '../../../shared/directivas/solo-numeros';
 import { BarraSuperior } from '../../../shared/barra-superior/barra-superior';
+import { MapaUbicacion } from '../../../shared/mapa-ubicacion/mapa-ubicacion';
 
 @Component({
   selector: 'app-detalle-solicitud',
-  imports: [ReactiveFormsModule, BarraSuperior, SoloNumeros],
+  imports: [ReactiveFormsModule, BarraSuperior, SoloNumeros, MapaUbicacion],
   templateUrl: './detalle-solicitud.html',
   styleUrl: './detalle-solicitud.css',
 })
@@ -57,6 +58,20 @@ export class DetalleSolicitud implements OnInit {
     return formatearDistancia(
       calcularDistanciaKm(perfil, { latitud: s.latitudOrigen, longitud: s.longitudOrigen })
     );
+  });
+
+  /**
+   * Abre la ruta en la app de mapas del celular.
+   *
+   * Es una direccion web normal, no la API de Google, asi que no hace falta
+   * ninguna llave ni tarjeta.
+   */
+  protected readonly enlaceComoLlegar = computed(() => {
+    const s = this.solicitud();
+    if (!s) {
+      return '';
+    }
+    return `https://www.google.com/maps/dir/?api=1&destination=${s.latitudOrigen},${s.longitudOrigen}`;
   });
 
   protected readonly esPendiente = computed(() => this.solicitud()?.estado === 'pendiente');

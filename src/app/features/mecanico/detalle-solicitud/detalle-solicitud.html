@@ -50,15 +50,22 @@
 
     <!-- Ubicación -->
     <section class="bloque">
-      <h2 class="bloque__titulo">Dónde está</h2>
-      <div class="mapa-pendiente">
-        <span class="texto-suave">
-          Coordenadas: {{ solicitud()!.latitudOrigen }}, {{ solicitud()!.longitudOrigen }}
-        </span>
+      <div class="bloque__encabezado">
+        <h2 class="bloque__titulo">Dónde está</h2>
         @if (distancia(); as km) {
           <span class="etiqueta-distancia">a {{ km }} de ti</span>
         }
       </div>
+
+      <app-mapa-ubicacion
+        [latitud]="solicitud()!.latitudOrigen"
+        [longitud]="solicitud()!.longitudOrigen"
+        [etiqueta]="solicitud()!.vehiculo"
+      />
+
+      <a class="boton-secundario boton-enlace" [href]="enlaceComoLlegar()" target="_blank" rel="noopener">
+        Cómo llegar
+      </a>
     </section>
 
     <!-- Aceptar o rechazar -->
