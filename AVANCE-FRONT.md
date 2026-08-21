@@ -122,7 +122,9 @@ DELETE /auth/me
 GET    /mecanicos/mi-perfil
 PUT    /mecanicos/mi-perfil
 PATCH  /mecanicos/estado
+POST   /solicitudes
 GET    /solicitudes
+POST   /solicitudes
 GET    /solicitudes/:id
 PATCH  /solicitudes/:id/estado
 PATCH  /solicitudes/:id/costos
@@ -173,7 +175,9 @@ Todo lo que está detrás del interruptor `usarApiReal`:
 - `core/services/auth.service.ts` — cuentas guardadas en el navegador
 - `core/services/mecanico.service.ts` — perfil guardado en el navegador, uno
   por usuario
-- `core/services/solicitud.service.ts` — usa `core/data/solicitudes.mock.ts`
+- `core/services/solicitud.service.ts` — las solicitudes se guardan en el
+  navegador. Esto permite probar la app completa sin back: el cliente crea
+  una solicitud, cierra sesión, entra como mecánico, y **le llega**
 
 Las tres devuelven `Observable`, igual que las llamadas reales, así que cambiar
 de uno a otro no obliga a tocar ninguna pantalla.
@@ -183,6 +187,19 @@ barra de arriba, y regístrate otra vez con otro correo. Las cuentas se quedan
 guardadas en el navegador, así que puedes ir cambiando de una a otra. Para
 borrarlas todas y empezar de cero, en el navegador: F12 → Application →
 Local Storage → borrar las llaves que empiezan con `oaxicanicos.`
+
+## Cómo probar la app completa sin el back
+
+1. Regístrate como **cliente** y crea una solicitud.
+2. Dale **Salir**.
+3. Regístrate como **mecánico**, llena tu perfil (para que calcule distancias)
+   y ponte **disponible**.
+4. La solicitud del cliente aparece en tu panel, con la distancia real entre
+   los dos. Puedes aceptarla y avanzarla.
+
+Las solicitudes viven en `localStorage`, así que sobreviven al recargar. Para
+borrar todo y empezar de cero: F12 → Application → Local Storage → borra las
+llaves que empiezan con `oaxicanicos.`
 
 ## Lo que falta
 
