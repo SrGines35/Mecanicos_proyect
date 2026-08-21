@@ -119,14 +119,15 @@ El rol se llama **`cliente`** o **`mecanico`** (no "usuario").
 ### Endpoints que todavía faltan del back
 
 ```
-POST  /auth/recuperar
-GET   /mecanicos/mi-perfil
-PUT   /mecanicos/mi-perfil
-PATCH /mecanicos/estado
-GET   /solicitudes
-GET   /solicitudes/:id
-PATCH /solicitudes/:id/estado
-PATCH /solicitudes/:id/costos
+POST   /auth/recuperar
+DELETE /auth/me
+GET    /mecanicos/mi-perfil
+PUT    /mecanicos/mi-perfil
+PATCH  /mecanicos/estado
+GET    /solicitudes
+GET    /solicitudes/:id
+PATCH  /solicitudes/:id/estado
+PATCH  /solicitudes/:id/costos
 ```
 
 Mientras no existan, esas pantallas corren con datos simulados.
@@ -148,6 +149,11 @@ disponible, ocupado, no_disponible
 Un mecánico solo aparece en las búsquedas si está `disponible` **y** tiene el
 perfil completo (descripción, zona y ubicación). Sin coordenadas no se puede
 calcular la distancia.
+
+Al terminar de llenar el perfil **por primera vez**, el mecánico queda
+`disponible` solo, sin tener que ir a prenderlo a mano. Después se respeta lo
+que él elija: si se pone en `no_disponible` y luego edita su descripción, no se
+le vuelve a prender.
 
 ### Dos cosas que el back tiene pendientes
 
@@ -181,6 +187,9 @@ Local Storage → borrar las llaves que empiezan con `oaxicanicos.`
 - [ ] Historial de servicios y ganancias del mecánico
 - [ ] Que el correo de recuperar contraseña se mande de verdad
       (falta `POST /auth/recuperar` del lado del back)
+- [ ] Que eliminar cuenta borre de verdad en la base de datos
+      (falta `DELETE /auth/me` del lado del back)
+- [ ] Eliminar cuenta también desde las pantallas del cliente (Luz)
 - [ ] Que el cliente pueda calificar al mecánico al terminar
 - [ ] Recuperar contraseña
 
