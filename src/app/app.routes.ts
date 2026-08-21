@@ -15,8 +15,10 @@ export const routes: Routes = [
     loadComponent: () => import('./features/registro/registro').then((m) => m.Registro),
     title: 'Oaxicanicos - Crear cuenta',
   },
+  // La ruta es /usuario porque asi la hizo Luz. El rol sigue siendo
+  // 'cliente', que es el que manda el back. No son lo mismo.
   {
-    path: 'cliente',
+    path: 'usuario',
     canActivate: [sesionGuard, rolGuard('cliente')],
     loadComponent: () =>
       import('./features/cliente/inicio-cliente/inicio-cliente').then((m) => m.InicioCliente),

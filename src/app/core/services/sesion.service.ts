@@ -67,9 +67,16 @@ export class SesionService {
     this.usuario.set(null);
   }
 
-  /** A donde le toca entrar a esta persona segun su rol */
+  /**
+   * A donde le toca entrar a esta persona segun su rol.
+   *
+   * OJO con la diferencia, que se presta a confusion:
+   * el ROL que manda el back es 'cliente', pero la RUTA de sus pantallas
+   * es /usuario. Se acordo asi con Luz, que es quien las hizo: era mas
+   * barato cambiar esta linea que renombrarle cuatro carpetas.
+   */
   rutaSegunRol(rol: Rol): string {
-    return rol === 'mecanico' ? '/mecanico' : '/cliente';
+    return rol === 'mecanico' ? '/mecanico' : '/usuario';
   }
 
   private leerUsuario(): Usuario | null {
