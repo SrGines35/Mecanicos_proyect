@@ -77,6 +77,8 @@ export class Panel implements OnInit {
 
   protected readonly zonaTrabajo = computed(() => this.perfil()?.zonaTrabajo ?? '');
 
+  protected readonly descripcionPerfil = computed(() => this.perfil()?.descripcion ?? '');
+
   ngOnInit(): void {
     this.mecanicoService.cargarPerfil().subscribe(() => {
       this.cargarSolicitudes();
