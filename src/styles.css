@@ -408,6 +408,12 @@ a:hover {
   padding: 22px 18px 60px;
 }
 
+/* Cuando hay menu fijo abajo, el contenido necesita espacio extra para que
+   no quede tapado el ultimo boton. */
+.contenedor--con-menu {
+  padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
+}
+
 .bloque {
   padding: 18px;
   margin-bottom: 16px;

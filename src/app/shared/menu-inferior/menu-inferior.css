@@ -1,0 +1,51 @@
+.menu {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  /* En celulares con barra de gestos, esto evita que el menu quede debajo */
+  padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  background: rgba(10, 10, 11, 0.94);
+  backdrop-filter: blur(10px);
+  border-top: 1px solid var(--borde);
+}
+
+.menu__opcion {
+  flex: 1;
+  max-width: 180px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  padding: 7px 10px 5px;
+  border-radius: 12px;
+  color: var(--gris-tenue);
+  text-decoration: none;
+  font-size: 0.72rem;
+  font-weight: 600;
+  transition: color 180ms ease, background 180ms ease;
+}
+
+.menu__opcion svg {
+  width: 22px;
+  height: 22px;
+}
+
+.menu__opcion:hover {
+  color: var(--gris);
+  text-decoration: none;
+}
+
+.menu__opcion.activo {
+  color: var(--ambar);
+  background: var(--ambar-tenue);
+}
+
+.menu__opcion.activo svg {
+  stroke-width: 2.2;
+}

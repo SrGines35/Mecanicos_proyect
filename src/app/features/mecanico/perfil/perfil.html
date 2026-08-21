@@ -1,6 +1,6 @@
 <app-barra-superior titulo="Mi perfil" [mostrarRegresar]="true" />
 
-<main class="contenedor">
+<main class="contenedor contenedor--con-menu">
   @if (cargando()) {
     <div class="estado-vacio">
       <div class="cargador cargador--gris"></div>
@@ -151,3 +151,5 @@
     </section>
   }
 </main>
+
+<app-menu-inferior />

@@ -1,6 +1,6 @@
 <app-barra-superior titulo="Panel del mecánico" />
 
-<main class="contenedor">
+<main class="contenedor contenedor--con-menu">
   <!-- Saludo -->
   <header class="saludo entra" style="--retraso: 0ms">
     <p class="saludo__hola">{{ saludo() }},</p>
@@ -82,26 +82,6 @@
     </section>
   }
 
-  <!-- Mi perfil: la puerta para volver a editarlo -->
-  @if (!cargando() && perfilCompleto()) {
-    <a class="tarjeta-perfil entra" style="--retraso: 240ms" routerLink="/mecanico/perfil">
-      <div class="tarjeta-perfil__texto">
-        <span class="tarjeta-perfil__titulo">Mi perfil</span>
-        <span class="tarjeta-perfil__resumen">{{ descripcionPerfil() }}</span>
-        <span class="tarjeta-perfil__pista">
-          Edita tu descripción, tu zona, tu ubicación o elimina tu cuenta
-        </span>
-      </div>
-
-      <span class="tarjeta-perfil__flecha" aria-hidden="true">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-             stroke-linecap="round" stroke-linejoin="round">
-          <path d="M9 18l6-6-6-6" />
-        </svg>
-      </span>
-    </a>
-  }
-
   <!-- Solicitudes -->
   <section class="bloque entra" style="--retraso: 300ms">
     <div class="bloque__encabezado">
@@ -177,3 +157,5 @@
     }
   </section>
 </main>
+
+<app-menu-inferior />

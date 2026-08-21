@@ -12,12 +12,13 @@ import { SesionService } from '../../../core/services/sesion.service';
 import { SolicitudService } from '../../../core/services/solicitud.service';
 import { calcularDistanciaKm, formatearDistancia, haceCuanto } from '../../../core/utils/distancia.util';
 import { BarraSuperior } from '../../../shared/barra-superior/barra-superior';
+import { MenuInferior } from '../../../shared/menu-inferior/menu-inferior';
 
 const ESTADOS: EstadoMecanico[] = ['disponible', 'ocupado', 'no_disponible'];
 
 @Component({
   selector: 'app-panel',
-  imports: [RouterLink, BarraSuperior],
+  imports: [RouterLink, BarraSuperior, MenuInferior],
   templateUrl: './panel.html',
   styleUrl: './panel.css',
 })
@@ -76,8 +77,6 @@ export class Panel implements OnInit {
   protected readonly calificacion = computed(() => this.perfil()?.calificacion ?? null);
 
   protected readonly zonaTrabajo = computed(() => this.perfil()?.zonaTrabajo ?? '');
-
-  protected readonly descripcionPerfil = computed(() => this.perfil()?.descripcion ?? '');
 
   ngOnInit(): void {
     this.mecanicoService.cargarPerfil().subscribe(() => {
