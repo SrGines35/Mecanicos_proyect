@@ -12,13 +12,13 @@ import { SesionService } from '../../../core/services/sesion.service';
 import { SolicitudService } from '../../../core/services/solicitud.service';
 import { calcularDistanciaKm, formatearDistancia, haceCuanto } from '../../../core/utils/distancia.util';
 import { BarraSuperior } from '../../../shared/barra-superior/barra-superior';
-import { MenuInferior } from '../../../shared/menu-inferior/menu-inferior';
+import { MenuMecanico } from '../menu-mecanico/menu-mecanico';
 
 const ESTADOS: EstadoMecanico[] = ['disponible', 'ocupado', 'no_disponible'];
 
 @Component({
   selector: 'app-panel',
-  imports: [RouterLink, BarraSuperior, MenuInferior],
+  imports: [RouterLink, BarraSuperior, MenuMecanico],
   templateUrl: './panel.html',
   styleUrl: './panel.css',
 })

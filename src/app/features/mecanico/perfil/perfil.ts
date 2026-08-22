@@ -6,7 +6,7 @@ import { AuthService } from '../../../core/services/auth.service';
 import { MecanicoService } from '../../../core/services/mecanico.service';
 import { SesionService } from '../../../core/services/sesion.service';
 import { BarraSuperior } from '../../../shared/barra-superior/barra-superior';
-import { MenuInferior } from '../../../shared/menu-inferior/menu-inferior';
+import { MenuMecanico } from '../menu-mecanico/menu-mecanico';
 import { SoloNumeros } from '../../../shared/directivas/solo-numeros';
 import { PATRON_TELEFONO } from '../../../core/validadores/validadores';
 import { Coordenadas, MapaUbicacion } from '../../../shared/mapa-ubicacion/mapa-ubicacion';
@@ -17,7 +17,7 @@ const OAXACA_LNG = -96.7237;
 
 @Component({
   selector: 'app-perfil',
-  imports: [ReactiveFormsModule, BarraSuperior, MapaUbicacion, MenuInferior, SoloNumeros],
+  imports: [ReactiveFormsModule, BarraSuperior, MapaUbicacion, MenuMecanico, SoloNumeros],
   templateUrl: './perfil.html',
   styleUrl: './perfil.css',
 })
