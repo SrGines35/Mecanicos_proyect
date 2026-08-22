@@ -44,6 +44,7 @@ más: los servicios ya apuntan a los endpoints correctos.
 | `/registro` | todos | Crear cuenta, como cliente o como mecánico |
 
 | `/mecanico` | mecánico | Panel: estado y solicitudes nuevas |
+| `/mecanico/historial` | mecánico | Servicios ya cerrados y lo que se ganó |
 | `/mecanico/perfil` | mecánico | Descripción, zona y ubicación |
 | `/mecanico/solicitud/:id` | mecánico | Detalle, mapa, costos y avance del servicio |
 | cualquier otra | todos | Página no encontrada |
@@ -206,7 +207,6 @@ llaves que empiezan con `oaxicanicos.`
 
 - [ ] Pantallas del cliente: mapa, lista de mecánicos, crear solicitud (Luz)
 - [ ] Conectar con los endpoints reales cuando existan
-- [ ] Historial de servicios y ganancias del mecánico
 - [ ] Que eliminar cuenta borre de verdad en la base de datos
       (falta `DELETE /auth/me` del lado del back)
 - [ ] Que editar el teléfono se guarde de verdad
@@ -216,9 +216,15 @@ llaves que empiezan con `oaxicanicos.`
 
 ## Notas técnicas
 
-- La navegación del mecánico es un **menú fijo abajo** (`shared/menu-inferior`)
-  con Inicio y Perfil, como las apps del celular. El botón de Salir se queda en
-  la barra de arriba.
+- La navegación del mecánico es un **menú fijo abajo**
+  (`features/mecanico/menu-mecanico`) con Inicio, Historial y Perfil, como las
+  apps del celular. El botón de Salir se queda en la barra de arriba.
+- Ese menú vivía en `shared/`, pero ahí estaba mal puesto: las rutas que trae
+  adentro son de una sola parte de la app, y lo de `shared/` tiene que servirle
+  a cualquiera. El cliente tiene su propio menú dentro de su layout.
+- En el historial, lo que se muestra como ganado es **piezas + mano de obra**,
+  sin la tarifa de la app. Esa tarifa la paga el cliente pero no le queda al
+  mecánico: incluirla sería decirle que ganó más de lo que ganó.
 - El **teléfono vive en el usuario**, no en el perfil del mecánico, porque lo
   tienen las dos clases de usuario. Por eso se guarda con otro endpoint y en la
   pantalla va en su propio bloque, separado del perfil de trabajo.
