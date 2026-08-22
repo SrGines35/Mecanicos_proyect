@@ -23,6 +23,12 @@ export interface DatosNuevaSolicitud {
 /** Porcentaje que cobra la app. Lo confirma el back al guardar. */
 const PORCENTAJE_APP = 0.1;
 
+/**
+ * Los estados en los que un servicio ya termino y no vuelve a moverse.
+ * Son los que forman el historial del mecanico.
+ */
+const ESTADOS_CERRADOS: EstadoSolicitud[] = ['completada', 'cancelada', 'rechazada'];
+
 const LLAVE_SOLICITUDES = 'oaxicanicos.solicitudesSimuladas';
 
 /**
@@ -160,6 +166,30 @@ export class SolicitudService {
       return of(this.simuladas.map((s) => ({ ...s }))).pipe(delay(this.RETARDO_MS));
     }
     return this.http.get<Solicitud[]>(this.base);
+  }
+
+  /**
+   * Los servicios que este mecanico ya cerro: terminados, cancelados y
+   * rechazados. De la mas reciente a la mas vieja.
+   *
+   * Se ordena comparando las fechas como texto, no con new Date(). Se
+   * puede porque fechaCreacion viene en formato ISO ("2026-08-22T14:03:11Z")
+   * y en ese formato el orden alfabetico y el orden cronologico son el
+   * mismo: el año va primero, luego el mes, luego el dia. Asi se evita
+   * crear un objeto Date por cada comparacion.
+   */
+  listarHistorial(): Observable<Solicitud[]> {
+    if (!environment.usarApiReal) {
+      const id = this.sesion.usuario()?.id;
+
+      const mios = this.simuladas
+        .filter((s) => s.mecanicoId === id && ESTADOS_CERRADOS.includes(s.estado))
+        .sort((a, b) => b.fechaCreacion.localeCompare(a.fechaCreacion));
+
+      return of(mios.map((s) => ({ ...s }))).pipe(delay(this.RETARDO_MS));
+    }
+
+    return this.http.get<Solicitud[]>(`${this.base}/historial`);
   }
 
   obtener(id: string): Observable<Solicitud> {
