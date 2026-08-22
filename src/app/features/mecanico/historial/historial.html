@@ -1,0 +1,141 @@
+<app-barra-superior titulo="Historial" [mostrarRegresar]="true" />
+
+<main class="contenedor contenedor--con-menu">
+  @if (error(); as mensaje) {
+    <div class="auth-aviso auth-aviso--error">
+      <span>{{ mensaje }}</span>
+    </div>
+  }
+
+  @if (cargando()) {
+    <div class="resumen">
+      @for (hueco of [1, 2]; track hueco) {
+        <div class="esqueleto esqueleto--tarjeta">
+          <div class="esqueleto__linea esqueleto__linea--corta"></div>
+          <div class="esqueleto__linea"></div>
+        </div>
+      }
+    </div>
+
+    @for (hueco of [1, 2, 3]; track hueco) {
+      <div class="esqueleto">
+        <div class="esqueleto__linea esqueleto__linea--media"></div>
+        <div class="esqueleto__linea"></div>
+        <div class="esqueleto__linea esqueleto__linea--corta"></div>
+      </div>
+    }
+  } @else if (!hayAlgo()) {
+    <!-- Nada que enseñar todavia. En lugar de una pantalla en blanco se
+         explica que tiene que pasar para que aparezca algo aqui. -->
+    <section class="vacio entra">
+      <svg class="vacio__dibujo" viewBox="0 0 120 90" fill="none" aria-hidden="true">
+        <rect x="26" y="20" width="68" height="54" rx="6" stroke="currentColor"
+              stroke-width="2" opacity="0.35" />
+        <path d="M38 36h44M38 47h44M38 58h26" stroke="currentColor" stroke-width="2"
+              stroke-linecap="round" opacity="0.25" />
+        <circle cx="86" cy="62" r="15" fill="var(--superficie)" stroke="currentColor"
+                stroke-width="2" opacity="0.7" />
+        <path d="M80.5 62l4 4 7.5-8" stroke="currentColor" stroke-width="2.2"
+              stroke-linecap="round" stroke-linejoin="round" />
+      </svg>
+
+      <h2 class="vacio__titulo">Todavía no tienes servicios terminados</h2>
+
+      <p class="texto-suave">
+        Cuando aceptes una solicitud y la marques como completada, aparece
+        aquí con lo que cobraste.
+      </p>
+    </section>
+  } @else {
+    <!-- Resumen: dos numeros, no mas. Los dos salen de la misma lista que
+         ya se cargo, no de una consulta aparte. -->
+    <section class="resumen entra" style="--retraso: 0ms">
+      <article class="tarjeta-dato">
+        <span class="tarjeta-dato__numero">{{ cuantosTerminados() }}</span>
+        <span class="tarjeta-dato__etiqueta">
+          {{ cuantosTerminados() === 1 ? 'servicio terminado' : 'servicios terminados' }}
+        </span>
+      </article>
+
+      <article class="tarjeta-dato tarjeta-dato--dinero">
+        <span class="tarjeta-dato__numero">{{ dinero(totalGanado()) }}</span>
+        <span class="tarjeta-dato__etiqueta">ganado en total</span>
+      </article>
+    </section>
+
+    <div class="pestanas entra" style="--retraso: 70ms" role="tablist">
+      <button
+        type="button"
+        role="tab"
+        class="pestana"
+        [class.pestana--activa]="filtro() === 'todos'"
+        [attr.aria-selected]="filtro() === 'todos'"
+        (click)="cambiarFiltro('todos')"
+      >
+        Todos
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="pestana"
+        [class.pestana--activa]="filtro() === 'completada'"
+        [attr.aria-selected]="filtro() === 'completada'"
+        (click)="cambiarFiltro('completada')"
+      >
+        Terminados
+      </button>
+      <button
+        type="button"
+        role="tab"
+        class="pestana"
+        [class.pestana--activa]="filtro() === 'cancelada'"
+        [attr.aria-selected]="filtro() === 'cancelada'"
+        (click)="cambiarFiltro('cancelada')"
+      >
+        Cancelados
+      </button>
+    </div>
+
+    @if (visibles().length === 0) {
+      <p class="texto-suave sin-resultados">
+        No hay servicios en esta pestaña.
+      </p>
+    } @else {
+      @for (servicio of visibles(); track servicio.id; let i = $index) {
+        <article
+          class="servicio entra"
+          [style.--retraso]="i * 60 + 140 + 'ms'"
+          tabindex="0"
+          role="button"
+          (click)="abrir(servicio.id)"
+          (keyup.enter)="abrir(servicio.id)"
+        >
+          <div class="servicio__fila">
+            <span class="servicio__vehiculo">{{ servicio.vehiculo }}</span>
+            <span
+              class="etiqueta"
+              [class.etiqueta--exito]="servicio.estado === 'completada'"
+              [class.etiqueta--apagada]="servicio.estado !== 'completada'"
+            >
+              {{ textoEstado[servicio.estado] }}
+            </span>
+          </div>
+
+          <p class="servicio__falla">{{ servicio.descripcionFalla }}</p>
+
+          <div class="servicio__pie">
+            <span class="servicio__fecha">{{ fecha(servicio.fechaCreacion) }}</span>
+
+            @if (servicio.estado === 'completada') {
+              <span class="servicio__monto">{{ dinero(ganancia(servicio)) }}</span>
+            } @else {
+              <span class="texto-suave">Sin cobro</span>
+            }
+          </div>
+        </article>
+      }
+    }
+  }
+</main>
+
+<app-menu-mecanico />
