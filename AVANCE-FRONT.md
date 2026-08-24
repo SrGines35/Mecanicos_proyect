@@ -5,8 +5,9 @@ seguirle sin tener que preguntar nada.
 
 ## Qué es la app
 
-Una aplicación web estilo DiDi pero de mecánicos: el usuario dice qué se le
-descompuso y la app le manda al mecánico disponible más cercano.
+Una aplicación web estilo DiDi pero de mecánicos: el cliente dice qué se le
+descompuso, la app le muestra los mecánicos disponibles más cercanos y le manda
+una solicitud. El mecánico la recibe, la acepta y va.
 
 ## Cómo correrlo
 
@@ -17,100 +18,228 @@ npm start
 
 Se abre en `http://localhost:4200/`.
 
-## Pantallas que hay ahorita
+## El interruptor: datos simulados o back real
 
-| Ruta | Pantalla |
-|---|---|
-| `/` | Iniciar sesión |
-| `/registro` | Crear cuenta, como usuario o como mecánico |
+En `src/environments/environment.ts`:
 
-> El flujo de pedir mecánico (inicio, solicitud, lista de cercanos, detalle y
-> seguimiento) se hizo en una etapa anterior y se sacó del proyecto para
-> enfocarse primero en la autenticación. **No se perdió**: sigue en el historial
-> de git, en los commits de la rama `front-freidy`. Se puede recuperar cuando
-> se necesite.
+```ts
+export const environment = {
+  usarApiReal: false,          // <- este
+  apiUrl: 'http://localhost:3000',
+};
+```
+
+- **En `false`** (como está ahora): la app funciona sola, con datos inventados
+  en memoria. Sirve para desarrollar y probar sin depender del back.
+- **En `true`**: llama al back de verdad.
+
+**Cuando el back esté listo se cambia esa línea y ya.** No hay que tocar nada
+más: los servicios ya apuntan a los endpoints correctos.
+
+## Pantallas
+
+| Ruta | Quién | Pantalla |
+|---|---|---|
+| `/` | todos | Iniciar sesión |
+| `/registro` | todos | Crear cuenta, como cliente o como mecánico |
+
+| `/mecanico` | mecánico | Panel: estado y solicitudes nuevas |
+| `/mecanico/perfil` | mecánico | Descripción, zona y ubicación |
+| `/mecanico/solicitud/:id` | mecánico | Detalle, mapa, costos y avance del servicio |
+| cualquier otra | todos | Página no encontrada |
+
+## Cómo funciona la sesión
+
+Al iniciar sesión, el back devuelve dos tokens. El front los guarda en el
+navegador (`localStorage`), así que **la sesión sobrevive aunque se cierre la
+pestaña o el navegador**: al volver a abrir la app entra directo, sin pasar por
+el login. Como Instagram.
+
+Tres piezas hacen eso:
+
+1. **`SesionService`** guarda y lee los tokens y el usuario.
+2. **`authInterceptor`** le pega el token a cada llamada. Si el back contesta
+   401 porque el token venció, pide uno nuevo con el refresh token y **repite la
+   llamada original** sin que el usuario se entere.
+3. **Los guards** deciden a dónde entra cada quien:
+   - `sesionGuard` — si no hay sesión, al login.
+   - `rolGuard('mecanico')` — si un cliente intenta entrar al panel del
+     mecánico, lo regresa al suyo.
+   - `invitadoGuard` — si ya hay sesión, el login ni se muestra.
 
 ## Cómo está organizado el código
 
 ```
+src/environments/          -> el interruptor y la URL del back
 src/app/
   core/
-    models/       -> las interfaces (Rol, Credenciales, DatosRegistro, ...)
-    services/     -> AuthService (hoy simulado)
-    validadores/  -> todas las reglas de validación en un solo archivo
-  shared/
-    logo/         -> la llave inglesa en SVG
-    icono-ojo/    -> botón de mostrar/ocultar contraseña
-    directivas/   -> SoloNumeros, para campos que solo aceptan dígitos
+    models/        -> las interfaces (auth, mecánico, solicitud)
+    data/          -> datos simulados
+    services/      -> auth, sesión, mecánico, solicitudes
+    guards/        -> sesión y rol
+    interceptores/ -> el que renueva el token
+    validadores/   -> las reglas de validación
+    utils/         -> cálculo de distancia (Haversine)
+  shared/          -> logo, ojito, barra superior, menú inferior, mapa, directivas
   features/
     login/
     registro/
+    no-encontrada/
+    cliente/       -> LE TOCA A LUZ
+    mecanico/      -> panel, perfil, detalle-solicitud
 ```
 
-La regla: `core` no sabe nada de las pantallas, y las pantallas no traen reglas
-de negocio adentro. Todo lo de validar, guardar o consultar vive en `core`.
+**El reparto:** Luz trabaja en `features/cliente/`, Freidy en
+`features/mecanico/`. Lo de `core/` se acuerda entre los dos antes de tocarlo,
+porque ahí sí se pueden pisar.
 
-## Reglas de validación (están en `core/validadores/validadores.ts`)
+## Lo acordado con el equipo de back
 
-| Campo | Regla |
-|---|---|
-| Nombre | Solo letras, acentos, espacios y guiones. De 3 a 60 caracteres. |
-| Correo | Cualquier dominio, no solo Gmail. |
-| Teléfono | Exactamente 10 dígitos. No deja escribir letras. |
-| Contraseña | Mínimo 8 caracteres, con al menos una letra y un número. |
-| Confirmar | Debe ser igual a la contraseña. |
+Los nombres son los que ya tenía Guillermo en el repo `App_Mecanicos`. El front
+se adaptó a ellos, no al revés.
 
-El registro pide **los mismos datos para usuario y para mecánico**. Lo único
-que cambia es el rol. Los datos propios del mecánico (descripción, ubicación,
-especialidades y precio de revisión) se llenan después, desde su perfil en el
-dashboard: así el registro queda corto y nadie abandona a la mitad.
+```
+POST /auth/register    { nombre, correo, telefono, password, role }
+POST /auth/login       { correo, password }
+POST /auth/refresh     { refreshToken }
+GET  /auth/me          header Authorization: Bearer <token>
+```
 
-Los mensajes de error solo aparecen cuando el usuario ya tocó el campo, o
-cuando le da al botón de enviar. Así no lo recibe todo en rojo desde el inicio.
+Respuesta de register y login:
+
+```json
+{ "user": { "id", "nombre", "correo", "role" },
+  "tokens": { "accessToken", "refreshToken" } }
+```
+
+El rol se llama **`cliente`** o **`mecanico`** (no "usuario").
+
+### Endpoints que todavía faltan del back
+
+```
+PATCH  /auth/me
+DELETE /auth/me
+GET    /mecanicos/mi-perfil
+PUT    /mecanicos/mi-perfil
+GET    /mecanicos/disponibles
+PATCH  /mecanicos/estado
+POST   /solicitudes
+GET    /solicitudes
+POST   /solicitudes
+GET    /solicitudes/:id
+PATCH  /solicitudes/:id/estado
+PATCH  /solicitudes/:id/costos
+```
+
+Mientras no existan, esas pantallas corren con datos simulados.
+
+### Estados de la solicitud
+
+```
+pendiente, aceptada, en_camino, en_proceso, completada, cancelada, rechazada
+```
+
+Escritos exactamente así, minúsculas y guion bajo.
+
+### Estados del mecánico
+
+```
+disponible, ocupado, no_disponible
+```
+
+Un mecánico solo aparece en las búsquedas si está `disponible` **y** tiene el
+perfil completo (descripción, zona y ubicación). Sin coordenadas no se puede
+calcular la distancia.
+
+Al terminar de llenar el perfil **por primera vez**, el mecánico queda
+`disponible` solo, sin tener que ir a prenderlo a mano. Después se respeta lo
+que él elija: si se pone en `no_disponible` y luego edita su descripción, no se
+le vuelve a prender.
+
+### Lo que se quitó
+
+**Recuperar contraseña.** La pantalla existía y funcionaba, pero el equipo
+decidió no incluirla en esta entrega. Si algún día se retoma, está en el
+historial de git.
+
+### Dos cosas que el back tiene pendientes
+
+1. **`GET /auth/me` no devuelve el `nombre`**, solo id, correo y role. Por eso
+   el front también guarda el usuario en el navegador. Si lo agregan, mejor.
+2. **El `accessToken` dura 15 minutos.** El interceptor lo renueva solo, así que
+   funciona, pero para la presentación conviene subirlo a varios días.
 
 ## Lo que está simulado
 
-Un solo punto: `core/services/auth.service.ts`. Hoy guarda las cuentas en
-memoria (se pierden al recargar la página) y responde con un retardo falso
-para que se vea el "cargando".
+Todo lo que está detrás del interruptor `usarApiReal`:
 
-Cuando exista el back, se cambia el cuerpo de esos métodos por llamadas con
-`HttpClient`. **Las firmas ya devuelven `Observable`, así que las pantallas no
-se tocan.**
+- `core/services/auth.service.ts` — cuentas guardadas en el navegador
+- `core/services/mecanico.service.ts` — perfil guardado en el navegador, uno
+  por usuario
+- `core/services/solicitud.service.ts` — las solicitudes se guardan en el
+  navegador. Esto permite probar la app completa sin back: el cliente crea
+  una solicitud, cierra sesión, entra como mecánico, y **le llega**
 
-## Endpoints que necesitamos del back
+Las tres devuelven `Observable`, igual que las llamadas reales, así que cambiar
+de uno a otro no obliga a tocar ninguna pantalla.
 
-```
-POST /auth/login      -> { correo, contrasena }
-POST /auth/registro   -> { nombre, correo, telefono, contrasena, rol }
-GET  /auth/perfil
-```
+**Para probar con varias cuentas:** regístrate, usa el botón **Salir** de la
+barra de arriba, y regístrate otra vez con otro correo. Las cuentas se quedan
+guardadas en el navegador, así que puedes ir cambiando de una a otra. Para
+borrarlas todas y empezar de cero, en el navegador: F12 → Application →
+Local Storage → borrar las llaves que empiezan con `oaxicanicos.`
 
-Los tres deben devolver: `{ token, id, nombre, correo, rol }`.
+## Cómo probar la app completa sin el back
 
-El `rol` es la pieza clave: con eso la app decide a qué pantallas mandar a cada
-quien y protege las rutas.
+1. Regístrate como **cliente** y crea una solicitud.
+2. Dale **Salir**.
+3. Regístrate como **mecánico**, llena tu perfil (para que calcule distancias)
+   y ponte **disponible**.
+4. La solicitud del cliente aparece en tu panel, con la distancia real entre
+   los dos. Puedes aceptarla y avanzarla.
 
-La forma exacta de los objetos está en `src/app/core/models/auth.model.ts`. Si
-el back respeta esos nombres de campo, el front no necesita ningún ajuste.
+Las solicitudes viven en `localStorage`, así que sobreviven al recargar. Para
+borrar todo y empezar de cero: F12 → Application → Local Storage → borra las
+llaves que empiezan con `oaxicanicos.`
 
 ## Lo que falta
 
-- [ ] Guard que proteja las rutas según el rol.
-- [ ] Guardar la sesión para que no se pierda al recargar (hoy vive en memoria).
-- [ ] Recuperar contraseña.
-- [ ] Pantallas internas del usuario y del mecánico (recuperar el flujo anterior).
-- [ ] Conectar con la API real.
+- [ ] Pantallas del cliente: mapa, lista de mecánicos, crear solicitud (Luz)
+- [ ] Conectar con los endpoints reales cuando existan
+- [ ] Que eliminar cuenta borre de verdad en la base de datos
+      (falta `DELETE /auth/me` del lado del back)
+- [ ] Que editar el teléfono se guarde de verdad
+      (falta `PATCH /auth/me` del lado del back)
+- [ ] Eliminar cuenta también desde las pantallas del cliente (Luz)
+- [ ] Que el cliente pueda calificar al mecánico al terminar
 
 ## Notas técnicas
 
-- Angular 21, componentes standalone, sin zone.js (zoneless). El estado se
-  maneja con **signals**.
-- Los formularios son **Reactive Forms**, no `ngModel`. Se cambió a propósito:
-  con `ngModel` de una sola vía, limpiar un valor en el componente no borraba
-  lo que ya se veía escrito en la pantalla (por eso antes se quedaban las
-  letras en el campo de teléfono).
-- Las plantillas usan el control de flujo nuevo (`@if`, `@for`).
+- La navegación del mecánico es un **menú fijo abajo**
+  (`features/mecanico/menu-mecanico`) con Inicio y Perfil, como las
+  apps del celular. El botón de Salir se queda en la barra de arriba.
+- Ese menú vivía en `shared/`, pero ahí estaba mal puesto: las rutas que trae
+  adentro son de una sola parte de la app, y lo de `shared/` tiene que servirle
+  a cualquiera. El cliente tiene su propio menú dentro de su layout.
+- El **teléfono vive en el usuario**, no en el perfil del mecánico, porque lo
+  tienen las dos clases de usuario. Por eso se guarda con otro endpoint y en la
+  pantalla va en su propio bloque, separado del perfil de trabajo.
+- Angular 21, componentes standalone, sin zone.js. El estado se maneja con
+  **signals**.
+- Formularios **reactivos**, no `ngModel`.
+- Plantillas con el control de flujo nuevo (`@if`, `@for`).
 - La paleta está en variables CSS al inicio de `src/styles.css`. El **rojo se
-  reserva solo para errores**; el color de la marca es el ámbar. Si la marca
-  fuera roja, un campo mal llenado se confundiría con el diseño normal.
+  usa solo para errores**; el color de la marca es el ámbar.
+- El mapa es **Leaflet + OpenStreetMap**, no Google Maps: Google pide tarjeta
+  de crédito para la llave de la API. OpenStreetMap no pide nada.
+- El componente del mapa es `shared/mapa-ubicacion`. Se usa de dos formas: con
+  `[editable]="true"` el pin se arrastra (perfil del mecánico), y sin eso queda
+  de solo lectura (detalle de la solicitud).
+- El pin del mapa es un SVG dibujado a mano. Leaflet trae sus propias imágenes,
+  pero al compilar con Angular las busca en una ruta que no existe y salen
+  rotas.
+- Después de un `git pull` que traiga cambios en `package.json`, hay que correr
+  `npm install` otra vez, porque Leaflet es una dependencia nueva.
+- La distancia la calcula el front con Haversine
+  (`core/utils/distancia.util.ts`), así el back no tiene que hacer consultas
+  geográficas.

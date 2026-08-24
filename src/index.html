@@ -5,10 +5,37 @@
   <title>Oaxicanicos - Mecánicos a domicilio</title>
   <base href="/">
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Oaxicanicos conecta a quien se quedó tirado con el mecánico disponible más cercano.">
   <meta name="theme-color" content="#0a0a0b">
-  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link rel="icon" type="image/svg+xml" href="favicon.svg">
+  <style>
+    /* Lo que se ve el segundo que tarda Angular en arrancar. Sin esto la
+       pantalla queda en blanco y parece que la app se trabó. */
+    html, body { margin: 0; height: 100%; background: #0a0a0b; }
+
+    .arranque {
+      position: fixed;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .arranque__punto {
+      width: 34px;
+      height: 34px;
+      border: 3px solid rgba(255, 255, 255, 0.12);
+      border-top-color: #f0951f;
+      border-radius: 50%;
+      animation: arranque-gira 700ms linear infinite;
+    }
+
+    @keyframes arranque-gira { to { transform: rotate(360deg); } }
+  </style>
 </head>
 <body>
-  <app-root></app-root>
+  <app-root>
+    <div class="arranque"><div class="arranque__punto"></div></div>
+  </app-root>
 </body>
 </html>
