@@ -1,9 +1,3 @@
-/* Menu fijo de abajo del CLIENTE.
-   Los estilos son los mismos que usa el menu del mecanico (shared/
-   menu-inferior) para que las dos mitades de la app se vean iguales.
-   No se reutiliza ese componente porque trae las rutas /mecanico
-   quemadas adentro; aqui las rutas son /usuario. */
-
 .menu {
   position: fixed;
   left: 0;
@@ -14,7 +8,7 @@
   justify-content: center;
   gap: 8px;
   padding: 8px 12px;
-  /* En celulares con barra de gestos, evita que el menu quede debajo */
+
   padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   background: rgba(10, 10, 11, 0.94);
   backdrop-filter: blur(10px);

@@ -1,10 +1,3 @@
-/* Pantalla de inicio del cliente.
-   No se fija alto ni se centra vertical: el contenido empieza arriba y crece
-   hacia abajo. Asi no queda ese hueco grande en pantallas altas.
-   Los margenes y el ancho maximo ya vienen de .contenedor, en el layout. */
-
-/* ---------- Saludo ---------- */
-
 .saludo {
   margin-bottom: 22px;
 }
@@ -22,7 +15,7 @@
   line-height: 1.15;
   letter-spacing: -0.02em;
   color: var(--blanco);
-  /* Un nombre muy largo no rompe la pantalla */
+
   overflow-wrap: anywhere;
 }
 
@@ -31,8 +24,6 @@
   font-size: 0.92rem;
   color: var(--gris);
 }
-
-/* ---------- Tarjeta de la accion principal ---------- */
 
 .accion {
   text-align: center;
@@ -54,7 +45,6 @@
   color: var(--gris);
 }
 
-/* El boton ya viene de .boton-primario. Aqui solo se acomoda el icono. */
 .accion .boton-primario {
   display: flex;
   align-items: center;
@@ -66,8 +56,6 @@
   width: 18px;
   height: 18px;
 }
-
-/* ---------- Como funciona ---------- */
 
 .pasos {
   padding: 0 2px;
@@ -105,8 +93,6 @@
   font-size: 0.76rem;
   font-weight: 700;
 }
-
-/* ---------- Pantallas mas anchas ---------- */
 
 @media (min-width: 430px) {
   .saludo__nombre {

@@ -1,4 +1,3 @@
-
 export type EstadoSolicitud =
   | 'pendiente'
   | 'aceptada'
@@ -7,7 +6,6 @@ export type EstadoSolicitud =
   | 'completada'
   | 'cancelada'
   | 'rechazada';
-
 
 export interface ClienteSolicitud {
   nombre: string;
@@ -30,7 +28,6 @@ export interface Solicitud {
   fechaCreacion: string;
 }
 
-
 export interface SolicitudCercana extends Solicitud {
   distanciaKm: number;
 }
@@ -45,14 +42,12 @@ export const TEXTO_ESTADO_SOLICITUD: Record<EstadoSolicitud, string> = {
   rechazada: 'Rechazada',
 };
 
-
 export const PASOS_SERVICIO: EstadoSolicitud[] = [
   'aceptada',
   'en_camino',
   'en_proceso',
   'completada',
 ];
-
 
 export function siguientePaso(estado: EstadoSolicitud): EstadoSolicitud | null {
   const indice = PASOS_SERVICIO.indexOf(estado);
@@ -61,7 +56,6 @@ export function siguientePaso(estado: EstadoSolicitud): EstadoSolicitud | null {
   }
   return PASOS_SERVICIO[indice + 1];
 }
-
 
 export function calcularTotal(solicitud: Solicitud): number {
   return solicitud.costoPiezas + solicitud.costoManoObra + solicitud.tarifaApp;

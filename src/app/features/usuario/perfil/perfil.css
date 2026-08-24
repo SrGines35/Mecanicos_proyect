@@ -1,20 +1,8 @@
-/* Pantalla "Mi perfil".
-   El ancho maximo, el centrado y los margenes ya los pone .contenedor desde
-   el layout, asi que aqui no se repiten: por eso se fue el padding de 40px y
-   el max-width de 650px que hacian que todo se viera suelto y desalineado
-   respecto a las demas pantallas.
-
-   Los estilos de .bloque, .campo y .boton-primario vienen de styles.css, que
-   es el mismo archivo del que sale el Login. Por eso se ven iguales. */
-
-/* ---------- Identidad ---------- */
-
 .identidad {
   text-align: center;
   margin-bottom: 20px;
 }
 
-/* El avatar es un icono, no una foto: no se sube, no se guarda, no se toca. */
 .identidad__avatar {
   display: inline-flex;
   align-items: center;
@@ -47,10 +35,6 @@
   color: var(--gris);
 }
 
-/* ---------- Campos ---------- */
-
-/* La etiqueta lleva su icono al lado. Estos estilos estan dentro de este
-   componente, asi que no le afectan al Login ni al registro. */
 .campo label {
   display: flex;
   align-items: center;
@@ -63,8 +47,6 @@
   color: var(--gris-tenue);
 }
 
-/* Mientras no se esta editando los datos se ven, pero apagados: se entiende
-   de un vistazo que hay que picar "Editar informacion" para cambiarlos. */
 .campo input:disabled {
   border-color: transparent;
   background: rgba(255, 255, 255, 0.03);
@@ -72,7 +54,6 @@
   cursor: default;
 }
 
-/* El ultimo campo no necesita separacion abajo: ya la pone el boton */
 .campo--ultimo {
   margin-bottom: 6px;
 }

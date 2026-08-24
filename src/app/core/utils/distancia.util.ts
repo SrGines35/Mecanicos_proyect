@@ -7,7 +7,6 @@ export interface Punto {
   longitud: number;
 }
 
-
 export function calcularDistanciaKm(origen: Punto, destino: Punto): number {
   const dLat = gradosARadianes(destino.latitud - origen.latitud);
   const dLon = gradosARadianes(destino.longitud - origen.longitud);
@@ -22,14 +21,12 @@ export function calcularDistanciaKm(origen: Punto, destino: Punto): number {
   return RADIO_TIERRA_KM * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-
 export function formatearDistancia(distanciaKm: number): string {
   if (distanciaKm < 1) {
     return `${Math.round(distanciaKm * 1000)} m`;
   }
   return `${distanciaKm.toFixed(1)} km`;
 }
-
 
 export function haceCuanto(fechaIso: string, ahora: number): string {
   const minutos = Math.floor((ahora - new Date(fechaIso).getTime()) / 60000);

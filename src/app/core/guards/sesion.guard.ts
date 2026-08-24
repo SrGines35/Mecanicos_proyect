@@ -4,7 +4,6 @@ import { CanActivateFn, Router } from '@angular/router';
 import { Rol } from '../models/auth.model';
 import { SesionService } from '../services/sesion.service';
 
-
 export const sesionGuard: CanActivateFn = () => {
   const sesion = inject(SesionService);
   const router = inject(Router);
@@ -15,7 +14,6 @@ export const sesionGuard: CanActivateFn = () => {
 
   return router.createUrlTree(['/']);
 };
-
 
 export const rolGuard = (rolPermitido: Rol): CanActivateFn => {
   return () => {
@@ -34,7 +32,6 @@ export const rolGuard = (rolPermitido: Rol): CanActivateFn => {
     return router.createUrlTree([sesion.rutaSegunRol(usuario.role)]);
   };
 };
-
 
 export const invitadoGuard: CanActivateFn = () => {
   const sesion = inject(SesionService);

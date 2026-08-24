@@ -9,7 +9,6 @@ import { SesionService } from '../../../core/services/sesion.service';
   styleUrl: './perfil.css'
 })
 export class Perfil {
-
   private readonly sesion = inject(SesionService);
 
   readonly editando = signal(false);
@@ -20,14 +19,11 @@ export class Perfil {
 
   readonly telefono = computed(() => this.sesion.usuario()?.telefono ?? '');
 
-
   editar(): void {
     this.editando.set(true);
   }
 
-
   guardar(): void {
     this.editando.set(false);
   }
-
 }
