@@ -1,31 +1,33 @@
-import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, computed, inject, signal } from '@angular/core';
+
+import { SesionService } from '../../../core/services/sesion.service';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [FormsModule],
   templateUrl: './perfil.html',
   styleUrl: './perfil.css'
 })
 export class Perfil {
 
-  editando = false;
+  private readonly sesion = inject(SesionService);
 
-  usuario = {
-    nombre: 'Usuario',
-    correo: 'correo@ejemplo.com',
-    telefono: '9510000000',
-  };
+  readonly editando = signal(false);
+
+  readonly nombre = computed(() => this.sesion.usuario()?.nombre ?? '');
+
+  readonly correo = computed(() => this.sesion.usuario()?.correo ?? '');
+
+  readonly telefono = computed(() => this.sesion.usuario()?.telefono ?? '');
 
 
   editar(): void {
-    this.editando = true;
+    this.editando.set(true);
   }
 
 
   guardar(): void {
-    this.editando = false;
+    this.editando.set(false);
   }
 
 }
