@@ -40,22 +40,26 @@ export class AuthService {
   }
 
   registrar(datos: DatosRegistro): Observable<RespuestaAuth> {
+    const limpios = { ...datos, password: datos.password.trim() };
+
     if (!environment.usarApiReal) {
-      return this.registrarSimulado(datos);
+      return this.registrarSimulado(limpios);
     }
 
     return this.http
-      .post<RespuestaAuth>(`${this.base}/register`, datos)
+      .post<RespuestaAuth>(`${this.base}/register`, limpios)
       .pipe(tap((r) => this.sesion.guardar(r.user, r.tokens)));
   }
 
   iniciarSesion(credenciales: Credenciales): Observable<RespuestaAuth> {
+    const limpias = { ...credenciales, password: credenciales.password.trim() };
+
     if (!environment.usarApiReal) {
-      return this.iniciarSesionSimulado(credenciales);
+      return this.iniciarSesionSimulado(limpias);
     }
 
     return this.http
-      .post<RespuestaAuth>(`${this.base}/login`, credenciales)
+      .post<RespuestaAuth>(`${this.base}/login`, limpias)
       .pipe(tap((r) => this.sesion.guardar(r.user, r.tokens)));
   }
 

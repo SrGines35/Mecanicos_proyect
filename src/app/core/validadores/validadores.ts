@@ -13,8 +13,8 @@ export function contrasenasCoinciden(
   campoConfirmar: string
 ): ValidatorFn {
   return (grupo: AbstractControl): ValidationErrors | null => {
-    const contrasena = grupo.get(campoContrasena)?.value;
-    const confirmar = grupo.get(campoConfirmar)?.value;
+    const contrasena = (grupo.get(campoContrasena)?.value ?? '').trim();
+    const confirmar = (grupo.get(campoConfirmar)?.value ?? '').trim();
 
     if (!confirmar) {
       return null;
