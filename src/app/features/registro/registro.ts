@@ -30,6 +30,7 @@ export class Registro {
   private readonly router = inject(Router);
 
   protected readonly mostrarContrasena = signal(false);
+  protected readonly mostrarConfirmacion = signal(false);
   protected readonly enviando = signal(false);
   protected readonly errorServidor = signal<string | null>(null);
 
@@ -63,6 +64,10 @@ export class Registro {
 
   protected seleccionarRol(role: Rol): void {
     this.formulario.controls.role.setValue(role);
+  }
+
+  protected alternarConfirmacion(): void {
+    this.mostrarConfirmacion.update((valor) => !valor);
   }
 
   protected alternarContrasena(): void {

@@ -116,13 +116,19 @@
 
       <div class="campo">
         <label for="confirmarPassword">Confirmar contraseña</label>
-        <input
-          id="confirmarPassword"
-          type="password"
-          formControlName="confirmarPassword"
-          autocomplete="new-password"
-          placeholder="Repite tu contraseña"
-        />
+        <div class="campo-contrasena">
+          <input
+            id="confirmarPassword"
+            [type]="mostrarConfirmacion() ? 'text' : 'password'"
+            formControlName="confirmarPassword"
+            autocomplete="new-password"
+            placeholder="Repite tu contraseña"
+          />
+          <app-icono-ojo
+            [visible]="mostrarConfirmacion()"
+            (alternar)="alternarConfirmacion()"
+          />
+        </div>
         @if (noCoinciden) {
           <p class="campo__error">Las dos contraseñas no son iguales</p>
         }
