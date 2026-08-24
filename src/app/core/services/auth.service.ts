@@ -12,20 +12,6 @@ import {
 } from '../models/auth.model';
 import { SesionService } from './sesion.service';
 
-/**
- * Servicio de autenticacion.
- *
- * Habla con el back real cuando `environment.usarApiReal` es true.
- * Mientras esta en false, responde con datos simulados en memoria
- * para que el front se pueda seguir desarrollando y probando aunque
- * el servidor no este levantado.
- *
- * Endpoints del back (repo App_Mecanicos, rama Dropxni):
- *   POST /auth/register
- *   POST /auth/login
- *   POST /auth/refresh
- *   GET  /auth/me
- */
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private readonly http = inject(HttpClient);
@@ -35,14 +21,6 @@ export class AuthService {
 
   private readonly RETARDO_MS = 700;
 
-  /**
-   * Cuentas de prueba mientras no hay back.
-   *
-   * Se guardan en el navegador a proposito. Antes vivian nada mas en
-   * memoria y se borraban al recargar la pagina, asi que no habia forma de
-   * registrar varios mecanicos y luego ir cambiando de uno a otro para
-   * probar. Cuando el back este listo esto ya no se usa.
-   */
   private readonly LLAVE_CUENTAS = 'oaxicanicos.cuentasSimuladas';
 
   private get cuentasSimuladas(): Map<string, DatosRegistro> {
@@ -58,8 +36,6 @@ export class AuthService {
     try {
       localStorage.setItem(this.LLAVE_CUENTAS, JSON.stringify([...cuentas]));
     } catch {
-      // Si el navegador no deja guardar, la app sigue funcionando;
-      // nada mas se pierden las cuentas al recargar.
     }
   }
 
@@ -87,15 +63,6 @@ export class AuthService {
     this.sesion.limpiar();
   }
 
-  /**
-   * Cambia datos de la cuenta. Por ahora solo el telefono.
-   *
-   * El telefono vive en el usuario, no en el perfil del mecanico, porque lo
-   * tienen las dos clases de usuario: el cliente tambien lo necesita para
-   * que el mecanico le pueda marcar.
-   *
-   * PENDIENTE DEL BACK: falta PATCH /auth/me.
-   */
   actualizarDatos(cambios: { telefono: string }): Observable<Usuario> {
     if (!environment.usarApiReal) {
       const cuentas = this.cuentasSimuladas;
@@ -117,16 +84,6 @@ export class AuthService {
       .pipe(tap((u) => this.sesion.actualizarUsuario(u)));
   }
 
-  /**
-   * Borra la cuenta para siempre.
-   *
-   * Es distinto de cerrar sesion: al cerrar sesion la cuenta sigue ahi y
-   * puedes volver a entrar con tu correo. Al eliminarla, el correo queda
-   * libre y habria que registrarse de nuevo desde cero.
-   *
-   * PENDIENTE DEL BACK: falta DELETE /auth/me. Mientras no exista, esto
-   * solo borra la cuenta simulada del navegador.
-   */
   eliminarCuenta(): Observable<void> {
     if (!environment.usarApiReal) {
       const cuentas = this.cuentasSimuladas;
@@ -147,10 +104,6 @@ export class AuthService {
       .delete<void>(`${this.base}/me`)
       .pipe(tap(() => this.sesion.limpiar()));
   }
-
-  // ---------------------------------------------------------------
-  // Modo simulado
-  // ---------------------------------------------------------------
 
   private registrarSimulado(datos: DatosRegistro): Observable<RespuestaAuth> {
     const correo = datos.correo.toLowerCase();

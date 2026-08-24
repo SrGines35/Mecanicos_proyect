@@ -10,16 +10,42 @@ import {
 } from '../models/mecanico.model';
 import { SesionService } from './sesion.service';
 
-/**
- * Perfil del mecanico que inicio sesion.
- *
- * Endpoints del back:
- *   GET   /mecanicos/mi-perfil
- *   PUT   /mecanicos/mi-perfil
- *   PATCH /mecanicos/estado
- *
- * Mientras environment.usarApiReal sea false, todo vive en memoria.
- */
+const MECANICOS_EJEMPLO: PerfilMecanico[] = [
+  {
+    usuarioId: 'ej-1',
+    nombre: 'Juan Ramírez Cruz',
+    telefono: '9515551001',
+    descripcion: 'Taller propio sobre la carretera. Motor, afinación y diagnóstico.',
+    zonaTrabajo: 'Centro de San Pablo Huixtepec',
+    latitud: 16.8215,
+    longitud: -96.7851,
+    estado: 'disponible',
+    calificacion: 4.8,
+  },
+  {
+    usuarioId: 'ej-2',
+    nombre: 'Lucía Hernández Gómez',
+    telefono: '9515552002',
+    descripcion: 'Servicio a domicilio. Sistema eléctrico, alternador y marcha.',
+    zonaTrabajo: 'San Pablo Huixtepec y Zimatlán',
+    latitud: 16.8178,
+    longitud: -96.7802,
+    estado: 'disponible',
+    calificacion: 4.6,
+  },
+  {
+    usuarioId: 'ej-3',
+    nombre: 'Rosa Jiménez Santos',
+    telefono: '9515554004',
+    descripcion: 'Vulcanizadora y auxilio vial. Cambio de llanta a domicilio.',
+    zonaTrabajo: 'Agencias cercanas',
+    latitud: 16.8302,
+    longitud: -96.7889,
+    estado: 'disponible',
+    calificacion: 4.9,
+  },
+];
+
 @Injectable({ providedIn: 'root' })
 export class MecanicoService {
   private readonly http = inject(HttpClient);
@@ -28,16 +54,8 @@ export class MecanicoService {
   private readonly base = `${environment.apiUrl}/mecanicos`;
   private readonly RETARDO_MS = 500;
 
-  /** El perfil cargado, o null si todavia no lo llena */
   readonly perfil = signal<PerfilMecanico | null>(null);
 
-  /**
-   * Perfiles simulados, guardados en el navegador y separados por usuario.
-   *
-   * Antes habia un solo perfil en memoria: si registrabas dos mecanicos se
-   * pisaban entre ellos, y al recargar la pagina se perdia. Asi no se podia
-   * probar con varios mecanicos en distintas ubicaciones.
-   */
   private readonly LLAVE_PERFILES = 'oaxicanicos.perfilesSimulados';
 
   private get perfilSimulado(): PerfilMecanico | null {
@@ -56,7 +74,6 @@ export class MecanicoService {
     try {
       localStorage.setItem(this.LLAVE_PERFILES, JSON.stringify(perfiles));
     } catch {
-      // Si el navegador no deja guardar, la app sigue funcionando.
     }
   }
 
@@ -89,22 +106,17 @@ export class MecanicoService {
   guardarPerfil(datos: DatosPerfilMecanico): Observable<PerfilMecanico> {
     const previo = this.perfilSimulado ?? this.perfil();
 
-    /**
-     * Al terminar de llenar el perfil por primera vez, el mecanico queda
-     * disponible sin tener que ir a prenderlo a mano.
-     *
-     * Solo pasa la primera vez, cuando el perfil pasa de incompleto a
-     * completo. Si despues el mecanico se pone en no_disponible y luego
-     * edita su descripcion, se respeta lo que el eligio: seria muy molesto
-     * que la app lo volviera a poner disponible sin avisarle.
-     */
     const seCompletoAhora =
       !this.perfilCompleto(previo) &&
       this.perfilCompleto({ ...(previo ?? this.perfilVacio()), ...datos });
 
     if (!environment.usarApiReal) {
+      const usuario = this.sesion.usuario();
+
       const actualizado: PerfilMecanico = {
         usuarioId: this.idActual(),
+        nombre: usuario?.nombre,
+        telefono: usuario?.telefono,
         ...datos,
         estado: seCompletoAhora ? 'disponible' : previo?.estado ?? 'no_disponible',
         calificacion: previo?.calificacion ?? 5,
@@ -118,8 +130,7 @@ export class MecanicoService {
     }
 
     return this.http.put<PerfilMecanico>(`${this.base}/mi-perfil`, datos).pipe(
-      // Son dos llamadas porque el back guarda el perfil y el estado por
-      // separado. Si falla la segunda, el perfil ya quedo guardado.
+
       switchMap((p) => (seCompletoAhora ? this.cambiarEstado('disponible') : of(p))),
       tap((p) => this.perfil.set(p))
     );
@@ -163,12 +174,19 @@ export class MecanicoService {
       .pipe(tap((p) => this.perfil.set(p)));
   }
 
-  /**
-   * Borra el perfil guardado de un mecanico.
-   *
-   * Recibe el id en vez de sacarlo de la sesion porque se usa al eliminar
-   * la cuenta, cuando la sesion ya se cerro y no habria de donde sacarlo.
-   */
+  listarDisponibles(): Observable<PerfilMecanico[]> {
+    if (!environment.usarApiReal) {
+      const registrados = Object.values(this.leerPerfiles()).filter(
+        (p) => p.estado === 'disponible' && this.perfilCompleto(p)
+      );
+
+      const lista = registrados.length > 0 ? registrados : MECANICOS_EJEMPLO;
+      return of(lista.map((p) => ({ ...p }))).pipe(delay(this.RETARDO_MS));
+    }
+
+    return this.http.get<PerfilMecanico[]>(`${this.base}/disponibles`);
+  }
+
   olvidarPerfil(usuarioId: string): void {
     const perfiles = this.leerPerfiles();
     delete perfiles[usuarioId];
@@ -176,17 +194,11 @@ export class MecanicoService {
     try {
       localStorage.setItem(this.LLAVE_PERFILES, JSON.stringify(perfiles));
     } catch {
-      // Si el navegador no deja guardar, no pasa nada grave.
     }
 
     this.perfil.set(null);
   }
 
-  /**
-   * Un perfil sirve solo si tiene descripcion, zona y ubicacion.
-   * Sin ubicacion no se puede calcular la distancia, y sin eso el
-   * mecanico no puede aparecer en las busquedas.
-   */
   perfilCompleto(perfil: PerfilMecanico | null): boolean {
     if (!perfil) {
       return false;

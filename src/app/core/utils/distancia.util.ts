@@ -7,13 +7,7 @@ export interface Punto {
   longitud: number;
 }
 
-/**
- * Formula de Haversine: distancia en linea recta entre dos puntos
- * de la Tierra, en kilometros.
- *
- * Esto lo calcula el FRONT a proposito. Asi el back nada mas devuelve
- * latitud y longitud y no tiene que hacer consultas geograficas.
- */
+
 export function calcularDistanciaKm(origen: Punto, destino: Punto): number {
   const dLat = gradosARadianes(destino.latitud - origen.latitud);
   const dLon = gradosARadianes(destino.longitud - origen.longitud);
@@ -28,7 +22,7 @@ export function calcularDistanciaKm(origen: Punto, destino: Punto): number {
   return RADIO_TIERRA_KM * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
-/** Lo deja bonito para mostrarlo: "850 m" o "2.4 km" */
+
 export function formatearDistancia(distanciaKm: number): string {
   if (distanciaKm < 1) {
     return `${Math.round(distanciaKm * 1000)} m`;
@@ -36,7 +30,7 @@ export function formatearDistancia(distanciaKm: number): string {
   return `${distanciaKm.toFixed(1)} km`;
 }
 
-/** "hace 3 min", "hace 2 h", "hace 4 d" */
+
 export function haceCuanto(fechaIso: string, ahora: number): string {
   const minutos = Math.floor((ahora - new Date(fechaIso).getTime()) / 60000);
 

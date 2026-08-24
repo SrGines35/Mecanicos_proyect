@@ -1,12 +1,11 @@
-/** Los tres estados que puede tener un mecanico */
 export type EstadoMecanico = 'disponible' | 'ocupado' | 'no_disponible';
 
-/**
- * Perfil del mecanico. Lo llena el desde su panel, despues de
- * registrarse. Corresponde a la tabla perfiles_mecanico del back.
- */
 export interface PerfilMecanico {
   usuarioId: string;
+
+  nombre?: string;
+  telefono?: string;
+
   descripcion: string;
   latitud: number;
   longitud: number;
@@ -15,8 +14,14 @@ export interface PerfilMecanico {
   calificacion: number;
 }
 
-/** Lo que se manda a PUT /mecanicos/mi-perfil */
-export type DatosPerfilMecanico = Omit<PerfilMecanico, 'usuarioId' | 'calificacion' | 'estado'>;
+export type DatosPerfilMecanico = Omit<
+  PerfilMecanico,
+  'usuarioId' | 'calificacion' | 'estado' | 'nombre' | 'telefono'
+>;
+
+export interface MecanicoCercano extends PerfilMecanico {
+  distanciaKm: number;
+}
 
 export const TEXTO_ESTADO: Record<EstadoMecanico, string> = {
   disponible: 'Disponible',

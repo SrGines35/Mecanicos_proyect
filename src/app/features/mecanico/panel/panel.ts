@@ -12,13 +12,13 @@ import { SesionService } from '../../../core/services/sesion.service';
 import { SolicitudService } from '../../../core/services/solicitud.service';
 import { calcularDistanciaKm, formatearDistancia, haceCuanto } from '../../../core/utils/distancia.util';
 import { BarraSuperior } from '../../../shared/barra-superior/barra-superior';
-import { MenuInferior } from '../../../shared/menu-inferior/menu-inferior';
+import { MenuMecanico } from '../menu-mecanico/menu-mecanico';
 
 const ESTADOS: EstadoMecanico[] = ['disponible', 'ocupado', 'no_disponible'];
 
 @Component({
   selector: 'app-panel',
-  imports: [RouterLink, BarraSuperior, MenuInferior],
+  imports: [RouterLink, BarraSuperior, MenuMecanico],
   templateUrl: './panel.html',
   styleUrl: './panel.css',
 })
@@ -45,15 +45,10 @@ export class Panel implements OnInit {
     () => this.perfil()?.estado ?? 'no_disponible'
   );
 
-  /** Solo el primer nombre: "Buenas tardes, Juan" se lee mejor que el nombre completo */
   protected readonly primerNombre = computed(
     () => this.sesion.usuario()?.nombre?.trim().split(' ')[0] ?? ''
   );
 
-  /**
-   * Saludo segun la hora del reloj del celular.
-   * No necesita al back para nada.
-   */
   protected readonly saludo = computed(() => {
     const hora = new Date().getHours();
     if (hora < 12) return 'Buenos días';
@@ -61,11 +56,8 @@ export class Panel implements OnInit {
     return 'Buenas noches';
   });
 
-  // ---- Numeros del resumen. Todos salen de lo que el front ya tiene ----
-
   protected readonly cuantasSolicitudes = computed(() => this.solicitudes().length);
 
-  /** La lista viene ordenada por cercania, asi que la primera es la mas cerca */
   protected readonly masCercana = computed(() => {
     const primera = this.solicitudes()[0];
     if (!primera || !this.perfilCompleto()) {
@@ -89,8 +81,6 @@ export class Panel implements OnInit {
       return;
     }
 
-    // Sin perfil completo no tiene caso ponerse disponible: no
-    // aparecería en las búsquedas de todos modos.
     if (estado === 'disponible' && !this.perfilCompleto()) {
       void this.router.navigate(['/mecanico/perfil']);
       return;
@@ -127,10 +117,6 @@ export class Panel implements OnInit {
     });
   }
 
-  /**
-   * Le agrega la distancia a cada solicitud y las ordena de la mas
-   * cercana a la mas lejana. El calculo lo hace el front.
-   */
   private conDistancia(lista: Solicitud[]): SolicitudCercana[] {
     const perfil = this.perfil();
 

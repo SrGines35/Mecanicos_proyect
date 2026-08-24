@@ -30,6 +30,7 @@ export class Registro {
   private readonly router = inject(Router);
 
   protected readonly mostrarContrasena = signal(false);
+  protected readonly mostrarConfirmacion = signal(false);
   protected readonly enviando = signal(false);
   protected readonly errorServidor = signal<string | null>(null);
 
@@ -65,6 +66,10 @@ export class Registro {
     this.formulario.controls.role.setValue(role);
   }
 
+  protected alternarConfirmacion(): void {
+    this.mostrarConfirmacion.update((valor) => !valor);
+  }
+
   protected alternarContrasena(): void {
     this.mostrarContrasena.update((valor) => !valor);
   }
@@ -91,8 +96,7 @@ export class Registro {
       .subscribe({
         next: (respuesta) => {
           this.enviando.set(false);
-          // Al registrarse ya queda con la sesion abierta: se va
-          // directo a su pantalla, sin pasar otra vez por el login.
+
           void this.router.navigate([this.sesion.rutaSegunRol(respuesta.user.role)]);
         },
         error: (error: unknown) => {

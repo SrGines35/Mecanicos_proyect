@@ -21,14 +21,11 @@
   color: var(--gris-tenue);
 }
 
-/* El pin es un SVG suelto, sin fondo ni borde de Leaflet */
 :host ::ng-deep .pin-mapa {
   background: transparent;
   border: none;
 }
 
-/* Los mapas de OpenStreetMap son claros y la app es oscura. Bajarles un
-   poco el brillo evita el golpe de luz sin que dejen de leerse las calles. */
 :host ::ng-deep .leaflet-tile-pane {
   filter: brightness(0.86) saturate(0.85);
 }

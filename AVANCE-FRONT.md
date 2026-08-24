@@ -42,7 +42,7 @@ más: los servicios ya apuntan a los endpoints correctos.
 |---|---|---|
 | `/` | todos | Iniciar sesión |
 | `/registro` | todos | Crear cuenta, como cliente o como mecánico |
-| `/cliente` | cliente | Inicio del cliente *(le toca a Luz)* |
+
 | `/mecanico` | mecánico | Panel: estado y solicitudes nuevas |
 | `/mecanico/perfil` | mecánico | Descripción, zona y ubicación |
 | `/mecanico/solicitud/:id` | mecánico | Detalle, mapa, costos y avance del servicio |
@@ -121,8 +121,11 @@ PATCH  /auth/me
 DELETE /auth/me
 GET    /mecanicos/mi-perfil
 PUT    /mecanicos/mi-perfil
+GET    /mecanicos/disponibles
 PATCH  /mecanicos/estado
+POST   /solicitudes
 GET    /solicitudes
+POST   /solicitudes
 GET    /solicitudes/:id
 PATCH  /solicitudes/:id/estado
 PATCH  /solicitudes/:id/costos
@@ -173,7 +176,9 @@ Todo lo que está detrás del interruptor `usarApiReal`:
 - `core/services/auth.service.ts` — cuentas guardadas en el navegador
 - `core/services/mecanico.service.ts` — perfil guardado en el navegador, uno
   por usuario
-- `core/services/solicitud.service.ts` — usa `core/data/solicitudes.mock.ts`
+- `core/services/solicitud.service.ts` — las solicitudes se guardan en el
+  navegador. Esto permite probar la app completa sin back: el cliente crea
+  una solicitud, cierra sesión, entra como mecánico, y **le llega**
 
 Las tres devuelven `Observable`, igual que las llamadas reales, así que cambiar
 de uno a otro no obliga a tocar ninguna pantalla.
@@ -184,11 +189,23 @@ guardadas en el navegador, así que puedes ir cambiando de una a otra. Para
 borrarlas todas y empezar de cero, en el navegador: F12 → Application →
 Local Storage → borrar las llaves que empiezan con `oaxicanicos.`
 
+## Cómo probar la app completa sin el back
+
+1. Regístrate como **cliente** y crea una solicitud.
+2. Dale **Salir**.
+3. Regístrate como **mecánico**, llena tu perfil (para que calcule distancias)
+   y ponte **disponible**.
+4. La solicitud del cliente aparece en tu panel, con la distancia real entre
+   los dos. Puedes aceptarla y avanzarla.
+
+Las solicitudes viven en `localStorage`, así que sobreviven al recargar. Para
+borrar todo y empezar de cero: F12 → Application → Local Storage → borra las
+llaves que empiezan con `oaxicanicos.`
+
 ## Lo que falta
 
 - [ ] Pantallas del cliente: mapa, lista de mecánicos, crear solicitud (Luz)
 - [ ] Conectar con los endpoints reales cuando existan
-- [ ] Historial de servicios y ganancias del mecánico
 - [ ] Que eliminar cuenta borre de verdad en la base de datos
       (falta `DELETE /auth/me` del lado del back)
 - [ ] Que editar el teléfono se guarde de verdad
@@ -198,9 +215,12 @@ Local Storage → borrar las llaves que empiezan con `oaxicanicos.`
 
 ## Notas técnicas
 
-- La navegación del mecánico es un **menú fijo abajo** (`shared/menu-inferior`)
-  con Inicio y Perfil, como las apps del celular. El botón de Salir se queda en
-  la barra de arriba.
+- La navegación del mecánico es un **menú fijo abajo**
+  (`features/mecanico/menu-mecanico`) con Inicio y Perfil, como las
+  apps del celular. El botón de Salir se queda en la barra de arriba.
+- Ese menú vivía en `shared/`, pero ahí estaba mal puesto: las rutas que trae
+  adentro son de una sola parte de la app, y lo de `shared/` tiene que servirle
+  a cualquiera. El cliente tiene su propio menú dentro de su layout.
 - El **teléfono vive en el usuario**, no en el perfil del mecánico, porque lo
   tienen las dos clases de usuario. Por eso se guarda con otro endpoint y en la
   pantalla va en su propio bloque, separado del perfil de trabajo.

@@ -58,8 +58,6 @@
   border-color: rgba(240, 149, 31, 0.4);
 }
 
-/* El de salir lleva texto ademas del icono.
-   Con puro icono nadie sabia que ahi se cerraba sesion. */
 .barra__salir {
   flex-shrink: 0;
   display: flex;

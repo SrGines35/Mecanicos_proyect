@@ -1,7 +1,4 @@
-/**
- * Los siete estados acordados con el equipo de back.
- * Se escriben EXACTAMENTE asi: minusculas y guion bajo.
- */
+
 export type EstadoSolicitud =
   | 'pendiente'
   | 'aceptada'
@@ -11,7 +8,7 @@ export type EstadoSolicitud =
   | 'cancelada'
   | 'rechazada';
 
-/** Datos del cliente que el back debe mandar junto con la solicitud */
+
 export interface ClienteSolicitud {
   nombre: string;
   telefono: string;
@@ -33,7 +30,7 @@ export interface Solicitud {
   fechaCreacion: string;
 }
 
-/** Solicitud con la distancia ya calculada por el front */
+
 export interface SolicitudCercana extends Solicitud {
   distanciaKm: number;
 }
@@ -48,7 +45,7 @@ export const TEXTO_ESTADO_SOLICITUD: Record<EstadoSolicitud, string> = {
   rechazada: 'Rechazada',
 };
 
-/** El orden en que avanza un servicio, para la barra de progreso */
+
 export const PASOS_SERVICIO: EstadoSolicitud[] = [
   'aceptada',
   'en_camino',
@@ -56,7 +53,7 @@ export const PASOS_SERVICIO: EstadoSolicitud[] = [
   'completada',
 ];
 
-/** Cual es el siguiente paso, o null si ya termino */
+
 export function siguientePaso(estado: EstadoSolicitud): EstadoSolicitud | null {
   const indice = PASOS_SERVICIO.indexOf(estado);
   if (indice === -1 || indice === PASOS_SERVICIO.length - 1) {
@@ -65,7 +62,7 @@ export function siguientePaso(estado: EstadoSolicitud): EstadoSolicitud | null {
   return PASOS_SERVICIO[indice + 1];
 }
 
-/** El total que paga el cliente */
+
 export function calcularTotal(solicitud: Solicitud): number {
   return solicitud.costoPiezas + solicitud.costoManoObra + solicitud.tarifaApp;
 }

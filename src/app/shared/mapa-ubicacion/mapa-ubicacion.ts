@@ -10,27 +10,11 @@ import {
 } from '@angular/core';
 import * as L from 'leaflet';
 
-/** Lo que emite el mapa cuando el usuario mueve el pin */
 export interface Coordenadas {
   latitud: number;
   longitud: number;
 }
 
-/**
- * Mapa reutilizable con un pin.
- *
- * Se usa de dos formas:
- *
- * - Solo lectura (editable = false): nada mas muestra donde esta el punto.
- *   Asi se usa en el detalle de la solicitud para ver donde quedo el cliente.
- *
- * - Editable (editable = true): el pin se puede arrastrar y tambien se puede
- *   tocar el mapa para moverlo. Cada vez que se mueve avisa al componente
- *   padre. Asi se usa en el perfil del mecanico.
- *
- * Los mapas son de OpenStreetMap, que es gratis y no pide tarjeta de credito
- * como Google Maps.
- */
 @Component({
   selector: 'app-mapa-ubicacion',
   imports: [],
@@ -41,13 +25,10 @@ export class MapaUbicacion implements OnDestroy {
   readonly latitud = input.required<number>();
   readonly longitud = input.required<number>();
 
-  /** Si es true, el pin se puede arrastrar */
   readonly editable = input(false);
 
-  /** Que tan cerca arranca el mapa. 16 es como media cuadra */
   readonly zoom = input(16);
 
-  /** Texto que sale al tocar el pin */
   readonly etiqueta = input('');
 
   readonly ubicacionCambiada = output<Coordenadas>();
@@ -57,13 +38,6 @@ export class MapaUbicacion implements OnDestroy {
   private mapa: L.Map | null = null;
   private pin: L.Marker | null = null;
 
-  /**
-   * Pin dibujado a mano en SVG.
-   *
-   * Leaflet trae sus propias imagenes de pin, pero al compilar con Angular
-   * las busca en una ruta que no existe y salen rotas. Con un divIcon el
-   * dibujo va en el HTML y no depende de ningun archivo.
-   */
   private readonly icono = L.divIcon({
     className: 'pin-mapa',
     html: `
@@ -80,8 +54,6 @@ export class MapaUbicacion implements OnDestroy {
   constructor() {
     afterNextRender(() => this.crearMapa());
 
-    // Si el padre cambia las coordenadas (por ejemplo al tocar "usar mi
-    // ubicacion"), el mapa se mueve solo.
     effect(() => {
       const lat = this.latitud();
       const lng = this.longitud();
@@ -92,8 +64,6 @@ export class MapaUbicacion implements OnDestroy {
 
       const actual = this.pin.getLatLng();
 
-      // Sin esta comparacion se haria un ciclo: el pin avisa al padre, el
-      // padre cambia el valor, el valor vuelve a mover el pin, y asi.
       if (Math.abs(actual.lat - lat) < 1e-7 && Math.abs(actual.lng - lng) < 1e-7) {
         return;
       }
@@ -142,9 +112,6 @@ export class MapaUbicacion implements OnDestroy {
       });
     }
 
-    // El contenedor a veces todavia no tiene su tamaño final cuando Leaflet
-    // se dibuja, y el mapa sale cortado o en gris. Esto lo obliga a medirse
-    // otra vez ya que la pantalla se acomodo.
     setTimeout(() => this.mapa?.invalidateSize(), 0);
   }
 

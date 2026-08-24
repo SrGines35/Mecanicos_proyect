@@ -6,18 +6,17 @@ import { AuthService } from '../../../core/services/auth.service';
 import { MecanicoService } from '../../../core/services/mecanico.service';
 import { SesionService } from '../../../core/services/sesion.service';
 import { BarraSuperior } from '../../../shared/barra-superior/barra-superior';
-import { MenuInferior } from '../../../shared/menu-inferior/menu-inferior';
+import { MenuMecanico } from '../menu-mecanico/menu-mecanico';
 import { SoloNumeros } from '../../../shared/directivas/solo-numeros';
 import { PATRON_TELEFONO } from '../../../core/validadores/validadores';
 import { Coordenadas, MapaUbicacion } from '../../../shared/mapa-ubicacion/mapa-ubicacion';
 
-/** Centro de Oaxaca. Solo sirve para que el mapa arranque en algun lado. */
 const OAXACA_LAT = 17.0654;
 const OAXACA_LNG = -96.7237;
 
 @Component({
   selector: 'app-perfil',
-  imports: [ReactiveFormsModule, BarraSuperior, MapaUbicacion, MenuInferior, SoloNumeros],
+  imports: [ReactiveFormsModule, BarraSuperior, MapaUbicacion, MenuMecanico, SoloNumeros],
   templateUrl: './perfil.html',
   styleUrl: './perfil.css',
 })
@@ -34,13 +33,6 @@ export class Perfil implements OnInit {
   protected readonly avisoUbicacion = signal<string | null>(null);
   protected readonly errorServidor = signal<string | null>(null);
 
-  /**
-   * La ubicacion vive en señales, no en el formulario.
-   *
-   * Es a proposito: el mapa avisa desde fuera de Angular, y con señales la
-   * pantalla se entera sola. Si estuviera en el formulario habria que
-   * refrescar la vista a mano cada vez que se arrastra el pin.
-   */
   protected readonly latitud = signal(0);
   protected readonly longitud = signal(0);
 
@@ -49,12 +41,6 @@ export class Perfil implements OnInit {
     zonaTrabajo: ['', [Validators.required, Validators.minLength(4)]],
   });
 
-  /**
-   * Los datos de la cuenta van en su propio formulario, aparte del perfil
-   * de trabajo. Son cosas distintas: el telefono es del usuario y lo tienen
-   * las dos clases (cliente y mecanico); la descripcion y la zona solo las
-   * tiene el mecanico. Ademas se guardan en endpoints distintos.
-   */
   protected readonly formularioDatos = this.fb.nonNullable.group({
     telefono: ['', [Validators.required, Validators.pattern(PATRON_TELEFONO)]],
   });
@@ -69,7 +55,6 @@ export class Perfil implements OnInit {
     () => this.latitud() !== 0 && this.longitud() !== 0
   );
 
-  /** Donde se para el mapa. Sin ubicacion propia, arranca en el centro de Oaxaca. */
   protected readonly centroLat = computed(() =>
     this.tieneUbicacion() ? this.latitud() : OAXACA_LAT
   );
@@ -112,14 +97,12 @@ export class Perfil implements OnInit {
     return control.invalid && control.touched;
   }
 
-  /** Llega desde el mapa cuando se arrastra el pin o se toca el mapa */
   protected moverPin(coordenadas: Coordenadas): void {
     this.latitud.set(coordenadas.latitud);
     this.longitud.set(coordenadas.longitud);
     this.avisoUbicacion.set(null);
   }
 
-  /** Toma la ubicacion del GPS del navegador y mueve el pin ahi */
   protected usarMiUbicacion(): void {
     this.avisoUbicacion.set(null);
 
@@ -212,10 +195,6 @@ export class Perfil implements OnInit {
       });
   }
 
-  // -----------------------------------------------------------------
-  // Eliminar cuenta
-  // -----------------------------------------------------------------
-
   protected readonly confirmando = signal(false);
   protected readonly eliminando = signal(false);
 
@@ -234,8 +213,6 @@ export class Perfil implements OnInit {
 
     this.eliminando.set(true);
 
-    // Se guarda antes: al eliminar la cuenta la sesion se cierra y despues
-    // ya no habria de donde sacar el id.
     const usuarioId = this.sesion.usuario()?.id;
 
     this.auth.eliminarCuenta().subscribe({
