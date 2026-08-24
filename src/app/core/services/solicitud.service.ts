@@ -21,8 +21,6 @@ export interface DatosNuevaSolicitud {
 
 const PORCENTAJE_APP = 0.1;
 
-const ESTADOS_CERRADOS: EstadoSolicitud[] = ['completada', 'cancelada', 'rechazada'];
-
 const LLAVE_SOLICITUDES = 'oaxicanicos.solicitudesSimuladas';
 
 @Injectable({ providedIn: 'root' })
@@ -118,20 +116,6 @@ export class SolicitudService {
       return of(this.simuladas.map((s) => ({ ...s }))).pipe(delay(this.RETARDO_MS));
     }
     return this.http.get<Solicitud[]>(this.base);
-  }
-
-  listarHistorial(): Observable<Solicitud[]> {
-    if (!environment.usarApiReal) {
-      const id = this.sesion.usuario()?.id;
-
-      const mios = this.simuladas
-        .filter((s) => s.mecanicoId === id && ESTADOS_CERRADOS.includes(s.estado))
-        .sort((a, b) => b.fechaCreacion.localeCompare(a.fechaCreacion));
-
-      return of(mios.map((s) => ({ ...s }))).pipe(delay(this.RETARDO_MS));
-    }
-
-    return this.http.get<Solicitud[]>(`${this.base}/historial`);
   }
 
   obtener(id: string): Observable<Solicitud> {

@@ -31,13 +31,6 @@ export const routes: Routes = [
     title: 'Oaxicanicos - Panel',
   },
   {
-    path: 'mecanico/historial',
-    canActivate: [sesionGuard, rolGuard('mecanico')],
-    loadComponent: () =>
-      import('./features/mecanico/historial/historial').then((m) => m.Historial),
-    title: 'Oaxicanicos - Historial',
-  },
-  {
     path: 'mecanico/perfil',
     canActivate: [sesionGuard, rolGuard('mecanico')],
     loadComponent: () =>
