@@ -1,6 +1,5 @@
 import { Solicitud } from '../models/solicitud.model';
 
-
 export const SOLICITUDES_MOCK: Solicitud[] = [
   {
     id: 'sol-a789',

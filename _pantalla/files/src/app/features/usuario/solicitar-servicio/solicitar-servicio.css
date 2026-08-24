@@ -1,0 +1,236 @@
+.entra {
+  animation: entrar 420ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: var(--retraso, 0ms);
+}
+
+@keyframes entrar {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .entra,
+  .esqueleto__linea {
+    animation: none !important;
+  }
+}
+
+.ubicacion {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 16px;
+  border: 1px dashed var(--borde-fuerte);
+  border-radius: 12px;
+  background: var(--superficie-alta);
+}
+
+.ubicacion--lista {
+  border-style: solid;
+  border-color: rgba(74, 222, 128, 0.35);
+  background: rgba(74, 222, 128, 0.06);
+}
+
+.ubicacion__dato {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.ubicacion__dato strong {
+  font-size: 0.9rem;
+  color: var(--blanco);
+}
+
+.ubicacion--lista .ubicacion__dato strong {
+  color: var(--exito);
+}
+
+.ubicacion__dato code {
+  font-size: 0.76rem;
+  color: var(--gris);
+  font-family: 'Cascadia Code', Consolas, monospace;
+}
+
+.ubicacion__dato span {
+  font-size: 0.76rem;
+}
+
+@media (max-width: 460px) {
+  .ubicacion {
+    flex-direction: column;
+    align-items: stretch;
+  }
+}
+
+.marca-lista {
+  flex-shrink: 0;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: rgba(74, 222, 128, 0.13);
+  color: var(--exito);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.mecanico {
+  position: relative;
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid var(--borde);
+  border-radius: 14px;
+  background: var(--superficie-alta);
+}
+
+.insignia-cerca {
+  position: absolute;
+  top: -8px;
+  right: 13px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: var(--ambar);
+  color: #1a1200;
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+}
+
+.mecanico__fila {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 5px;
+}
+
+.mecanico__nombre {
+  font-weight: 600;
+  color: var(--blanco);
+}
+
+.mecanico__calificacion {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ambar-claro);
+}
+
+.mecanico__calificacion svg {
+  width: 13px;
+  height: 13px;
+  color: var(--ambar);
+}
+
+.mecanico__descripcion {
+  margin: 0 0 10px;
+  font-size: 0.85rem;
+  color: var(--gris);
+  line-height: 1.45;
+}
+
+.mecanico__pie {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.etiqueta-distancia {
+  display: inline-block;
+  padding: 3px 10px;
+  border-radius: 999px;
+  background: var(--ambar-tenue);
+  font-size: 0.76rem;
+  color: var(--ambar-claro);
+}
+
+.mecanico__zona {
+  font-size: 0.76rem;
+  color: var(--gris-tenue);
+}
+
+.contador {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  height: 24px;
+  padding: 0 7px;
+  border-radius: 999px;
+  background: var(--ambar);
+  color: #1a1200;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.nota-lista {
+  margin-top: 12px;
+  margin-bottom: 0;
+}
+
+.nota-final {
+  margin-top: 12px;
+  text-align: center;
+}
+
+.esqueleto {
+  padding: 15px;
+  margin-bottom: 10px;
+  border: 1px solid var(--borde);
+  border-radius: 14px;
+  background: var(--superficie-alta);
+}
+
+.esqueleto__linea {
+  height: 11px;
+  margin-bottom: 9px;
+  border-radius: 6px;
+  background: linear-gradient(
+    90deg,
+    var(--superficie) 25%,
+    rgba(255, 255, 255, 0.07) 37%,
+    var(--superficie) 63%
+  );
+  background-size: 400% 100%;
+  animation: brillar 1.4s ease-in-out infinite;
+}
+
+.esqueleto__linea:last-child {
+  margin-bottom: 0;
+}
+
+.esqueleto__linea--corta {
+  width: 45%;
+}
+
+@keyframes brillar {
+  from {
+    background-position: 100% 50%;
+  }
+  to {
+    background-position: 0 50%;
+  }
+}
+
+.vacio {
+  padding: 18px 4px;
+}
+
+.vacio__titulo {
+  margin: 0 0 6px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--blanco);
+}

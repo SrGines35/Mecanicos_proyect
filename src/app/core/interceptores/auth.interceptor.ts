@@ -13,12 +13,10 @@ import { environment } from '../../../environments/environment';
 import { Tokens } from '../models/auth.model';
 import { SesionService } from '../services/sesion.service';
 
-
 const RUTAS_PUBLICAS = /\/auth\/(login|register|refresh)$/;
 
 const conToken = <T>(peticion: HttpRequest<T>, token: string): HttpRequest<T> =>
   peticion.clone({ setHeaders: { Authorization: `Bearer ${token}` } });
-
 
 export const authInterceptor: HttpInterceptorFn = (peticion, siguiente) => {
   const sesion = inject(SesionService);
@@ -34,7 +32,6 @@ export const authInterceptor: HttpInterceptorFn = (peticion, siguiente) => {
     catchError((error: HttpErrorResponse) => {
       const refreshToken = sesion.refreshToken;
 
-
       if (error.status !== 401 || esPublica || !refreshToken) {
         return throwError(() => error);
       }
@@ -47,7 +44,6 @@ export const authInterceptor: HttpInterceptorFn = (peticion, siguiente) => {
             return siguiente(conToken(peticion, tokens.accessToken));
           }),
           catchError((errorRefresh) => {
-
             sesion.limpiar();
             void router.navigate(['/']);
             return throwError(() => errorRefresh);

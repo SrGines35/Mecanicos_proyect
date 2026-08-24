@@ -1,0 +1,31 @@
+<app-barra-superior [titulo]="titulo()" [mostrarRegresar]="mostrarRegresar()" />
+
+<main class="contenedor contenedor--con-menu">
+  <router-outlet />
+</main>
+
+<nav class="menu" aria-label="Navegación principal">
+  <a
+    class="menu__opcion"
+    routerLink="/usuario/home"
+    routerLinkActive="activo"
+    [routerLinkActiveOptions]="{ exact: true }"
+  >
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <path d="M3 10.5L12 3l9 7.5" />
+      <path d="M5 9.8V20a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V9.8" />
+      <path d="M9.5 21v-6h5v6" />
+    </svg>
+    <span>Inicio</span>
+  </a>
+
+  <a class="menu__opcion" routerLink="/usuario/perfil" routerLinkActive="activo">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"
+         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4.5 20.5a7.5 7.5 0 0 1 15 0" />
+    </svg>
+    <span>Perfil</span>
+  </a>
+</nav>

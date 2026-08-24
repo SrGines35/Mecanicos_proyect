@@ -3,6 +3,7 @@ import { Routes } from '@angular/router';
 import { invitadoGuard, rolGuard, sesionGuard } from './core/guards/sesion.guard';
 
 export const routes: Routes = [
+
   {
     path: '',
     canActivate: [invitadoGuard],
@@ -20,21 +21,41 @@ export const routes: Routes = [
     path: 'usuario',
     canActivate: [sesionGuard, rolGuard('cliente')],
     loadComponent: () =>
-      import('./features/cliente/inicio-cliente/inicio-cliente').then((m) => m.InicioCliente),
-    title: 'Oaxicanicos - Inicio',
+      import('./features/usuario/layout/layout').then((m) => m.Layout),
+    children: [
+      { path: '', redirectTo: 'home', pathMatch: 'full' },
+      {
+        path: 'home',
+        loadComponent: () => import('./features/usuario/home/home').then((m) => m.Home),
+        title: 'Oaxicanicos - Inicio',
+      },
+      {
+        path: 'perfil',
+        loadComponent: () =>
+          import('./features/usuario/perfil/perfil').then((m) => m.Perfil),
+        title: 'Oaxicanicos - Mi perfil',
+      },
+      {
+        path: 'solicitar-servicio',
+        loadComponent: () =>
+          import('./features/usuario/solicitar-servicio/solicitar-servicio').then(
+            (m) => m.SolicitarServicio
+          ),
+        title: 'Oaxicanicos - Solicitar servicio',
+      },
+    ],
   },
+
   {
     path: 'mecanico',
     canActivate: [sesionGuard, rolGuard('mecanico')],
-    loadComponent: () =>
-      import('./features/mecanico/panel/panel').then((m) => m.Panel),
+    loadComponent: () => import('./features/mecanico/panel/panel').then((m) => m.Panel),
     title: 'Oaxicanicos - Panel',
   },
   {
     path: 'mecanico/perfil',
     canActivate: [sesionGuard, rolGuard('mecanico')],
-    loadComponent: () =>
-      import('./features/mecanico/perfil/perfil').then((m) => m.Perfil),
+    loadComponent: () => import('./features/mecanico/perfil/perfil').then((m) => m.Perfil),
     title: 'Oaxicanicos - Mi perfil',
   },
   {

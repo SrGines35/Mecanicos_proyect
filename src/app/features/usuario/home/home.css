@@ -1,0 +1,101 @@
+.saludo {
+  margin-bottom: 22px;
+}
+
+.saludo__hola {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--gris);
+}
+
+.saludo__nombre {
+  margin: 0 0 6px;
+  font-size: 2rem;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.02em;
+  color: var(--blanco);
+
+  overflow-wrap: anywhere;
+}
+
+.saludo__mensaje {
+  margin: 0;
+  font-size: 0.92rem;
+  color: var(--gris);
+}
+
+.accion {
+  text-align: center;
+}
+
+.accion__dibujo {
+  width: 100%;
+  max-width: 190px;
+  height: auto;
+  margin: 2px auto 14px;
+  display: block;
+  color: var(--ambar);
+}
+
+.accion__texto {
+  margin: 0 0 18px;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--gris);
+}
+
+.accion .boton-primario {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+}
+
+.accion .boton-primario svg {
+  width: 18px;
+  height: 18px;
+}
+
+.pasos {
+  padding: 0 2px;
+}
+
+.pasos__lista {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+}
+
+.pasos__lista li {
+  display: flex;
+  align-items: flex-start;
+  gap: 11px;
+  font-size: 0.87rem;
+  line-height: 1.5;
+  color: var(--gris);
+}
+
+.pasos__numero {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid rgba(240, 149, 31, 0.3);
+  border-radius: 50%;
+  background: var(--ambar-tenue);
+  color: var(--ambar);
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+
+@media (min-width: 430px) {
+  .saludo__nombre {
+    font-size: 2.3rem;
+  }
+}

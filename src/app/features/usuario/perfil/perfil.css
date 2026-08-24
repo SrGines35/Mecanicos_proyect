@@ -1,0 +1,59 @@
+.identidad {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.identidad__avatar {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 74px;
+  height: 74px;
+  margin-bottom: 13px;
+  border: 1px solid rgba(240, 149, 31, 0.28);
+  border-radius: 50%;
+  background: var(--ambar-tenue);
+  color: var(--ambar);
+}
+
+.identidad__avatar svg {
+  width: 36px;
+  height: 36px;
+}
+
+.identidad__titulo {
+  margin: 0 0 4px;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  color: var(--blanco);
+}
+
+.identidad__ayuda {
+  margin: 0;
+  font-size: 0.87rem;
+  color: var(--gris);
+}
+
+.campo label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+}
+
+.campo label svg {
+  width: 15px;
+  height: 15px;
+  color: var(--gris-tenue);
+}
+
+.campo input:disabled {
+  border-color: transparent;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--gris);
+  cursor: default;
+}
+
+.campo--ultimo {
+  margin-bottom: 6px;
+}
