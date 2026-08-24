@@ -91,8 +91,7 @@ export class Registro {
       .subscribe({
         next: (respuesta) => {
           this.enviando.set(false);
-          // Al registrarse ya queda con la sesion abierta: se va
-          // directo a su pantalla, sin pasar otra vez por el login.
+
           void this.router.navigate([this.sesion.rutaSegunRol(respuesta.user.role)]);
         },
         error: (error: unknown) => {

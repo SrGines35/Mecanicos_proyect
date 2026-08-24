@@ -5,10 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { SesionService } from '../../core/services/sesion.service';
 
-/**
- * Barra de arriba de las pantallas internas.
- * Muestra el titulo, la flecha para regresar y el boton de salir.
- */
+
 @Component({
   selector: 'app-barra-superior',
   templateUrl: './barra-superior.html',

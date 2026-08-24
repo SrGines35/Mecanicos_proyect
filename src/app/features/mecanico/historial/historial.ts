@@ -6,7 +6,6 @@ import { SolicitudService } from '../../../core/services/solicitud.service';
 import { BarraSuperior } from '../../../shared/barra-superior/barra-superior';
 import { MenuMecanico } from '../menu-mecanico/menu-mecanico';
 
-/** Las tres pestañas de arriba de la lista */
 type Filtro = 'todos' | 'completada' | 'cancelada';
 
 @Component({
@@ -27,16 +26,6 @@ export class Historial implements OnInit {
 
   private readonly servicios = signal<Solicitud[]>([]);
 
-  /**
-   * La lista que se dibuja.
-   *
-   * El filtro NO vuelve a pedir los datos: la lista completa ya esta en
-   * una señal y aqui solo se recorta. Por eso cambiar de pestaña es
-   * instantaneo y no depende del back.
-   *
-   * 'cancelada' junta canceladas y rechazadas: para el mecanico las dos
-   * significan lo mismo, que el servicio no se hizo.
-   */
   protected readonly visibles = computed(() => {
     const todos = this.servicios();
     const filtro = this.filtro();
@@ -56,13 +45,6 @@ export class Historial implements OnInit {
     () => this.servicios().filter((s) => s.estado === 'completada').length
   );
 
-  /**
-   * Lo que le quedo al mecanico: piezas mas mano de obra.
-   *
-   * No se usa calcularTotal() a proposito. Ese incluye la tarifa de la
-   * app, que es lo que paga el cliente pero NO lo que recibe el mecanico.
-   * Poner ese numero aqui seria decirle que gano mas de lo que gano.
-   */
   protected readonly totalGanado = computed(() =>
     this.servicios()
       .filter((s) => s.estado === 'completada')
@@ -96,7 +78,6 @@ export class Historial implements OnInit {
     return servicio.costoPiezas + servicio.costoManoObra;
   }
 
-  /** "18 de agosto", sin el año, porque casi siempre es el mismo */
   protected fecha(fechaIso: string): string {
     return new Date(fechaIso).toLocaleDateString('es-MX', {
       day: 'numeric',

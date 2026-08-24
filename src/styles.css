@@ -1,32 +1,20 @@
-/* =========================================================
-   Estilos base de Oaxicanicos
-   Paleta: negro / ambar (color de herramienta y señalizacion).
-   El rojo se reserva UNICAMENTE para errores, para que cuando
-   algo este mal el usuario lo distinga de la marca.
-   ========================================================= */
-
 :root {
-  /* Fondos */
   --negro: #0a0a0b;
   --superficie: #151517;
   --superficie-alta: #1e1e22;
 
-  /* Bordes */
   --borde: rgba(255, 255, 255, 0.08);
   --borde-fuerte: rgba(255, 255, 255, 0.16);
 
-  /* Marca */
   --ambar: #f0951f;
   --ambar-claro: #fbbf3c;
   --ambar-oscuro: #b96a08;
   --ambar-tenue: rgba(240, 149, 31, 0.12);
 
-  /* Texto */
   --blanco: #f4f4f5;
   --gris: #9b9ba3;
   --gris-tenue: #6b6b73;
 
-  /* Estados */
   --error: #ff6b5e;
   --error-tenue: rgba(255, 107, 94, 0.1);
   --exito: #4ade80;
@@ -77,10 +65,6 @@ a:hover {
   text-decoration: underline;
 }
 
-/* =========================================================
-   Autenticacion (login / registro)
-   ========================================================= */
-
 .auth-pagina {
   min-height: 100vh;
   width: 100%;
@@ -102,8 +86,6 @@ a:hover {
   padding: 36px 30px;
   box-shadow: 0 24px 64px rgba(0, 0, 0, 0.55);
 }
-
-/* ---------- Marca ---------- */
 
 .auth-marca {
   text-align: center;
@@ -146,8 +128,6 @@ a:hover {
   font-size: 0.88rem;
 }
 
-/* ---------- Campos ---------- */
-
 .campo {
   margin-bottom: 18px;
 }
@@ -189,7 +169,6 @@ a:hover {
   background: #232329;
 }
 
-/* Solo se pinta de rojo cuando el campo YA se toco y esta mal */
 .campo input.ng-invalid.ng-touched,
 .campo select.ng-invalid.ng-touched {
   border-color: var(--error);
@@ -230,8 +209,6 @@ a:hover {
   font-weight: 700;
 }
 
-/* ---------- Contraseña con ojito ---------- */
-
 .campo-contrasena {
   position: relative;
 }
@@ -268,8 +245,6 @@ a:hover {
   background: rgba(255, 255, 255, 0.05);
 }
 
-/* ---------- Selector de rol ---------- */
-
 .segmentado {
   display: flex;
   gap: 4px;
@@ -303,8 +278,6 @@ a:hover {
   color: #1a1200;
 }
 
-/* ---------- Botones ---------- */
-
 .boton-primario {
   width: 100%;
   padding: 14px 20px;
@@ -333,8 +306,6 @@ a:hover {
   filter: grayscale(0.6) brightness(0.7);
   cursor: not-allowed;
 }
-
-/* ---------- Mensajes ---------- */
 
 .auth-aviso {
   display: flex;
@@ -371,8 +342,6 @@ a:hover {
   font-weight: 600;
 }
 
-/* ---------- Utilidades ---------- */
-
 .cargador {
   display: inline-block;
   width: 15px;
@@ -397,10 +366,6 @@ a:hover {
   }
 }
 
-/* =========================================================
-   Pantallas internas (panel, perfil, detalle)
-   ========================================================= */
-
 .contenedor {
   width: 100%;
   max-width: 560px;
@@ -408,8 +373,6 @@ a:hover {
   padding: 22px 18px 60px;
 }
 
-/* Cuando hay menu fijo abajo, el contenido necesita espacio extra para que
-   no quede tapado el ultimo boton. */
 .contenedor--con-menu {
   padding-bottom: calc(104px + env(safe-area-inset-bottom, 0px));
 }
@@ -458,8 +421,6 @@ a:hover {
   margin-top: 16px;
 }
 
-/* ---------- Botones secundarios ---------- */
-
 .boton-secundario,
 .boton-peligro {
   width: 100%;
@@ -500,8 +461,6 @@ a:hover {
   cursor: not-allowed;
 }
 
-/* ---------- Rejilla de dos columnas ---------- */
-
 .fila-doble {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -513,8 +472,6 @@ a:hover {
     grid-template-columns: 1fr;
   }
 }
-
-/* ---------- Cargador gris (sobre fondo oscuro) ---------- */
 
 .cargador--gris {
   border-color: var(--borde-fuerte);

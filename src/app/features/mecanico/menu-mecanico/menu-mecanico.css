@@ -8,7 +8,7 @@
   justify-content: center;
   gap: 8px;
   padding: 8px 12px;
-  /* En celulares con barra de gestos, esto evita que el menu quede debajo */
+
   padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
   background: rgba(10, 10, 11, 0.94);
   backdrop-filter: blur(10px);

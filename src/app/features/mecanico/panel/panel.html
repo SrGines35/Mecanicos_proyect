@@ -1,7 +1,7 @@
 <app-barra-superior titulo="Panel del mecánico" />
 
 <main class="contenedor contenedor--con-menu">
-  <!-- Saludo -->
+
   <header class="saludo entra" style="--retraso: 0ms">
     <p class="saludo__hola">{{ saludo() }},</p>
     <h1 class="saludo__nombre">{{ primerNombre() }}</h1>
@@ -17,7 +17,6 @@
     }
   </header>
 
-  <!-- Aviso cuando falta llenar el perfil -->
   @if (!cargando() && !perfilCompleto()) {
     <div class="aviso-perfil entra" style="--retraso: 60ms">
       <div class="aviso-perfil__texto">
@@ -31,7 +30,6 @@
     </div>
   }
 
-  <!-- Estado -->
   <section class="bloque entra" style="--retraso: 120ms">
     <h2 class="bloque__titulo">Tu estado</h2>
 
@@ -55,7 +53,6 @@
     <p class="campo__ayuda">{{ ayudaEstado[estadoActual()] }}</p>
   </section>
 
-  <!-- Resumen. Todos estos numeros salen de lo que el front ya calcula. -->
   @if (perfilCompleto()) {
     <section class="resumen-cifras entra" style="--retraso: 180ms">
       <div class="cifra">
@@ -82,7 +79,6 @@
     </section>
   }
 
-  <!-- Solicitudes -->
   <section class="bloque entra" style="--retraso: 300ms">
     <div class="bloque__encabezado">
       <h2 class="bloque__titulo">Solicitudes nuevas</h2>
@@ -92,7 +88,6 @@
     </div>
 
     @if (cargando()) {
-      <!-- Esqueletos en vez de una ruedita: se ve la forma de lo que va a llegar -->
       @for (hueco of [1, 2]; track hueco) {
         <div class="esqueleto">
           <div class="esqueleto__linea esqueleto__linea--corta"></div>
@@ -127,8 +122,6 @@
       </div>
     } @else {
       @for (solicitud of solicitudes(); track solicitud.id; let i = $index) {
-        <!-- El retraso va contado desde que llega la lista, no desde que abre
-             la pantalla: las solicitudes tardan en responder. -->
         <button
           class="tarjeta-solicitud entra"
           [style.--retraso]="i * 70 + 'ms'"

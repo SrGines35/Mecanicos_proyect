@@ -1,11 +1,6 @@
 import { Solicitud } from '../models/solicitud.model';
 
-/**
- * Solicitudes de prueba mientras el back no tiene el modulo listo.
- * Las coordenadas son reales, de la ciudad de Oaxaca de Juarez.
- *
- * Cuando exista el endpoint, este archivo se borra.
- */
+
 export const SOLICITUDES_MOCK: Solicitud[] = [
   {
     id: 'sol-a789',

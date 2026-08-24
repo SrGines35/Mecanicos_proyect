@@ -12,7 +12,6 @@ export interface CostosServicio {
   costoManoObra: number;
 }
 
-/** Lo que llena el cliente para pedir un mecanico */
 export interface DatosNuevaSolicitud {
   vehiculo: string;
   descripcionFalla: string;
@@ -20,32 +19,12 @@ export interface DatosNuevaSolicitud {
   longitudOrigen: number;
 }
 
-/** Porcentaje que cobra la app. Lo confirma el back al guardar. */
 const PORCENTAJE_APP = 0.1;
 
-/**
- * Los estados en los que un servicio ya termino y no vuelve a moverse.
- * Son los que forman el historial del mecanico.
- */
 const ESTADOS_CERRADOS: EstadoSolicitud[] = ['completada', 'cancelada', 'rechazada'];
 
 const LLAVE_SOLICITUDES = 'oaxicanicos.solicitudesSimuladas';
 
-/**
- * Solicitudes de servicio.
- *
- * Endpoints del back:
- *   POST  /solicitudes           el cliente pide un mecanico
- *   GET   /solicitudes           las mias, segun mi rol
- *   GET   /solicitudes/:id
- *   PATCH /solicitudes/:id/estado
- *   PATCH /solicitudes/:id/costos
- *
- * En modo simulado las solicitudes se guardan en el navegador. Es a
- * proposito y no es un capricho: asi el cliente crea una solicitud, cierra
- * sesion, entra como mecanico, y LE LLEGA. Sin eso las dos mitades de la
- * app no se pueden probar juntas hasta que el back este listo.
- */
 @Injectable({ providedIn: 'root' })
 export class SolicitudService {
   private readonly http = inject(HttpClient);
@@ -54,10 +33,6 @@ export class SolicitudService {
   private readonly base = `${environment.apiUrl}/solicitudes`;
   private readonly RETARDO_MS = 600;
 
-  // ---------------------------------------------------------------
-  // Guardado en el navegador (solo modo simulado)
-  // ---------------------------------------------------------------
-
   private get simuladas(): Solicitud[] {
     try {
       const guardado = localStorage.getItem(LLAVE_SOLICITUDES);
@@ -65,11 +40,8 @@ export class SolicitudService {
         return JSON.parse(guardado) as Solicitud[];
       }
     } catch {
-      // Si el dato quedo corrupto se empieza de cero
     }
 
-    // La primera vez se siembran las de ejemplo, para que el panel del
-    // mecanico no se vea vacio antes de que exista un cliente.
     const iniciales = SOLICITUDES_MOCK.map((s) => ({ ...s }));
     this.guardar(iniciales);
     return iniciales;
@@ -79,19 +51,9 @@ export class SolicitudService {
     try {
       localStorage.setItem(LLAVE_SOLICITUDES, JSON.stringify(lista));
     } catch {
-      // Si el navegador no deja guardar, la app sigue funcionando
     }
   }
 
-  // ---------------------------------------------------------------
-  // Para el cliente
-  // ---------------------------------------------------------------
-
-  /**
-   * Crea una solicitud nueva. La usa la pantalla del cliente.
-   *
-   * El cliente sale de la sesion abierta: no hay que pasarselo.
-   */
   crear(datos: DatosNuevaSolicitud): Observable<Solicitud> {
     if (!environment.usarApiReal) {
       const usuario = this.sesion.usuario();
@@ -129,7 +91,6 @@ export class SolicitudService {
     return this.http.post<Solicitud>(this.base, datos);
   }
 
-  /** Las solicitudes del cliente que tiene la sesion abierta */
   listarMias(): Observable<Solicitud[]> {
     if (!environment.usarApiReal) {
       const id = this.sesion.usuario()?.id;
@@ -140,10 +101,6 @@ export class SolicitudService {
     return this.http.get<Solicitud[]>(`${this.base}/mias`);
   }
 
-  /**
-   * Si el cliente tiene una solicitud viva ahorita, la devuelve.
-   * Sirve para que el home le muestre en que va su servicio.
-   */
   miSolicitudActiva(): Observable<Solicitud | null> {
     const vivas: EstadoSolicitud[] = ['pendiente', 'aceptada', 'en_camino', 'en_proceso'];
 
@@ -152,14 +109,9 @@ export class SolicitudService {
     );
   }
 
-  /** El cliente se arrepiente antes de que llegue el mecanico */
   cancelar(id: string): Observable<Solicitud> {
     return this.cambiarEstado(id, 'cancelada');
   }
-
-  // ---------------------------------------------------------------
-  // Para el mecanico
-  // ---------------------------------------------------------------
 
   listar(): Observable<Solicitud[]> {
     if (!environment.usarApiReal) {
@@ -168,16 +120,6 @@ export class SolicitudService {
     return this.http.get<Solicitud[]>(this.base);
   }
 
-  /**
-   * Los servicios que este mecanico ya cerro: terminados, cancelados y
-   * rechazados. De la mas reciente a la mas vieja.
-   *
-   * Se ordena comparando las fechas como texto, no con new Date(). Se
-   * puede porque fechaCreacion viene en formato ISO ("2026-08-22T14:03:11Z")
-   * y en ese formato el orden alfabetico y el orden cronologico son el
-   * mismo: el año va primero, luego el mes, luego el dia. Asi se evita
-   * crear un objeto Date por cada comparacion.
-   */
   listarHistorial(): Observable<Solicitud[]> {
     if (!environment.usarApiReal) {
       const id = this.sesion.usuario()?.id;

@@ -15,12 +15,7 @@ export const routes: Routes = [
     loadComponent: () => import('./features/registro/registro').then((m) => m.Registro),
     title: 'Oaxicanicos - Crear cuenta',
   },
-  // La ruta es /usuario porque asi la hizo Luz. El rol sigue siendo
-  // 'cliente', que es el que manda el back. No son lo mismo.
-  //
-  // Aqui apunta al inicio-cliente provisional. Las pantallas de verdad
-  // (layout, home, perfil, solicitar-servicio) estan en la rama de Luz y
-  // esta linea se cambia cuando se junten las dos ramas en main.
+
   {
     path: 'usuario',
     canActivate: [sesionGuard, rolGuard('cliente')],
@@ -58,8 +53,7 @@ export const routes: Routes = [
       ),
     title: 'Oaxicanicos - Solicitud',
   },
-  // Cualquier direccion que no exista. Antes mandaba al login sin decir nada,
-  // lo cual confundia: parecia que la app te habia sacado.
+
   {
     path: '**',
     loadComponent: () =>

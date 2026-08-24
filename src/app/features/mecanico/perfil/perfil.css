@@ -52,10 +52,6 @@
   }
 }
 
-/* =========================================================
-   Zona de riesgo (eliminar cuenta)
-   ========================================================= */
-
 .zona-riesgo {
   margin-top: 40px;
   padding: 18px;
@@ -81,8 +77,6 @@
 .zona-riesgo .boton-peligro {
   margin-top: 0;
 }
-
-/* ---------- Datos de la cuenta que no se pueden cambiar ---------- */
 
 .dato-fijo {
   display: flex;
@@ -113,7 +107,6 @@
   color: var(--blanco);
 }
 
-/* El primer campo despues de los datos fijos necesita aire */
 .dato-fijo + form .campo {
   margin-top: 16px;
 }

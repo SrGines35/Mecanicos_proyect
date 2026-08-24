@@ -46,7 +46,6 @@ export class DetalleSolicitud implements OnInit {
     costoManoObra: [0, [Validators.required, Validators.min(0)]],
   });
 
-  /** Distancia entre el mecanico y el coche del cliente */
   protected readonly distancia = computed(() => {
     const s = this.solicitud();
     const perfil = this.mecanicoService.perfil();
@@ -60,12 +59,6 @@ export class DetalleSolicitud implements OnInit {
     );
   });
 
-  /**
-   * Abre la ruta en la app de mapas del celular.
-   *
-   * Es una direccion web normal, no la API de Google, asi que no hace falta
-   * ninguna llave ni tarjeta.
-   */
   protected readonly enlaceComoLlegar = computed(() => {
     const s = this.solicitud();
     if (!s) {
@@ -91,18 +84,10 @@ export class DetalleSolicitud implements OnInit {
     return s ? calcularTotal(s) : 0;
   });
 
-  /**
-   * Los valores del formulario como señal.
-   *
-   * Hace falta convertirlos con toSignal porque un computed() no se
-   * entera de que el formulario cambio: getRawValue() no es reactivo.
-   * Sin esto, la tarifa se quedaba en $0 mientras se escribia.
-   */
   private readonly valoresCostos = toSignal(this.formularioCostos.valueChanges, {
     initialValue: this.formularioCostos.getRawValue(),
   });
 
-  /** Cuanto se lleva la app: 10% de piezas mas mano de obra */
   protected readonly tarifaCalculada = computed(() => {
     const valores = this.valoresCostos();
     const piezas = Number(valores.costoPiezas ?? 0);
@@ -118,7 +103,6 @@ export class DetalleSolicitud implements OnInit {
       return;
     }
 
-    // El perfil se necesita para poder calcular la distancia
     this.mecanicoService.cargarPerfil().subscribe();
 
     this.solicitudService.obtener(id).subscribe({
@@ -137,7 +121,6 @@ export class DetalleSolicitud implements OnInit {
     });
   }
 
-  /** Marca visualmente hasta dónde va el servicio */
   protected pasoAlcanzado(paso: EstadoSolicitud): boolean {
     const actual = this.solicitud()?.estado;
     if (!actual) {

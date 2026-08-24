@@ -56,7 +56,7 @@ export class Login {
       .subscribe({
         next: (respuesta) => {
           this.enviando.set(false);
-          // Cada quien a su pantalla, segun su rol
+
           void this.router.navigate([this.sesion.rutaSegunRol(respuesta.user.role)]);
         },
         error: (error: unknown) => {
@@ -66,7 +66,7 @@ export class Login {
       });
   }
 
-  /** Traduce el error del back a algo que el usuario entienda */
+  
   private mensajeDeError(error: unknown): string {
     if (error instanceof Error) {
       return error.message;
