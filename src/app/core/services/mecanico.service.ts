@@ -9,42 +9,7 @@ import {
   PerfilMecanico,
 } from '../models/mecanico.model';
 import { SesionService } from './sesion.service';
-
-const MECANICOS_EJEMPLO: PerfilMecanico[] = [
-  {
-    usuarioId: 'ej-1',
-    nombre: 'Juan Ramírez Cruz',
-    telefono: '9515551001',
-    descripcion: 'Taller propio sobre la carretera. Motor, afinación y diagnóstico.',
-    zonaTrabajo: 'Centro de San Pablo Huixtepec',
-    latitud: 16.8215,
-    longitud: -96.7851,
-    estado: 'disponible',
-    calificacion: 4.8,
-  },
-  {
-    usuarioId: 'ej-2',
-    nombre: 'Lucía Hernández Gómez',
-    telefono: '9515552002',
-    descripcion: 'Servicio a domicilio. Sistema eléctrico, alternador y marcha.',
-    zonaTrabajo: 'San Pablo Huixtepec y Zimatlán',
-    latitud: 16.8178,
-    longitud: -96.7802,
-    estado: 'disponible',
-    calificacion: 4.6,
-  },
-  {
-    usuarioId: 'ej-3',
-    nombre: 'Rosa Jiménez Santos',
-    telefono: '9515554004',
-    descripcion: 'Vulcanizadora y auxilio vial. Cambio de llanta a domicilio.',
-    zonaTrabajo: 'Agencias cercanas',
-    latitud: 16.8302,
-    longitud: -96.7889,
-    estado: 'disponible',
-    calificacion: 4.9,
-  },
-];
+import { SolicitudService } from './solicitud.service';
 
 const ESTADO_HACIA_BACK: Record<EstadoMecanico, string> = {
   disponible: 'disponible',
@@ -56,6 +21,7 @@ const ESTADO_HACIA_BACK: Record<EstadoMecanico, string> = {
 export class MecanicoService {
   private readonly http = inject(HttpClient);
   private readonly sesion = inject(SesionService);
+  private readonly solicitudes = inject(SolicitudService);
 
   private readonly base = `${environment.apiUrl}/mechanics`;
   private readonly RETARDO_MS = 500;
@@ -96,9 +62,24 @@ export class MecanicoService {
     }
   }
 
+  promedioDe(usuarioId: string): number | null {
+    const notas = this.solicitudes.calificacionesDeMecanico(usuarioId);
+
+    if (notas.length === 0) {
+      return null;
+    }
+
+    const suma = notas.reduce((total, nota) => total + nota, 0);
+    return Math.round((suma / notas.length) * 10) / 10;
+  }
+
+  private conPromedio(perfil: PerfilMecanico | null): PerfilMecanico | null {
+    return perfil ? { ...perfil, calificacion: this.promedioDe(perfil.usuarioId) } : null;
+  }
+
   cargarPerfil(): Observable<PerfilMecanico | null> {
     if (!environment.usarApiReal) {
-      return of(this.perfilSimulado).pipe(
+      return of(this.conPromedio(this.perfilSimulado)).pipe(
         delay(this.RETARDO_MS),
         tap((p) => this.perfil.set(p))
       );
@@ -125,11 +106,11 @@ export class MecanicoService {
         telefono: usuario?.telefono,
         ...datos,
         estado: seCompletoAhora ? 'disponible' : previo?.estado ?? 'no_disponible',
-        calificacion: previo?.calificacion ?? 5,
+        calificacion: previo?.calificacion ?? null,
       };
       this.perfilSimulado = actualizado;
 
-      return of(actualizado).pipe(
+      return of(this.conPromedio(actualizado)!).pipe(
         delay(this.RETARDO_MS),
         tap((p) => this.perfil.set(p))
       );
@@ -154,7 +135,7 @@ export class MecanicoService {
       latitud: 0,
       longitud: 0,
       estado: 'no_disponible',
-      calificacion: 5,
+      calificacion: null,
     };
   }
 
@@ -168,12 +149,12 @@ export class MecanicoService {
           longitud: 0,
           zonaTrabajo: '',
           estado,
-          calificacion: 5,
+          calificacion: null,
         };
       }
       this.perfilSimulado = { ...this.perfilSimulado!, estado };
 
-      return of(this.perfilSimulado!).pipe(
+      return of(this.conPromedio(this.perfilSimulado)!).pipe(
         delay(300),
         tap((p) => this.perfil.set(p))
       );
@@ -192,8 +173,8 @@ export class MecanicoService {
         (p) => p.estado === 'disponible' && this.perfilCompleto(p)
       );
 
-      const lista = registrados.length > 0 ? registrados : MECANICOS_EJEMPLO;
-      return of(lista.map((p) => ({ ...p }))).pipe(delay(this.RETARDO_MS));
+      return of(registrados.map((p) => ({ ...p, calificacion: this.promedioDe(p.usuarioId) })))
+        .pipe(delay(this.RETARDO_MS));
     }
 
     return this.http.get<PerfilMecanico[]>(`${this.base}/nearby`, {
