@@ -6,7 +6,12 @@ import {
   EstadoMecanico,
   TEXTO_ESTADO,
 } from '../../../core/models/mecanico.model';
-import { Solicitud, SolicitudCercana } from '../../../core/models/solicitud.model';
+import {
+  EstadoSolicitud,
+  Solicitud,
+  SolicitudCercana,
+  TEXTO_ESTADO_SOLICITUD,
+} from '../../../core/models/solicitud.model';
 import { MecanicoService } from '../../../core/services/mecanico.service';
 import { SesionService } from '../../../core/services/sesion.service';
 import { SolicitudService } from '../../../core/services/solicitud.service';
@@ -15,6 +20,8 @@ import { BarraSuperior } from '../../../shared/barra-superior/barra-superior';
 import { MenuMecanico } from '../menu-mecanico/menu-mecanico';
 
 const ESTADOS: EstadoMecanico[] = ['disponible', 'ocupado', 'no_disponible'];
+
+const ESTADOS_EN_CURSO: EstadoSolicitud[] = ['aceptada', 'en_camino', 'en_proceso'];
 
 @Component({
   selector: 'app-panel',
@@ -35,7 +42,23 @@ export class Panel implements OnInit {
   protected readonly perfil = this.mecanicoService.perfil;
   protected readonly cargando = signal(true);
   protected readonly cambiandoEstado = signal(false);
-  protected readonly solicitudes = signal<SolicitudCercana[]>([]);
+  protected readonly textoEstadoSolicitud = TEXTO_ESTADO_SOLICITUD;
+
+  private readonly todas = signal<Solicitud[]>([]);
+
+  protected readonly solicitudes = computed(() =>
+    this.conDistancia(this.todas().filter((s) => s.estado === 'pendiente'))
+  );
+
+  protected readonly enCurso = computed(() => {
+    const mio = this.sesion.usuario()?.id;
+
+    return (
+      this.todas().find(
+        (s) => s.mecanicoId === mio && ESTADOS_EN_CURSO.includes(s.estado)
+      ) ?? null
+    );
+  });
 
   protected readonly perfilCompleto = computed(() =>
     this.mecanicoService.perfilCompleto(this.perfil())
@@ -110,7 +133,7 @@ export class Panel implements OnInit {
 
     this.solicitudService.listar().subscribe({
       next: (lista) => {
-        this.solicitudes.set(this.conDistancia(lista));
+        this.todas.set(lista);
         this.cargando.set(false);
       },
       error: () => this.cargando.set(false),
@@ -121,7 +144,6 @@ export class Panel implements OnInit {
     const perfil = this.perfil();
 
     return lista
-      .filter((s) => s.estado === 'pendiente')
       .map((s) => ({
         ...s,
         distanciaKm: perfil

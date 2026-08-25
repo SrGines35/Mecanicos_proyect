@@ -84,6 +84,22 @@
     </section>
   }
 
+  @if (enCurso(); as servicio) {
+    <section class="bloque entra" style="--retraso: 240ms">
+      <div class="bloque__encabezado">
+        <h2 class="bloque__titulo">Tu servicio en curso</h2>
+        <span class="etiqueta-estado">{{ textoEstadoSolicitud[servicio.estado] }}</span>
+      </div>
+
+      <p class="en-curso__vehiculo">{{ servicio.vehiculo }}</p>
+      <p class="en-curso__cliente">{{ servicio.cliente.nombre }}</p>
+
+      <button type="button" class="boton-primario" (click)="abrirSolicitud(servicio.id)">
+        Seguir con este servicio
+      </button>
+    </section>
+  }
+
   <section class="bloque entra" style="--retraso: 300ms">
     <div class="bloque__encabezado">
       <h2 class="bloque__titulo">Solicitudes nuevas</h2>
