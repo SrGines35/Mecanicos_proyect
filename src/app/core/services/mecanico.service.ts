@@ -46,12 +46,18 @@ const MECANICOS_EJEMPLO: PerfilMecanico[] = [
   },
 ];
 
+const ESTADO_HACIA_BACK: Record<EstadoMecanico, string> = {
+  disponible: 'disponible',
+  ocupado: 'ocupado',
+  no_disponible: 'cerrado',
+};
+
 @Injectable({ providedIn: 'root' })
 export class MecanicoService {
   private readonly http = inject(HttpClient);
   private readonly sesion = inject(SesionService);
 
-  private readonly base = `${environment.apiUrl}/mecanicos`;
+  private readonly base = `${environment.apiUrl}/mechanics`;
   private readonly RETARDO_MS = 500;
 
   readonly perfil = signal<PerfilMecanico | null>(null);
@@ -99,7 +105,7 @@ export class MecanicoService {
     }
 
     return this.http
-      .get<PerfilMecanico | null>(`${this.base}/mi-perfil`)
+      .get<PerfilMecanico | null>(`${this.base}/profile/me`)
       .pipe(tap((p) => this.perfil.set(p)));
   }
 
@@ -129,7 +135,11 @@ export class MecanicoService {
       );
     }
 
-    return this.http.put<PerfilMecanico>(`${this.base}/mi-perfil`, datos).pipe(
+    const peticion = previo
+      ? this.http.patch<PerfilMecanico>(`${this.base}/profile/me`, datos)
+      : this.http.post<PerfilMecanico>(`${this.base}/profile`, datos);
+
+    return peticion.pipe(
 
       switchMap((p) => (seCompletoAhora ? this.cambiarEstado('disponible') : of(p))),
       tap((p) => this.perfil.set(p))
@@ -170,11 +180,13 @@ export class MecanicoService {
     }
 
     return this.http
-      .patch<PerfilMecanico>(`${this.base}/estado`, { estado })
+      .patch<PerfilMecanico>(`${this.base}/profile/me`, {
+        estadoDisponibilidad: ESTADO_HACIA_BACK[estado],
+      })
       .pipe(tap((p) => this.perfil.set(p)));
   }
 
-  listarDisponibles(): Observable<PerfilMecanico[]> {
+  listarDisponibles(latitud?: number, longitud?: number): Observable<PerfilMecanico[]> {
     if (!environment.usarApiReal) {
       const registrados = Object.values(this.leerPerfiles()).filter(
         (p) => p.estado === 'disponible' && this.perfilCompleto(p)
@@ -184,7 +196,9 @@ export class MecanicoService {
       return of(lista.map((p) => ({ ...p }))).pipe(delay(this.RETARDO_MS));
     }
 
-    return this.http.get<PerfilMecanico[]>(`${this.base}/disponibles`);
+    return this.http.get<PerfilMecanico[]>(`${this.base}/nearby`, {
+      params: { lat: latitud ?? 0, lng: longitud ?? 0 },
+    });
   }
 
   olvidarPerfil(usuarioId: string): void {
