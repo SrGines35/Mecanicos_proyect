@@ -26,6 +26,7 @@ export interface Solicitud {
   costoManoObra: number;
   tarifaApp: number;
   fechaCreacion: string;
+  calificacion?: number | null;
 }
 
 export interface SolicitudCercana extends Solicitud {

@@ -152,6 +152,14 @@ export class SolicitudService {
     return this.http.patch<Solicitud>(`${this.base}/${id}/costos`, costos);
   }
 
+  calificar(id: string, calificacion: number): Observable<Solicitud> {
+    if (!environment.usarApiReal) {
+      return this.actualizarSimulada(id, (s) => ({ ...s, calificacion }));
+    }
+
+    return this.http.patch<Solicitud>(`${this.base}/${id}/calificacion`, { calificacion });
+  }
+
   private actualizarSimulada(
     id: string,
     cambio: (s: Solicitud) => Solicitud
