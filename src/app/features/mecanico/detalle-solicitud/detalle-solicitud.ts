@@ -17,11 +17,12 @@ import { SolicitudService } from '../../../core/services/solicitud.service';
 import { calcularDistanciaKm, formatearDistancia } from '../../../core/utils/distancia.util';
 import { SoloNumeros } from '../../../shared/directivas/solo-numeros';
 import { BarraSuperior } from '../../../shared/barra-superior/barra-superior';
+import { BarraProgreso } from '../../../shared/barra-progreso/barra-progreso';
 import { MapaUbicacion } from '../../../shared/mapa-ubicacion/mapa-ubicacion';
 
 @Component({
   selector: 'app-detalle-solicitud',
-  imports: [ReactiveFormsModule, BarraSuperior, SoloNumeros, MapaUbicacion],
+  imports: [ReactiveFormsModule, BarraSuperior, SoloNumeros, MapaUbicacion, BarraProgreso],
   templateUrl: './detalle-solicitud.html',
   styleUrl: './detalle-solicitud.css',
 })
@@ -33,7 +34,6 @@ export class DetalleSolicitud implements OnInit {
   private readonly mecanicoService = inject(MecanicoService);
   private readonly sesion = inject(SesionService);
 
-  protected readonly pasos = PASOS_SERVICIO;
   protected readonly textoEstado = TEXTO_ESTADO_SOLICITUD;
 
   protected readonly solicitud = signal<Solicitud | null>(null);
@@ -75,6 +75,12 @@ export class DetalleSolicitud implements OnInit {
   });
 
   protected readonly enReparacion = computed(() => this.solicitud()?.estado === 'en_proceso');
+
+  protected readonly estrellas = [1, 2, 3, 4, 5];
+
+  protected readonly fueCompletada = computed(() => this.solicitud()?.estado === 'completada');
+
+  protected readonly calificacion = computed(() => this.solicitud()?.calificacion ?? null);
 
   protected readonly termino = computed(() => {
     const estado = this.solicitud()?.estado;
@@ -123,14 +129,6 @@ export class DetalleSolicitud implements OnInit {
     });
   }
 
-  protected pasoAlcanzado(paso: EstadoSolicitud): boolean {
-    const actual = this.solicitud()?.estado;
-    if (!actual) {
-      return false;
-    }
-    const indiceActual = PASOS_SERVICIO.indexOf(actual);
-    return indiceActual >= PASOS_SERVICIO.indexOf(paso);
-  }
 
   protected get textoSiguientePaso(): string | null {
     const actual = this.solicitud()?.estado;

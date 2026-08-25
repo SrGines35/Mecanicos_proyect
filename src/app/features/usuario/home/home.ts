@@ -9,6 +9,7 @@ import {
 } from '../../../core/models/solicitud.model';
 import { SesionService } from '../../../core/services/sesion.service';
 import { SolicitudService } from '../../../core/services/solicitud.service';
+import { BarraProgreso } from '../../../shared/barra-progreso/barra-progreso';
 
 const MENSAJE_ESTADO: Partial<Record<EstadoSolicitud, string>> = {
   pendiente: 'Estamos buscando un mecánico cerca de ti',
@@ -26,7 +27,7 @@ const ESTADOS_VIVOS: EstadoSolicitud[] = [
 
 @Component({
   selector: 'app-home',
-  imports: [RouterLink],
+  imports: [RouterLink, BarraProgreso],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })

@@ -19,6 +19,8 @@
 
     <p class="servicio__mensaje">{{ mensajeEstado() }}</p>
 
+    <app-barra-progreso [estado]="solicitud.estado" />
+
     <dl class="datos">
       <div class="datos__fila">
         <dt>Vehículo</dt>
