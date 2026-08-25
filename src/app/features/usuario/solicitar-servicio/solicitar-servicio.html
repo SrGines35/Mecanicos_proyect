@@ -1,0 +1,167 @@
+@if (error(); as mensaje) {
+  <div class="auth-aviso auth-aviso--error">
+    <span>{{ mensaje }}</span>
+  </div>
+}
+
+<form [formGroup]="formulario" (ngSubmit)="enviar()" novalidate>
+
+  <section class="bloque entra" style="--retraso: 0ms">
+    <div class="bloque__encabezado">
+      <h2 class="bloque__titulo">1 · Dónde estás</h2>
+      @if (tieneUbicacion()) {
+        <span class="marca-lista">Listo</span>
+      }
+    </div>
+
+    <div class="ubicacion" [class.ubicacion--lista]="tieneUbicacion()">
+      @if (tieneUbicacion()) {
+        <div class="ubicacion__dato">
+          <strong>Ubicación marcada</strong>
+          <code>{{ coordenadas() }}</code>
+        </div>
+      } @else {
+        <div class="ubicacion__dato">
+          <strong>Sin ubicación</strong>
+          <span class="texto-suave">El mecánico necesita saber a dónde ir</span>
+        </div>
+      }
+
+      <button
+        type="button"
+        class="boton-secundario"
+        [disabled]="buscandoUbicacion()"
+        (click)="usarMiUbicacion()"
+      >
+        @if (buscandoUbicacion()) {
+          <span class="cargador cargador--gris"></span>Buscando...
+        } @else {
+          Usar mi GPS
+        }
+      </button>
+    </div>
+
+    <app-mapa-ubicacion
+      [latitud]="centroLat()"
+      [longitud]="centroLng()"
+      [editable]="true"
+      [zoom]="tieneUbicacion() ? 16 : 13"
+      (ubicacionCambiada)="moverPin($event)"
+    />
+
+    @if (avisoUbicacion(); as aviso) {
+      <p class="campo__error">{{ aviso }}</p>
+    }
+  </section>
+
+  <section class="bloque entra" style="--retraso: 80ms">
+    <h2 class="bloque__titulo">2 · Qué le pasa a tu carro</h2>
+
+    <div class="campo">
+      <label for="vehiculo">¿Qué vehículo es?</label>
+      <input
+        id="vehiculo"
+        type="text"
+        formControlName="vehiculo"
+        maxlength="60"
+        placeholder="Ej. Nissan Versa 2018 blanco"
+      />
+      @if (mostrarError('vehiculo')) {
+        <p class="campo__error">Escribe marca, modelo y color</p>
+      } @else {
+        <p class="campo__ayuda">Así el mecánico te reconoce al llegar.</p>
+      }
+    </div>
+
+    <div class="campo">
+      <label for="descripcionFalla">¿Qué le pasa?</label>
+      <textarea
+        id="descripcionFalla"
+        formControlName="descripcionFalla"
+        maxlength="300"
+        placeholder="Ej. No arranca. Hace un ruido al girar la llave y las luces se ven débiles."
+      ></textarea>
+      @if (mostrarError('descripcionFalla')) {
+        <p class="campo__error">Cuéntanos un poco más, con al menos 10 letras</p>
+      } @else {
+        <p class="campo__ayuda">
+          Entre más nos digas, mejor llega preparado. Te quedan
+          {{ caracteresRestantes() }} caracteres.
+        </p>
+      }
+    </div>
+  </section>
+
+  <section class="bloque entra" style="--retraso: 160ms">
+    <div class="bloque__encabezado">
+      <h2 class="bloque__titulo">3 · Mecánicos cerca de ti</h2>
+      @if (!cargandoMecanicos() && cercanos().length > 0) {
+        <span class="contador">{{ cercanos().length }}</span>
+      }
+    </div>
+
+    @if (cargandoMecanicos()) {
+      @for (hueco of [1, 2]; track hueco) {
+        <div class="esqueleto">
+          <div class="esqueleto__linea esqueleto__linea--corta"></div>
+          <div class="esqueleto__linea"></div>
+        </div>
+      }
+    } @else if (!tieneUbicacion()) {
+      <p class="texto-suave">
+        Marca dónde estás arriba y aquí aparecen los mecánicos disponibles,
+        del más cercano al más lejano.
+      </p>
+    } @else if (cercanos().length === 0) {
+      <div class="vacio">
+        <p class="vacio__titulo">No hay mecánicos disponibles</p>
+        <p class="texto-suave">
+          Puedes mandar tu solicitud de todos modos: le va a llegar al primero
+          que se ponga disponible.
+        </p>
+      </div>
+    } @else {
+      @for (mecanico of cercanos(); track mecanico.usuarioId; let i = $index) {
+        <article class="mecanico entra" [style.--retraso]="i * 70 + 'ms'">
+          @if (i === 0) {
+            <span class="insignia-cerca">El más cerca</span>
+          }
+
+          <div class="mecanico__fila">
+            <span class="mecanico__nombre">{{ mecanico.nombre ?? 'Mecánico' }}</span>
+            <span class="mecanico__calificacion">
+              {{ mecanico.calificacion }}
+              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                <path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.3l6.5-.9z" />
+              </svg>
+            </span>
+          </div>
+
+          <p class="mecanico__descripcion">{{ mecanico.descripcion }}</p>
+
+          <div class="mecanico__pie">
+            <span class="etiqueta-distancia">a {{ distancia(mecanico.distanciaKm) }}</span>
+            <span class="mecanico__zona">{{ mecanico.zonaTrabajo }}</span>
+          </div>
+        </article>
+      }
+
+      <p class="campo__ayuda nota-lista">
+        Tu solicitud le llega a todos y la toma el primero que la acepte.
+      </p>
+    }
+  </section>
+
+  <button type="submit" class="boton-primario" [disabled]="enviando()">
+    @if (enviando()) {
+      <span class="cargador"></span>Enviando...
+    } @else {
+      Pedir mecánico
+    }
+  </button>
+
+  <p class="campo__ayuda nota-final">
+    No se paga nada por pedirlo. El costo lo acuerdas con el mecánico y se paga
+    en efectivo al terminar.
+  </p>
+</form>

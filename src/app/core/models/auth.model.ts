@@ -1,13 +1,9 @@
-
-
 export type Rol = 'cliente' | 'mecanico';
-
 
 export interface Credenciales {
   correo: string;
   password: string;
 }
-
 
 export interface DatosRegistro {
   nombre: string;
@@ -17,7 +13,6 @@ export interface DatosRegistro {
   role: Rol;
 }
 
-
 export interface Usuario {
   id: string;
   nombre: string;
@@ -26,12 +21,10 @@ export interface Usuario {
   role: Rol;
 }
 
-
 export interface Tokens {
   accessToken: string;
   refreshToken: string;
 }
-
 
 export interface RespuestaAuth {
   user: Usuario;
