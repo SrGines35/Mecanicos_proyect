@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, signal } from '@angular/core';
 import { Location } from '@angular/common';
 import { Router } from '@angular/router';
 
@@ -19,11 +19,22 @@ export class BarraSuperior {
   readonly titulo = input<string>('');
   readonly mostrarRegresar = input<boolean>(false);
 
+  protected readonly confirmando = signal(false);
+
   protected regresar(): void {
     this.location.back();
   }
 
+  protected pedirConfirmacion(): void {
+    this.confirmando.set(true);
+  }
+
+  protected cancelarSalida(): void {
+    this.confirmando.set(false);
+  }
+
   protected salir(): void {
+    this.confirmando.set(false);
     this.auth.cerrarSesion();
     void this.router.navigate(['/']);
   }

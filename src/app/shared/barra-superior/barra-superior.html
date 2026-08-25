@@ -15,7 +15,7 @@
     }
   </div>
 
-  <button class="barra__salir" type="button" title="Cerrar sesión" (click)="salir()">
+  <button class="barra__salir" type="button" title="Cerrar sesión" (click)="pedirConfirmacion()">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
          stroke-linecap="round" stroke-linejoin="round">
       <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
@@ -23,3 +23,33 @@
     <span>Salir</span>
   </button>
 </header>
+
+@if (confirmando()) {
+  <div class="salida" role="dialog" aria-modal="true" aria-labelledby="salida-titulo">
+    <div class="salida__fondo" (click)="cancelarSalida()"></div>
+
+    <div class="salida__caja">
+      <svg class="salida__icono" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+           stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" />
+      </svg>
+
+      <h2 class="salida__titulo" id="salida-titulo">¿Cerrar sesión?</h2>
+
+      <p class="salida__texto">
+        Vas a salir de tu cuenta. Para volver a entrar tendrás que escribir tu
+        correo y tu contraseña otra vez.
+      </p>
+
+      <div class="salida__botones">
+        <button type="button" class="salida__cancelar" (click)="cancelarSalida()">
+          Quedarme
+        </button>
+
+        <button type="button" class="salida__confirmar" (click)="salir()">
+          Sí, salir
+        </button>
+      </div>
+    </div>
+  </div>
+}
