@@ -74,6 +74,8 @@ export class DetalleSolicitud implements OnInit {
     return estado === 'aceptada' || estado === 'en_camino' || estado === 'en_proceso';
   });
 
+  protected readonly enReparacion = computed(() => this.solicitud()?.estado === 'en_proceso');
+
   protected readonly termino = computed(() => {
     const estado = this.solicitud()?.estado;
     return estado === 'completada' || estado === 'rechazada' || estado === 'cancelada';

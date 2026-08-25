@@ -90,6 +90,7 @@
     }
 
     @if (estaActiva()) {
+      @if (enReparacion()) {
       <section class="bloque">
         <h2 class="bloque__titulo">Costos del servicio</h2>
 
@@ -149,6 +150,7 @@
         </div>
         <p class="texto-suave nota-pago">El cliente paga en efectivo al terminar.</p>
       </div>
+      }
 
       @if (textoSiguientePaso; as texto) {
         <button
