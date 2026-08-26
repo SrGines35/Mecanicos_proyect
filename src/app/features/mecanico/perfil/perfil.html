@@ -83,7 +83,7 @@
         @if (mostrarError('descripcion')) {
           <p class="campo__error">Escribe una descripción (máximo 200 caracteres)</p>
         } @else {
-          <p class="campo__ayuda">Te quedan {{ caracteresRestantes }} caracteres.</p>
+          <p class="campo__ayuda">Te quedan {{ caracteresRestantes() }} caracteres.</p>
         }
       </div>
 
