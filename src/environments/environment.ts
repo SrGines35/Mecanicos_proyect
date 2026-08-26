@@ -1,9 +1,9 @@
 export const environment = {
-  apiUrl: 'http://localhost:3000/api',
+  apiUrl: 'https://appmecanicos-production.up.railway.app/api',
   api: {
-    auth: false,
-    authMe: false,
-    mecanicos: false,
-    solicitudes: false,
+    auth: true,
+    authMe: true,
+    mecanicos: true,
+    solicitudes: true,
   },
 };
