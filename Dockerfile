@@ -16,7 +16,7 @@ RUN npm run build
 FROM node:22-alpine
 WORKDIR /app
 RUN npm install -g serve
-COPY --from=builder /app/dist/frontend/browser /app/public
+COPY --from=builder /app/dist /app/public
 
 # 6. Exponer puerto y correr el servidor estático
 EXPOSE 3000
