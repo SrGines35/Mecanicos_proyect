@@ -20,4 +20,4 @@ COPY --from=builder /app/dist /app/public
 
 # 6. Exponer puerto y correr el servidor estático
 EXPOSE 3000
-CMD ["serve", "-s", "public", "-l", "3000"]
+CMD sh -c "serve -s /app/dist/frontend/browser -l ${PORT:-3000} || serve -s /app/dist/browser -l ${PORT:-3000} || serve -s /app/dist -l ${PORT:-3000}"
