@@ -12,11 +12,17 @@ export interface ClienteSolicitud {
   telefono: string;
 }
 
+export interface MecanicoSolicitud {
+  nombre: string;
+  telefono: string;
+}
+
 export interface Solicitud {
   id: string;
   usuarioId: string;
   mecanicoId: string | null;
   cliente: ClienteSolicitud;
+  mecanico?: MecanicoSolicitud | null;
   vehiculo: string;
   descripcionFalla: string;
   latitudOrigen: number;
@@ -27,6 +33,7 @@ export interface Solicitud {
   tarifaApp: number;
   fechaCreacion: string;
   calificacion?: number | null;
+  rechazadaPor?: string[];
 }
 
 export interface SolicitudCercana extends Solicitud {

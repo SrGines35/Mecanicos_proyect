@@ -155,7 +155,25 @@ export class DetalleSolicitud implements OnInit {
   }
 
   protected rechazar(): void {
-    this.cambiarEstado('rechazada');
+    const s = this.solicitud();
+    const mio = this.sesion.usuario()?.id;
+
+    if (!s || !mio || this.procesando()) {
+      return;
+    }
+
+    this.procesando.set(true);
+
+    this.solicitudService.rechazar(s.id, mio).subscribe({
+      next: () => {
+        this.procesando.set(false);
+        void this.router.navigate(['/mecanico']);
+      },
+      error: () => {
+        this.procesando.set(false);
+        this.error.set('No pudimos rechazar la solicitud');
+      },
+    });
   }
 
   protected avanzar(): void {
@@ -200,6 +218,17 @@ export class DetalleSolicitud implements OnInit {
     void this.router.navigate(['/mecanico']);
   }
 
+  private ajustarDisponibilidad(estado: EstadoSolicitud): void {
+    if (estado === 'aceptada') {
+      this.mecanicoService.cambiarEstado('ocupado').subscribe({ error: () => undefined });
+      return;
+    }
+
+    if (estado === 'completada') {
+      this.mecanicoService.cambiarEstado('disponible').subscribe({ error: () => undefined });
+    }
+  }
+
   private cambiarEstado(estado: EstadoSolicitud): void {
     const s = this.solicitud();
     if (!s || this.procesando()) {
@@ -212,10 +241,7 @@ export class DetalleSolicitud implements OnInit {
       next: (actualizada) => {
         this.solicitud.set(actualizada);
         this.procesando.set(false);
-
-        if (estado === 'rechazada') {
-          void this.router.navigate(['/mecanico']);
-        }
+        this.ajustarDisponibilidad(estado);
       },
       error: () => {
         this.procesando.set(false);

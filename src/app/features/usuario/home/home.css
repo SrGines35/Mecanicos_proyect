@@ -306,3 +306,36 @@
     transform: none;
   }
 }
+
+.enlace-telefono {
+  color: var(--ambar);
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.enlace-telefono:hover {
+  text-decoration: underline;
+}
+
+.sin-mecanicos {
+  margin-top: 14px;
+  padding: 16px;
+  border: 1px solid rgba(240, 149, 31, 0.28);
+  border-radius: 14px;
+  background: rgba(240, 149, 31, 0.06);
+}
+
+.sin-mecanicos__titulo {
+  margin: 0 0 6px;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--ambar);
+}
+
+.sin-mecanicos .texto-suave {
+  margin: 0 0 14px;
+}
+
+.sin-mecanicos .boton-secundario {
+  margin-top: 10px;
+}
