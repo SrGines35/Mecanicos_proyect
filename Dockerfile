@@ -11,9 +11,7 @@ FROM node:22-alpine
 WORKDIR /app
 RUN npm install -g serve
 
-# Copiamos el contenido exacto de la carpeta browser generada por Angular a una carpeta limpia /app/public
-# (Aquí usaremos un comodín para asegurarnos de traer la carpeta correcta sin importar el nombre del proyecto)
-COPY --from=builder /app/dist/*/browser /app/public
+COPY --from=builder /app/dist/frontend /app/public
 
 EXPOSE 8080
 
