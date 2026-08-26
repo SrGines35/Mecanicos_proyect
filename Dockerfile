@@ -19,5 +19,6 @@ RUN npm install -g serve
 COPY --from=builder /app/dist /app/public
 
 # 6. Exponer puerto y correr el servidor estático
-EXPOSE 3000
-CMD sh -c "serve -s /app/dist/frontend/browser -l ${PORT:-3000} || serve -s /app/dist/browser -l ${PORT:-3000} || serve -s /app/dist -l ${PORT:-3000}"
+# 6. Exponer puerto y correr el servidor estático en el puerto 8080 que pide Railway
+EXPOSE 8080
+CMD sh -c "serve -s /app/dist/frontend/browser -l 8080 || serve -s /app/dist/browser -l 8080 || serve -s /app/dist -l 8080"
