@@ -410,3 +410,28 @@
   max-width: 34ch;
   margin-inline: auto;
 }
+
+.en-curso__vehiculo {
+  margin: 4px 0 0;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--blanco);
+}
+
+.en-curso__cliente {
+  margin: 2px 0 16px;
+  font-size: 0.87rem;
+  color: var(--gris);
+}
+
+.etiqueta-estado {
+  flex-shrink: 0;
+  padding: 4px 11px;
+  border: 1px solid rgba(240, 149, 31, 0.28);
+  border-radius: 999px;
+  background: var(--ambar-tenue);
+  color: var(--ambar-claro);
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}

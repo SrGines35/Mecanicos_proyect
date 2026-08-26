@@ -1,61 +1,3 @@
-.progreso {
-  display: flex;
-  gap: 4px;
-  margin-bottom: 22px;
-}
-
-.progreso__paso {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 7px;
-  position: relative;
-}
-
-.progreso__paso::before {
-  content: '';
-  position: absolute;
-  top: 5px;
-  left: -50%;
-  width: 100%;
-  height: 2px;
-  background: var(--borde);
-}
-
-.progreso__paso:first-child::before {
-  display: none;
-}
-
-.progreso__paso.alcanzado::before {
-  background: var(--ambar);
-}
-
-.progreso__punto {
-  width: 12px;
-  height: 12px;
-  border-radius: 50%;
-  background: var(--superficie-alta);
-  border: 2px solid var(--borde);
-  z-index: 1;
-}
-
-.progreso__paso.alcanzado .progreso__punto {
-  background: var(--ambar);
-  border-color: var(--ambar);
-}
-
-.progreso__texto {
-  font-size: 0.7rem;
-  color: var(--gris-tenue);
-  text-align: center;
-}
-
-.progreso__paso.alcanzado .progreso__texto {
-  color: var(--ambar-claro);
-  font-weight: 600;
-}
-
 .dato {
   display: flex;
   flex-direction: column;
@@ -148,4 +90,35 @@
 .nota-pago {
   margin: 10px 0 0;
   font-size: 0.78rem;
+}
+
+.calificacion {
+  text-align: center;
+}
+
+.calificacion__estrellas {
+  display: flex;
+  justify-content: center;
+  gap: 6px;
+  margin: 6px 0 10px;
+}
+
+.calificacion__estrellas svg {
+  width: 30px;
+  height: 30px;
+  fill: var(--superficie-alta);
+  stroke: var(--borde-fuerte);
+  stroke-width: 1.2;
+}
+
+.calificacion__estrellas svg.calificacion__estrella--llena {
+  fill: var(--ambar);
+  stroke: var(--ambar);
+}
+
+.calificacion__numero {
+  margin: 0;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--ambar-claro);
 }

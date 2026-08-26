@@ -1,0 +1,8 @@
+<div class="progreso">
+  @for (paso of pasos; track paso) {
+    <div class="progreso__paso" [class.alcanzado]="alcanzado(paso)">
+      <span class="progreso__punto"></span>
+      <span class="progreso__texto">{{ textoEstado[paso] }}</span>
+    </div>
+  }
+</div>

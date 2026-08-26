@@ -12,6 +12,8 @@ import { Coordenadas, MapaUbicacion } from '../../../shared/mapa-ubicacion/mapa-
 const OAXACA_LAT = 17.0654;
 const OAXACA_LNG = -96.7237;
 
+const DISTANCIA_MINIMA_KM = 0.5;
+
 @Component({
   selector: 'app-solicitar-servicio',
   imports: [ReactiveFormsModule, MapaUbicacion],
@@ -26,7 +28,7 @@ export class SolicitarServicio implements OnInit {
 
   protected readonly buscandoUbicacion = signal(false);
   protected readonly avisoUbicacion = signal<string | null>(null);
-  protected readonly cargandoMecanicos = signal(true);
+  protected readonly cargandoMecanicos = signal(false);
   protected readonly enviando = signal(false);
   protected readonly error = signal<string | null>(null);
 
@@ -34,6 +36,7 @@ export class SolicitarServicio implements OnInit {
   protected readonly longitud = signal(0);
 
   private readonly mecanicos = signal<MecanicoCercano[]>([]);
+  private ultimaBusqueda: Coordenadas | null = null;
 
   protected readonly formulario = this.fb.nonNullable.group({
     vehiculo: ['', [Validators.required, Validators.minLength(4), Validators.maxLength(60)]],
@@ -79,15 +82,33 @@ export class SolicitarServicio implements OnInit {
   protected readonly caracteresRestantes = computed(() => 300 - this.textoFalla().length);
 
   ngOnInit(): void {
-    this.mecanicoService.listarDisponibles().subscribe({
+    this.usarMiUbicacion();
+  }
+
+  private buscarMecanicos(): void {
+    if (!this.tieneUbicacion()) {
+      return;
+    }
+
+    const yo: Coordenadas = { latitud: this.latitud(), longitud: this.longitud() };
+
+    if (this.ultimaBusqueda && calcularDistanciaKm(this.ultimaBusqueda, yo) < DISTANCIA_MINIMA_KM) {
+      return;
+    }
+
+    this.ultimaBusqueda = yo;
+    this.cargandoMecanicos.set(true);
+
+    this.mecanicoService.listarDisponibles(yo.latitud, yo.longitud).subscribe({
       next: (lista) => {
         this.mecanicos.set(lista.map((m) => ({ ...m, distanciaKm: 0 })));
         this.cargandoMecanicos.set(false);
       },
-      error: () => this.cargandoMecanicos.set(false),
+      error: () => {
+        this.mecanicos.set([]);
+        this.cargandoMecanicos.set(false);
+      },
     });
-
-    this.usarMiUbicacion();
   }
 
   protected distancia(km: number): string {
@@ -103,6 +124,7 @@ export class SolicitarServicio implements OnInit {
     this.latitud.set(coordenadas.latitud);
     this.longitud.set(coordenadas.longitud);
     this.avisoUbicacion.set(null);
+    this.buscarMecanicos();
   }
 
   protected usarMiUbicacion(): void {
@@ -120,6 +142,7 @@ export class SolicitarServicio implements OnInit {
         this.latitud.set(posicion.coords.latitude);
         this.longitud.set(posicion.coords.longitude);
         this.buscandoUbicacion.set(false);
+        this.buscarMecanicos();
       },
       () => {
         this.buscandoUbicacion.set(false);

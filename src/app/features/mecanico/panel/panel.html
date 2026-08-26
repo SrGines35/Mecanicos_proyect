@@ -68,14 +68,35 @@
       </div>
 
       <div class="cifra">
-        <span class="cifra__numero cifra__numero--estrella">
-          {{ calificacion() ?? '—' }}
-          <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-            <path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.3l6.5-.9z" />
-          </svg>
-        </span>
-        <span class="cifra__texto">tu calificación</span>
+        @if (calificacion(); as nota) {
+          <span class="cifra__numero cifra__numero--estrella">
+            {{ nota }}
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.3l6.5-.9z" />
+            </svg>
+          </span>
+          <span class="cifra__texto">tu calificación</span>
+        } @else {
+          <span class="cifra__numero">—</span>
+          <span class="cifra__texto">sin calificaciones todavía</span>
+        }
       </div>
+    </section>
+  }
+
+  @if (enCurso(); as servicio) {
+    <section class="bloque entra" style="--retraso: 240ms">
+      <div class="bloque__encabezado">
+        <h2 class="bloque__titulo">Tu servicio en curso</h2>
+        <span class="etiqueta-estado">{{ textoEstadoSolicitud[servicio.estado] }}</span>
+      </div>
+
+      <p class="en-curso__vehiculo">{{ servicio.vehiculo }}</p>
+      <p class="en-curso__cliente">{{ servicio.cliente.nombre }}</p>
+
+      <button type="button" class="boton-primario" (click)="abrirSolicitud(servicio.id)">
+        Seguir con este servicio
+      </button>
     </section>
   }
 

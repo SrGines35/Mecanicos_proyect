@@ -19,14 +19,7 @@
     }
 
     @if (!esPendiente()) {
-      <div class="progreso">
-        @for (paso of pasos; track paso) {
-          <div class="progreso__paso" [class.alcanzado]="pasoAlcanzado(paso)">
-            <span class="progreso__punto"></span>
-            <span class="progreso__texto">{{ textoEstado[paso] }}</span>
-          </div>
-        }
-      </div>
+      <app-barra-progreso [estado]="solicitud()!.estado" />
     }
 
     <section class="bloque">
@@ -90,6 +83,7 @@
     }
 
     @if (estaActiva()) {
+      @if (enReparacion()) {
       <section class="bloque">
         <h2 class="bloque__titulo">Costos del servicio</h2>
 
@@ -149,6 +143,7 @@
         </div>
         <p class="texto-suave nota-pago">El cliente paga en efectivo al terminar.</p>
       </div>
+      }
 
       @if (textoSiguientePaso; as texto) {
         <button
@@ -175,6 +170,31 @@
           }
         </span>
       </div>
+
+      @if (fueCompletada()) {
+        <section class="bloque calificacion">
+          @if (calificacion(); as estrellasDadas) {
+            <h2 class="bloque__titulo">Así te calificó el cliente</h2>
+
+            <div class="calificacion__estrellas" role="img"
+                 [attr.aria-label]="estrellasDadas + ' de 5 estrellas'">
+              @for (n of estrellas; track n) {
+                <svg viewBox="0 0 24 24" aria-hidden="true"
+                     [class.calificacion__estrella--llena]="n <= estrellasDadas">
+                  <path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.3l6.5-.9z" />
+                </svg>
+              }
+            </div>
+
+            <p class="calificacion__numero">{{ estrellasDadas }} de 5</p>
+          } @else {
+            <h2 class="bloque__titulo">Calificación</h2>
+            <p class="texto-suave">
+              El cliente todavía no te ha calificado. Aparece aquí en cuanto lo haga.
+            </p>
+          }
+        </section>
+      }
 
       <button class="boton-secundario" type="button" (click)="volver()">Volver al panel</button>
     }

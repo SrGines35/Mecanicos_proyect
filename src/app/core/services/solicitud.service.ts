@@ -3,7 +3,6 @@ import { Injectable, inject } from '@angular/core';
 import { Observable, delay, map, of, throwError } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
-import { SOLICITUDES_MOCK } from '../data/solicitudes.mock';
 import { EstadoSolicitud, Solicitud } from '../models/solicitud.model';
 import { SesionService } from './sesion.service';
 
@@ -40,9 +39,7 @@ export class SolicitudService {
     } catch {
     }
 
-    const iniciales = SOLICITUDES_MOCK.map((s) => ({ ...s }));
-    this.guardar(iniciales);
-    return iniciales;
+    return [];
   }
 
   private guardar(lista: Solicitud[]): void {
@@ -150,6 +147,20 @@ export class SolicitudService {
     }
 
     return this.http.patch<Solicitud>(`${this.base}/${id}/costos`, costos);
+  }
+
+  calificar(id: string, calificacion: number): Observable<Solicitud> {
+    if (!environment.usarApiReal) {
+      return this.actualizarSimulada(id, (s) => ({ ...s, calificacion }));
+    }
+
+    return this.http.patch<Solicitud>(`${this.base}/${id}/calificacion`, { calificacion });
+  }
+
+  calificacionesDeMecanico(mecanicoId: string): number[] {
+    return this.simuladas
+      .filter((s) => s.mecanicoId === mecanicoId && typeof s.calificacion === 'number')
+      .map((s) => s.calificacion as number);
   }
 
   private actualizarSimulada(

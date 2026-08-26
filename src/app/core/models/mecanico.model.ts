@@ -11,7 +11,7 @@ export interface PerfilMecanico {
   longitud: number;
   zonaTrabajo: string;
   estado: EstadoMecanico;
-  calificacion: number;
+  calificacion: number | null;
 }
 
 export type DatosPerfilMecanico = Omit<

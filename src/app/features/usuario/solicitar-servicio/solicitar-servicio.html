@@ -129,12 +129,16 @@
 
           <div class="mecanico__fila">
             <span class="mecanico__nombre">{{ mecanico.nombre ?? 'Mecánico' }}</span>
-            <span class="mecanico__calificacion">
-              {{ mecanico.calificacion }}
-              <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-                <path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.3l6.5-.9z" />
-              </svg>
-            </span>
+            @if (mecanico.calificacion; as nota) {
+              <span class="mecanico__calificacion">
+                {{ nota }}
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                  <path d="M12 2.5l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.3l6.5-.9z" />
+                </svg>
+              </span>
+            } @else {
+              <span class="mecanico__nuevo">Nuevo</span>
+            }
           </div>
 
           <p class="mecanico__descripcion">{{ mecanico.descripcion }}</p>

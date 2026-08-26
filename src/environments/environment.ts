@@ -1,5 +1,4 @@
 export const environment = {
-  usarApiReal: false,
-  apiUrl: 'http://localhost:3000',
+  usarApiReal: true,
+  apiUrl: 'http://localhost:3000/api',
 };
-
