@@ -3,10 +3,13 @@ import { RouterLink } from '@angular/router';
 
 import {
   EstadoSolicitud,
+  MecanicoSolicitud,
   Solicitud,
   TEXTO_ESTADO_SOLICITUD,
   calcularTotal,
 } from '../../../core/models/solicitud.model';
+import { PerfilMecanico } from '../../../core/models/mecanico.model';
+import { MecanicoService } from '../../../core/services/mecanico.service';
 import { SesionService } from '../../../core/services/sesion.service';
 import { SolicitudService } from '../../../core/services/solicitud.service';
 import { BarraProgreso } from '../../../shared/barra-progreso/barra-progreso';
@@ -34,6 +37,7 @@ const ESTADOS_VIVOS: EstadoSolicitud[] = [
 export class Home implements OnInit {
   private readonly sesion = inject(SesionService);
   private readonly solicitudes = inject(SolicitudService);
+  private readonly mecanicos = inject(MecanicoService);
 
   protected readonly textoEstado = TEXTO_ESTADO_SOLICITUD;
   protected readonly estrellas = [1, 2, 3, 4, 5];
@@ -41,6 +45,14 @@ export class Home implements OnInit {
   protected readonly cargando = signal(true);
   protected readonly activa = signal<Solicitud | null>(null);
   protected readonly porCalificar = signal<Solicitud | null>(null);
+
+  protected readonly mecanico = signal<MecanicoSolicitud | null>(null);
+  protected readonly cancelando = signal(false);
+
+  private readonly disponibles = signal<PerfilMecanico[]>([]);
+  protected readonly revisando = signal(false);
+  protected readonly esperando = signal(false);
+  protected readonly insistiendo = signal(false);
 
   protected readonly seleccion = signal(0);
   protected readonly resaltada = signal(0);
@@ -63,10 +75,31 @@ export class Home implements OnInit {
 
   protected readonly pintadas = computed(() => this.resaltada() || this.seleccion());
 
+  protected readonly puedeCancelar = computed(() => this.activa()?.estado === 'pendiente');
+
+  protected readonly sinMecanicos = computed(() => {
+    const solicitud = this.activa();
+
+    if (!solicitud || solicitud.estado !== 'pendiente' || this.revisando()) {
+      return false;
+    }
+
+    const rechazos = solicitud.rechazadaPor ?? [];
+
+    return this.disponibles().filter((m) => !rechazos.includes(m.usuarioId)).length === 0;
+  });
+
   ngOnInit(): void {
     this.solicitudes.listarMias().subscribe({
       next: (lista) => {
-        this.activa.set(lista.find((s) => ESTADOS_VIVOS.includes(s.estado)) ?? null);
+        const activa = lista.find((s) => ESTADOS_VIVOS.includes(s.estado)) ?? null;
+
+        this.activa.set(activa);
+        this.mecanico.set(activa ? this.datosDelMecanico(activa) : null);
+
+        if (activa) {
+          this.buscarMecanicos(activa);
+        }
 
         this.porCalificar.set(
           lista.find(
@@ -78,9 +111,84 @@ export class Home implements OnInit {
       },
       error: () => {
         this.activa.set(null);
+        this.mecanico.set(null);
         this.porCalificar.set(null);
         this.cargando.set(false);
       },
+    });
+  }
+
+  private buscarMecanicos(solicitud: Solicitud): void {
+    if (solicitud.estado !== 'pendiente') {
+      this.disponibles.set([]);
+      return;
+    }
+
+    this.revisando.set(true);
+
+    this.mecanicos
+      .listarDisponibles(solicitud.latitudOrigen, solicitud.longitudOrigen)
+      .subscribe({
+        next: (lista) => {
+          this.disponibles.set(lista);
+          this.revisando.set(false);
+        },
+        error: () => {
+          this.disponibles.set([]);
+          this.revisando.set(false);
+        },
+      });
+  }
+
+  protected seguirEsperando(): void {
+    const solicitud = this.activa();
+
+    if (!solicitud || this.insistiendo()) {
+      return;
+    }
+
+    this.insistiendo.set(true);
+
+    this.solicitudes.reiniciarRechazos(solicitud.id).subscribe({
+      next: (actualizada) => {
+        this.activa.set(actualizada);
+        this.esperando.set(true);
+        this.insistiendo.set(false);
+        this.buscarMecanicos(actualizada);
+      },
+      error: () => this.insistiendo.set(false),
+    });
+  }
+
+  private datosDelMecanico(solicitud: Solicitud): MecanicoSolicitud | null {
+    if (solicitud.mecanico) {
+      return solicitud.mecanico;
+    }
+
+    if (!solicitud.mecanicoId) {
+      return null;
+    }
+
+    return this.mecanicos.datosDe(solicitud.mecanicoId);
+  }
+
+  protected cancelarSolicitud(): void {
+    const solicitud = this.activa();
+
+    if (!solicitud || !this.puedeCancelar() || this.cancelando()) {
+      return;
+    }
+
+    this.cancelando.set(true);
+
+    this.solicitudes.cancelar(solicitud.id).subscribe({
+      next: () => {
+        this.activa.set(null);
+        this.mecanico.set(null);
+        this.disponibles.set([]);
+        this.cancelando.set(false);
+      },
+      error: () => this.cancelando.set(false),
     });
   }
 

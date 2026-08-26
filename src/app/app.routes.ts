@@ -1,5 +1,6 @@
 import { Routes } from '@angular/router';
 
+import { perfilCompletoGuard } from './core/guards/perfil.guard';
 import { invitadoGuard, rolGuard, sesionGuard } from './core/guards/sesion.guard';
 
 export const routes: Routes = [
@@ -48,7 +49,7 @@ export const routes: Routes = [
 
   {
     path: 'mecanico',
-    canActivate: [sesionGuard, rolGuard('mecanico')],
+    canActivate: [sesionGuard, rolGuard('mecanico'), perfilCompletoGuard],
     loadComponent: () => import('./features/mecanico/panel/panel').then((m) => m.Panel),
     title: 'Oaxicanicos - Panel',
   },
@@ -60,7 +61,7 @@ export const routes: Routes = [
   },
   {
     path: 'mecanico/solicitud/:id',
-    canActivate: [sesionGuard, rolGuard('mecanico')],
+    canActivate: [sesionGuard, rolGuard('mecanico'), perfilCompletoGuard],
     loadComponent: () =>
       import('./features/mecanico/detalle-solicitud/detalle-solicitud').then(
         (m) => m.DetalleSolicitud

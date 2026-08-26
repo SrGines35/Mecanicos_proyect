@@ -50,7 +50,7 @@ export class SolicitudService {
   }
 
   crear(datos: DatosNuevaSolicitud): Observable<Solicitud> {
-    if (!environment.usarApiReal) {
+    if (!environment.api.solicitudes) {
       const usuario = this.sesion.usuario();
 
       if (!usuario) {
@@ -74,6 +74,7 @@ export class SolicitudService {
         costoManoObra: 0,
         tarifaApp: 0,
         fechaCreacion: new Date().toISOString(),
+        rechazadaPor: [],
       };
 
       const lista = this.simuladas;
@@ -87,7 +88,7 @@ export class SolicitudService {
   }
 
   listarMias(): Observable<Solicitud[]> {
-    if (!environment.usarApiReal) {
+    if (!environment.api.solicitudes) {
       const id = this.sesion.usuario()?.id;
       const mias = this.simuladas.filter((s) => s.usuarioId === id);
       return of(mias.map((s) => ({ ...s }))).pipe(delay(this.RETARDO_MS));
@@ -108,15 +109,38 @@ export class SolicitudService {
     return this.cambiarEstado(id, 'cancelada');
   }
 
+  rechazar(id: string, mecanicoId: string): Observable<Solicitud> {
+    if (!environment.api.solicitudes) {
+      return this.actualizarSimulada(id, (s) => ({
+        ...s,
+        rechazadaPor: [...new Set([...(s.rechazadaPor ?? []), mecanicoId])],
+      }));
+    }
+
+    return this.http.patch<Solicitud>(`${this.base}/${id}/rechazo`, {});
+  }
+
+  reiniciarRechazos(id: string): Observable<Solicitud> {
+    if (!environment.api.solicitudes) {
+      return this.actualizarSimulada(id, (s) => ({ ...s, rechazadaPor: [] }));
+    }
+
+    return this.http.patch<Solicitud>(`${this.base}/${id}/seguir-esperando`, {});
+  }
+
+  fueRechazadaPor(solicitud: Solicitud, mecanicoId: string): boolean {
+    return (solicitud.rechazadaPor ?? []).includes(mecanicoId);
+  }
+
   listar(): Observable<Solicitud[]> {
-    if (!environment.usarApiReal) {
+    if (!environment.api.solicitudes) {
       return of(this.simuladas.map((s) => ({ ...s }))).pipe(delay(this.RETARDO_MS));
     }
     return this.http.get<Solicitud[]>(this.base);
   }
 
   obtener(id: string): Observable<Solicitud> {
-    if (!environment.usarApiReal) {
+    if (!environment.api.solicitudes) {
       const encontrada = this.simuladas.find((s) => s.id === id);
       if (!encontrada) {
         return throwError(() => new Error('No encontramos esa solicitud')).pipe(delay(300));
@@ -127,7 +151,7 @@ export class SolicitudService {
   }
 
   cambiarEstado(id: string, estado: EstadoSolicitud, mecanicoId?: string): Observable<Solicitud> {
-    if (!environment.usarApiReal) {
+    if (!environment.api.solicitudes) {
       return this.actualizarSimulada(id, (s) => ({
         ...s,
         estado,
@@ -142,7 +166,7 @@ export class SolicitudService {
     const tarifaApp =
       Math.round((costos.costoPiezas + costos.costoManoObra) * PORCENTAJE_APP * 100) / 100;
 
-    if (!environment.usarApiReal) {
+    if (!environment.api.solicitudes) {
       return this.actualizarSimulada(id, (s) => ({ ...s, ...costos, tarifaApp }));
     }
 
@@ -150,7 +174,7 @@ export class SolicitudService {
   }
 
   calificar(id: string, calificacion: number): Observable<Solicitud> {
-    if (!environment.usarApiReal) {
+    if (!environment.api.solicitudes) {
       return this.actualizarSimulada(id, (s) => ({ ...s, calificacion }));
     }
 

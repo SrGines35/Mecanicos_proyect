@@ -1,4 +1,5 @@
 import { Component, OnInit, computed, inject, signal } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
@@ -88,9 +89,12 @@ export class Perfil implements OnInit {
     });
   }
 
-  protected get caracteresRestantes(): number {
-    return 200 - this.formulario.controls.descripcion.value.length;
-  }
+  private readonly textoDescripcion = toSignal(
+    this.formulario.controls.descripcion.valueChanges,
+    { initialValue: '' }
+  );
+
+  protected readonly caracteresRestantes = computed(() => 200 - this.textoDescripcion().length);
 
   protected mostrarError(campo: 'descripcion' | 'zonaTrabajo'): boolean {
     const control = this.formulario.controls[campo];

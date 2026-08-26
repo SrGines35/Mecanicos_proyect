@@ -1,6 +1,6 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { Injectable, inject, signal } from '@angular/core';
-import { Observable, delay, of, switchMap, tap } from 'rxjs';
+import { Observable, catchError, delay, map, of, switchMap, tap, throwError } from 'rxjs';
 
 import { environment } from '../../../environments/environment';
 import {
@@ -11,11 +11,7 @@ import {
 import { SesionService } from './sesion.service';
 import { SolicitudService } from './solicitud.service';
 
-const ESTADO_HACIA_BACK: Record<EstadoMecanico, string> = {
-  disponible: 'disponible',
-  ocupado: 'ocupado',
-  no_disponible: 'cerrado',
-};
+const RADIO_BUSQUEDA_METROS = 50000;
 
 @Injectable({ providedIn: 'root' })
 export class MecanicoService {
@@ -77,17 +73,25 @@ export class MecanicoService {
     return perfil ? { ...perfil, calificacion: this.promedioDe(perfil.usuarioId) } : null;
   }
 
+  private normalizar<T extends PerfilMecanico>(perfil: T): T {
+    return { ...perfil, calificacion: perfil.calificacion ? perfil.calificacion : null };
+  }
+
   cargarPerfil(): Observable<PerfilMecanico | null> {
-    if (!environment.usarApiReal) {
+    if (!environment.api.mecanicos) {
       return of(this.conPromedio(this.perfilSimulado)).pipe(
         delay(this.RETARDO_MS),
         tap((p) => this.perfil.set(p))
       );
     }
 
-    return this.http
-      .get<PerfilMecanico | null>(`${this.base}/profile/me`)
-      .pipe(tap((p) => this.perfil.set(p)));
+    return this.http.get<PerfilMecanico | null>(`${this.base}/profile/me`).pipe(
+      catchError((error: HttpErrorResponse) =>
+        error.status === 404 ? of(null) : throwError(() => error)
+      ),
+      map((p) => (p ? this.normalizar(p) : null)),
+      tap((p) => this.perfil.set(p))
+    );
   }
 
   guardarPerfil(datos: DatosPerfilMecanico): Observable<PerfilMecanico> {
@@ -97,7 +101,7 @@ export class MecanicoService {
       !this.perfilCompleto(previo) &&
       this.perfilCompleto({ ...(previo ?? this.perfilVacio()), ...datos });
 
-    if (!environment.usarApiReal) {
+    if (!environment.api.mecanicos) {
       const usuario = this.sesion.usuario();
 
       const actualizado: PerfilMecanico = {
@@ -121,7 +125,7 @@ export class MecanicoService {
       : this.http.post<PerfilMecanico>(`${this.base}/profile`, datos);
 
     return peticion.pipe(
-
+      map((p) => this.normalizar(p)),
       switchMap((p) => (seCompletoAhora ? this.cambiarEstado('disponible') : of(p))),
       tap((p) => this.perfil.set(p))
     );
@@ -140,7 +144,7 @@ export class MecanicoService {
   }
 
   cambiarEstado(estado: EstadoMecanico): Observable<PerfilMecanico> {
-    if (!environment.usarApiReal) {
+    if (!environment.api.mecanicos) {
       if (!this.perfilSimulado) {
         this.perfilSimulado = {
           usuarioId: this.sesion.usuario()?.id ?? 'sim',
@@ -161,14 +165,15 @@ export class MecanicoService {
     }
 
     return this.http
-      .patch<PerfilMecanico>(`${this.base}/profile/me`, {
-        estadoDisponibilidad: ESTADO_HACIA_BACK[estado],
-      })
-      .pipe(tap((p) => this.perfil.set(p)));
+      .patch<PerfilMecanico>(`${this.base}/profile/me`, { estadoDisponibilidad: estado })
+      .pipe(
+        map((p) => this.normalizar(p)),
+        tap((p) => this.perfil.set(p))
+      );
   }
 
   listarDisponibles(latitud?: number, longitud?: number): Observable<PerfilMecanico[]> {
-    if (!environment.usarApiReal) {
+    if (!environment.api.mecanicos) {
       const registrados = Object.values(this.leerPerfiles()).filter(
         (p) => p.estado === 'disponible' && this.perfilCompleto(p)
       );
@@ -177,9 +182,28 @@ export class MecanicoService {
         .pipe(delay(this.RETARDO_MS));
     }
 
-    return this.http.get<PerfilMecanico[]>(`${this.base}/nearby`, {
-      params: { lat: latitud ?? 0, lng: longitud ?? 0 },
-    });
+    return this.http
+      .get<PerfilMecanico[]>(`${this.base}/nearby`, {
+        params: {
+          lat: latitud ?? 0,
+          lng: longitud ?? 0,
+          radio: RADIO_BUSQUEDA_METROS,
+        },
+      })
+      .pipe(map((lista) => lista.map((p) => this.normalizar(p))));
+  }
+
+  datosDe(usuarioId: string): { nombre: string; telefono: string } | null {
+    const perfil = this.leerPerfiles()[usuarioId];
+
+    if (!perfil) {
+      return null;
+    }
+
+    return {
+      nombre: perfil.nombre ?? 'Mecánico',
+      telefono: perfil.telefono ?? '',
+    };
   }
 
   olvidarPerfil(usuarioId: string): void {

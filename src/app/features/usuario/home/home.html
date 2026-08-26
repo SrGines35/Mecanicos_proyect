@@ -31,7 +31,81 @@
         <dt>Falla</dt>
         <dd>{{ solicitud.descripcionFalla }}</dd>
       </div>
+
+      @if (mecanico(); as datos) {
+        <div class="datos__fila">
+          <dt>Mecánico</dt>
+          <dd>{{ datos.nombre }}</dd>
+        </div>
+
+        @if (datos.telefono) {
+          <div class="datos__fila">
+            <dt>Teléfono</dt>
+            <dd><a class="enlace-telefono" href="tel:{{ datos.telefono }}">{{ datos.telefono }}</a></dd>
+          </div>
+        }
+      }
     </dl>
+
+    @if (puedeCancelar()) {
+      @if (sinMecanicos() && !esperando()) {
+        <div class="sin-mecanicos">
+          <p class="sin-mecanicos__titulo">
+            Lo sentimos, por el momento no hay mecánicos cerca
+          </p>
+
+          <p class="texto-suave">
+            Ninguno de los mecánicos cercanos puede tomar tu solicitud ahorita.
+            Puedes seguir esperando a que alguno se desocupe, o cancelarla y
+            probar más tarde.
+          </p>
+
+          <button
+            type="button"
+            class="boton-primario"
+            [disabled]="insistiendo()"
+            (click)="seguirEsperando()"
+          >
+            @if (insistiendo()) {
+              <span class="cargador"></span>Buscando otra vez...
+            } @else {
+              Seguir esperando
+            }
+          </button>
+
+          <button
+            type="button"
+            class="boton-secundario"
+            [disabled]="cancelando()"
+            (click)="cancelarSolicitud()"
+          >
+            @if (cancelando()) {
+              <span class="cargador cargador--gris"></span>Cancelando...
+            } @else {
+              Cancelar solicitud
+            }
+          </button>
+        </div>
+      } @else {
+        <button
+          type="button"
+          class="boton-secundario"
+          [disabled]="cancelando()"
+          (click)="cancelarSolicitud()"
+        >
+          @if (cancelando()) {
+            <span class="cargador cargador--gris"></span>Cancelando...
+          } @else {
+            Cancelar solicitud
+          }
+        </button>
+
+        <p class="campo__ayuda">
+          Puedes cancelar mientras ningún mecánico haya aceptado. Una vez que alguien
+          la tome, ya no aparece esta opción.
+        </p>
+      }
+    }
   </section>
 } @else if (porCalificar(); as solicitud) {
   <section class="bloque">

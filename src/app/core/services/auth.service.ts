@@ -42,7 +42,7 @@ export class AuthService {
   registrar(datos: DatosRegistro): Observable<RespuestaAuth> {
     const limpios = { ...datos, password: datos.password.trim() };
 
-    if (!environment.usarApiReal) {
+    if (!environment.api.auth) {
       return this.registrarSimulado(limpios);
     }
 
@@ -54,7 +54,7 @@ export class AuthService {
   iniciarSesion(credenciales: Credenciales): Observable<RespuestaAuth> {
     const limpias = { ...credenciales, password: credenciales.password.trim() };
 
-    if (!environment.usarApiReal) {
+    if (!environment.api.auth) {
       return this.iniciarSesionSimulado(limpias);
     }
 
@@ -68,7 +68,7 @@ export class AuthService {
   }
 
   actualizarDatos(cambios: { telefono: string }): Observable<Usuario> {
-    if (!environment.usarApiReal) {
+    if (!environment.api.authMe) {
       const cuentas = this.cuentasSimuladas;
       const correo = this.sesion.usuario()?.correo?.toLowerCase();
       const cuenta = correo ? cuentas.get(correo) : undefined;
@@ -89,7 +89,7 @@ export class AuthService {
   }
 
   eliminarCuenta(): Observable<void> {
-    if (!environment.usarApiReal) {
+    if (!environment.api.authMe) {
       const cuentas = this.cuentasSimuladas;
       const correo = this.sesion.usuario()?.correo?.toLowerCase();
 

@@ -57,3 +57,14 @@
 .campo--ultimo {
   margin-bottom: 6px;
 }
+
+.campo input[readonly] {
+  border-color: transparent;
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--gris);
+  cursor: default;
+}
+
+.boton-secundario {
+  margin-top: 10px;
+}

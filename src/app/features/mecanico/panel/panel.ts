@@ -46,9 +46,15 @@ export class Panel implements OnInit {
 
   private readonly todas = signal<Solicitud[]>([]);
 
-  protected readonly solicitudes = computed(() =>
-    this.conDistancia(this.todas().filter((s) => s.estado === 'pendiente'))
-  );
+  protected readonly solicitudes = computed(() => {
+    const mio = this.sesion.usuario()?.id ?? '';
+
+    return this.conDistancia(
+      this.todas().filter(
+        (s) => s.estado === 'pendiente' && !(s.rechazadaPor ?? []).includes(mio)
+      )
+    );
+  });
 
   protected readonly enCurso = computed(() => {
     const mio = this.sesion.usuario()?.id;
