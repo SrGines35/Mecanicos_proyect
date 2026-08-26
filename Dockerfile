@@ -1,4 +1,4 @@
-# 1. Etapa de compilación
+# 1. Etapa de compilación de Angular
 FROM node:22-alpine AS builder
 WORKDIR /app
 COPY package*.json ./
@@ -6,17 +6,17 @@ RUN npm ci
 COPY . .
 RUN npm run build
 
-# 2. Etapa de producción usando un servidor http-server o serve bien configurado
+# 2. Etapa de producción
 FROM node:22-alpine
 WORKDIR /app
 
 # Instalamos serve globalmente
-RUn npm install -g serve
+RUN npm install -g serve
 
-# Copiamos la build de Angular a /app
-COPY --from=builder /app/dist/frontend /app
+# Copiamos exactamente la ruta que descubrimos que genera Angular
+COPY --from=builder /app/dist/frontend/browser /app/public
 
 EXPOSE 8080
 
-# Ejecutamos serve apuntando al directorio actual (.) donde está el index.html y los archivos compilados
-CMD ["serve", "-s", ".", "-l", "8080"]
+# Servimos exactamente la carpeta public en el puerto 8080
+CMD ["serve", "-s", "/app/public", "-l", "8080"]
