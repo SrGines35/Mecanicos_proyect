@@ -21,5 +21,6 @@ COPY --from=builder /app/dist /app/public
 # 6. Exponer puerto y correr el servidor estático
 # 6. Exponer puerto y correr el servidor estático en el puerto 8080 que pide Railway
 # 6. Exponer y escuchar el puerto dinámico que Railway asigna
+# 6. Exponer, listar carpetas para depurar y arrancar
 EXPOSE 8080
-CMD sh -c "PORT=${PORT:-8080} && (serve -s /app/dist/frontend/browser -l $PORT || serve -s /app/dist/browser -l $PORT || serve -s /app/dist -l $PORT)"
+CMD sh -c "echo '=== CONTENIDO DE DIST ===' && ls -R /app/dist && PORT=${PORT:-8080} && (serve -s /app/dist/frontend/browser -l $PORT || serve -s /app/dist/browser -l $PORT || serve -s /app/dist -l $PORT)"
